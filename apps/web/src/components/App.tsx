@@ -59,35 +59,12 @@ export function App() {
         {!callOpen && <CallAlexFAB onCall={openCall} />}
         {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} />}
       </div>
-
-      {/* Modals */}
-      <NewEstimateModal
-        open={modal === "new-estimate"}
-        onClose={() => setModal(null)}
-        onCreated={(est) => { openEstimateEditor(est); }}
-      />
-      <AddClientModal
-        open={modal === "add-client"}
-        onClose={() => setModal(null)}
-      />
-      <LogExpenseModal
-        open={modal === "log-expense"}
-        onClose={() => setModal(null)}
-      />
-      <UploadInvoiceModal
-        open={modal === "upload-invoice"}
-        onClose={() => setModal(null)}
-      />
-      <EditProfileModal
-        open={modal === "edit-profile"}
-        onClose={() => setModal(null)}
-        user={user}
-      />
-      <EstimateEditorModal
-        open={modal === "edit-estimate"}
-        onClose={() => { setModal(null); setEditingEstimate(null); }}
-        estimate={editingEstimate}
-      />
+      <NewEstimateModal open={modal === "new-estimate"} onClose={() => setModal(null)} onCreated={(est) => { openEstimateEditor(est); }} />
+      <AddClientModal open={modal === "add-client"} onClose={() => setModal(null)} />
+      <LogExpenseModal open={modal === "log-expense"} onClose={() => setModal(null)} />
+      <UploadInvoiceModal open={modal === "upload-invoice"} onClose={() => setModal(null)} />
+      <EditProfileModal open={modal === "edit-profile"} onClose={() => setModal(null)} user={user} />
+      <EstimateEditorModal open={modal === "edit-estimate"} onClose={() => { setModal(null); setEditingEstimate(null); }} estimate={editingEstimate} />
     </>
   );
 }

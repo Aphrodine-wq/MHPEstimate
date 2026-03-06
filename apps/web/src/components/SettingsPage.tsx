@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { isConnected } from "../lib/supabase";
 import { useCompanySettings, upsertSetting } from "../lib/store";

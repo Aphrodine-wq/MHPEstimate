@@ -1,5 +1,3 @@
-"use client";
-
 import { useEstimates } from "../lib/store";
 
 export function AnalyticsPage() {

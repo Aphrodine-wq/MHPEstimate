@@ -1,7 +1,4 @@
-"use client";
-
 import { useState, useEffect } from "react";
-
 const mhpLogo = "/mhp-logo.png";
 
 interface SplashScreenProps {

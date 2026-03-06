@@ -1,5 +1,3 @@
-"use client";
-
 import { useVoiceCalls } from "../lib/store";
 import { EmptyState } from "./EmptyState";
 

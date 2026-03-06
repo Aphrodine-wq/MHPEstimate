@@ -1,5 +1,3 @@
-"use client";
-
 import { useCurrentUser } from "../lib/store";
 
 export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {

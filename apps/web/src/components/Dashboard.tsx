@@ -1,5 +1,3 @@
-"use client";
-
 import { useEstimates, useActivityFeed } from "../lib/store";
 import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";

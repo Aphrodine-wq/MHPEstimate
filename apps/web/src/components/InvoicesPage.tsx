@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useInvoices } from "../lib/store";
 import { EmptyState } from "./EmptyState";

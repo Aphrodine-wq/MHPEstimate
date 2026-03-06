@@ -1,5 +1,3 @@
-"use client";
-
 import { useConversation } from "@elevenlabs/react";
 import { useCallback } from "react";
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";
@@ -459,7 +457,7 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
               <div className="flex items-center justify-center rounded-lg border border-dashed border-[var(--sep)] py-8">
                 <p className="text-[12px] text-[var(--tertiary)]">
                   No {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} line items yet.
-                  Click &quot;Add Row&quot; to start.
+                  Click "Add Row" to start.
                 </p>
               </div>
             ) : (

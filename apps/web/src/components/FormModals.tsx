@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";

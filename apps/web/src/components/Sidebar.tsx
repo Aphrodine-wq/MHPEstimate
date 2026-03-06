@@ -1,7 +1,4 @@
-"use client";
-
 import { useCurrentUser } from "../lib/store";
-
 const mhpLogo = "/mhp-logo.png";
 
 interface SidebarProps {
