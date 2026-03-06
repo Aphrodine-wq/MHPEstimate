@@ -1,10 +1,12 @@
-import { useEstimates, createEstimate } from "../lib/store";
+import { useEstimates, useActivityFeed } from "../lib/store";
+import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";
 import type { Estimate } from "@proestimate/shared/types";
 
 interface DashboardProps {
   onNavigate?: (page: string) => void;
   onCallAlex?: () => void;
+  onModal?: (m: string) => void;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -24,8 +26,69 @@ const STATUS_STYLE: Record<string, string> = {
   expired: "bg-[var(--gray5)] text-[var(--gray1)]",
 };
 
-export function Dashboard({ onNavigate, onCallAlex }: DashboardProps) {
-  const { data: estimates, loading, refresh } = useEstimates();
+const QUOTES = [
+  { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin" },
+  { text: "Quality means doing it right when no one is looking.", author: "Henry Ford" },
+  { text: "Measure twice, cut once.", author: "Proverb" },
+  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+  { text: "Excellence is not a skill. It is an attitude.", author: "Ralph Marston" },
+  { text: "The details are not the details. They make the design.", author: "Charles Eames" },
+  { text: "Build your reputation by helping other people build theirs.", author: "Anthony J. D'Angelo" },
+  { text: "A good plan today is better than a perfect plan tomorrow.", author: "George S. Patton" },
+  { text: "Price is what you pay. Value is what you get.", author: "Warren Buffett" },
+  { text: "The foundation of every state is the education of its youth.", author: "Diogenes" },
+  { text: "Vision without execution is hallucination.", author: "Thomas Edison" },
+  { text: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt" },
+  { text: "Building a house is about dreaming and finding a way to build that dream with your own hands.", author: "Kevin McCloud" },
+  { text: "Construction is a team sport.", author: "Matt Stevens" },
+  { text: "Safety is not a gadget but a state of mind.", author: "Eleanor Everet" },
+  { text: "Every accomplishment starts with the decision to try.", author: "John F. Kennedy" },
+  { text: "The strength of the team is each individual member.", author: "Phil Jackson" },
+  { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+  { text: "Well done is better than well said.", author: "Benjamin Franklin" },
+  { text: "Your most unhappy customers are your greatest source of learning.", author: "Bill Gates" },
+  { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
+  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
+  { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
+  { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
+  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
+];
+
+const ACTIVITY_COLORS: Record<ActivityEntry["type"], string> = {
+  estimate: "bg-[var(--accent)]",
+  client: "bg-[var(--green)]",
+  invoice: "bg-[var(--purple)]",
+  call: "bg-[var(--orange)]",
+};
+
+const ACTIVITY_TYPE_LABEL: Record<ActivityEntry["type"], string> = {
+  estimate: "Estimate",
+  client: "Client",
+  invoice: "Invoice",
+  call: "Call",
+};
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
+  const { data: estimates, loading } = useEstimates();
+  const activityEntries = useActivityFeed();
+
+  const todayQuote = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length]!;
 
   const sent = estimates.filter((e) => e.status === "sent" || e.status === "approved");
   const accepted = estimates.filter((e) => e.status === "accepted");
@@ -46,62 +109,120 @@ export function Dashboard({ onNavigate, onCallAlex }: DashboardProps) {
         </p>
       </header>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-4 gap-3 px-8 py-4">
-        <Metric label="Pipeline" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
-        <Metric label="Won" value={fmt(totalWon)} sub={`${accepted.length} accepted`} />
-        <Metric label="Avg Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "—"} sub="Target 35–42%" />
-        <Metric label="Drafts" value={drafts.length.toString()} sub="In progress" />
+      {/* KPIs row: 4 metrics + quote of the day */}
+      <div className="grid grid-cols-7 gap-3 px-8 py-4">
+        <div className="col-span-5 grid grid-cols-4 gap-3">
+          <Metric label="Pipeline" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
+          <Metric label="Won" value={fmt(totalWon)} sub={`${accepted.length} accepted`} />
+          <Metric label="Avg Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "—"} sub="Target 35–42%" />
+          <Metric label="Drafts" value={drafts.length.toString()} sub="In progress" />
+        </div>
+        <div className="col-span-2 flex flex-col rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Quote of the Day</p>
+          <div className="mt-2 flex flex-1 items-start gap-2">
+            <div className="mt-0.5 h-full w-[3px] flex-shrink-0 rounded-full bg-[var(--accent)]" />
+            <div className="min-w-0">
+              <p className="text-[13px] italic leading-snug text-[var(--label)]">{todayQuote.text}</p>
+              <p className="mt-1 text-[11px] text-[var(--secondary)]">— {todayQuote.author}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-5 gap-4 px-8 pb-6">
-        {/* Recent estimates */}
-        <div className="col-span-3 flex flex-col">
+      {/* Main content: left (estimates + actions/pipeline) + right (activity feed) */}
+      <div className="grid flex-1 grid-cols-7 gap-4 px-8 pb-6">
+        {/* Left column */}
+        <div className="col-span-5 flex flex-col gap-4">
+          {/* Recent estimates */}
+          <div className="flex flex-1 flex-col">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[13px] font-semibold">Recent Estimates</p>
+            </div>
+            <div className="flex-1 overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)]">
+              {loading ? (
+                <LoadingRows count={4} />
+              ) : estimates.length === 0 ? (
+                <div className="flex h-full items-center justify-center py-16">
+                  <p className="text-[13px] text-[var(--secondary)]">No estimates yet</p>
+                </div>
+              ) : (
+                estimates.slice(0, 8).map((est, i, arr) => (
+                  <EstimateRow key={est.id} estimate={est} last={i === arr.length - 1} />
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Quick Actions + Pipeline Breakdown */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="mb-2 text-[13px] font-semibold">Quick Actions</p>
+              <div className="space-y-2">
+                <ActionButton label="New Estimate" desc="Start from scratch" onClick={() => onModal?.("new-estimate")} />
+                <ActionButton label="Quick Ballpark" desc="Voice or manual entry" onClick={() => onCallAlex?.()} />
+                <ActionButton label="Upload Invoice" desc="Add supplier pricing" onClick={() => onModal?.("upload-invoice")} />
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-[13px] font-semibold">Pipeline</p>
+              <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
+                <p className="text-[22px] font-bold tracking-tight">{fmt(totalPipeline)}</p>
+                <p className="mb-4 text-[11px] text-[var(--secondary)]">Total pending value</p>
+                <div className="space-y-2">
+                  <PipelineRow label="Draft" count={estimates.filter((e) => e.status === "draft").length} total={estimates.length} />
+                  <PipelineRow label="In Review" count={estimates.filter((e) => e.status === "in_review").length} total={estimates.length} />
+                  <PipelineRow label="Sent" count={estimates.filter((e) => e.status === "sent").length} total={estimates.length} />
+                  <PipelineRow label="Approved" count={estimates.filter((e) => e.status === "approved").length} total={estimates.length} />
+                  <PipelineRow label="Accepted" count={accepted.length} total={estimates.length} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column: Activity Feed */}
+        <div className="col-span-2 flex flex-col">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-[13px] font-semibold">Recent Estimates</p>
+            <p className="text-[13px] font-semibold">Activity Feed</p>
           </div>
           <div className="flex-1 overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)]">
-            {loading ? (
-              <LoadingRows count={4} />
-            ) : estimates.length === 0 ? (
-              <div className="flex h-full items-center justify-center py-16">
-                <p className="text-[13px] text-[var(--secondary)]">No estimates yet</p>
-              </div>
-            ) : (
-              estimates.slice(0, 8).map((est, i, arr) => (
-                <EstimateRow key={est.id} estimate={est} last={i === arr.length - 1} />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Pipeline breakdown */}
-        <div className="col-span-2 flex flex-col gap-4">
-          <div>
-            <p className="mb-2 text-[13px] font-semibold">Pipeline</p>
-            <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-              <p className="text-[22px] font-bold tracking-tight">{fmt(totalPipeline)}</p>
-              <p className="mb-4 text-[11px] text-[var(--secondary)]">Total pending value</p>
-              <div className="space-y-2">
-                <PipelineRow label="Draft" count={estimates.filter((e) => e.status === "draft").length} total={estimates.length} />
-                <PipelineRow label="In Review" count={estimates.filter((e) => e.status === "in_review").length} total={estimates.length} />
-                <PipelineRow label="Sent" count={estimates.filter((e) => e.status === "sent").length} total={estimates.length} />
-                <PipelineRow label="Approved" count={estimates.filter((e) => e.status === "approved").length} total={estimates.length} />
-                <PipelineRow label="Accepted" count={accepted.length} total={estimates.length} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <p className="mb-2 text-[13px] font-semibold">Quick Actions</p>
-            <div className="space-y-2">
-              <ActionButton label="New Estimate" desc="Start from scratch" onClick={async () => { await createEstimate(); await refresh(); onNavigate?.("estimates"); }} />
-              <ActionButton label="Quick Ballpark" desc="Voice or manual entry" onClick={() => onCallAlex?.()} />
-              <ActionButton label="Upload Invoice" desc="Add supplier pricing" onClick={() => onNavigate?.("invoices")} />
-            </div>
+            <ActivityFeed entries={activityEntries} />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
+  if (entries.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center py-16">
+        <p className="text-[13px] text-[var(--secondary)]">No recent activity</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {entries.map((entry, i) => (
+        <div
+          key={entry.id}
+          className={`flex items-start gap-3 px-4 py-3 ${i < entries.length - 1 ? "border-b border-[var(--sep)]" : ""}`}
+        >
+          <div className="mt-1.5 flex-shrink-0">
+            <div className={`h-2 w-2 rounded-full ${ACTIVITY_COLORS[entry.type]}`} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] leading-snug truncate">{entry.description}</p>
+            <div className="mt-0.5 flex items-center gap-2">
+              <span className="text-[11px] text-[var(--secondary)]">{ACTIVITY_TYPE_LABEL[entry.type]}</span>
+              <span className="text-[11px] text-[var(--tertiary)]">{entry.action}</span>
+            </div>
+          </div>
+          <p className="flex-shrink-0 text-[11px] text-[var(--secondary)]">{timeAgo(entry.timestamp)}</p>
+        </div>
+      ))}
     </div>
   );
 }
