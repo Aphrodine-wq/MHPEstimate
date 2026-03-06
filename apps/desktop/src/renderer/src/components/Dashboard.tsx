@@ -147,7 +147,7 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
                 </div>
               ) : (
                 estimates.slice(0, 8).map((est, i, arr) => (
-                  <EstimateRow key={est.id} estimate={est} last={i === arr.length - 1} />
+                  <EstimateRow key={est.id} estimate={est} last={i === arr.length - 1} onNavigate={onNavigate} />
                 ))
               )}
             </div>
@@ -237,9 +237,12 @@ function Metric({ label, value, sub }: { label: string; value: string; sub: stri
   );
 }
 
-function EstimateRow({ estimate, last }: { estimate: Estimate; last: boolean }) {
+function EstimateRow({ estimate, last, onNavigate }: { estimate: Estimate; last: boolean; onNavigate?: (page: string) => void }) {
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 ${!last ? "border-b border-[var(--sep)]" : ""}`}>
+    <button
+      onClick={() => onNavigate?.("estimates")}
+      className={`flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[var(--bg)] ${!last ? "border-b border-[var(--sep)]" : ""}`}
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-[13px] font-medium truncate">{estimate.estimate_number}</p>
@@ -255,7 +258,7 @@ function EstimateRow({ estimate, last }: { estimate: Estimate; last: boolean }) 
           <p className="text-[11px] text-[var(--secondary)]">{Number(estimate.gross_margin_pct).toFixed(1)}%</p>
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
