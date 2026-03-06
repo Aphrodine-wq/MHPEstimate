@@ -11,11 +11,11 @@ import { SettingsPage } from "./components/SettingsPage";
 import { Profile } from "./components/Profile";
 import { CallAlexFAB, CallAlexPanel } from "./components/CallAlex";
 import { SplashScreen } from "./components/SplashScreen";
-import { NewEstimateModal, AddClientModal, AddProductModal, UploadInvoiceModal, EditProfileModal } from "./components/FormModals";
+import { NewEstimateModal, AddClientModal, LogExpenseModal, UploadInvoiceModal, EditProfileModal } from "./components/FormModals";
 import { EstimateEditorModal } from "./components/EstimateEditorModal";
 import { useCurrentUser } from "./lib/store";
 
-type ModalType = null | "new-estimate" | "add-client" | "add-product" | "upload-invoice" | "edit-profile" | "edit-estimate";
+type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
 
 const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }>> = {
   dashboard: Dashboard,
@@ -68,8 +68,8 @@ export function App() {
         open={modal === "add-client"}
         onClose={() => setModal(null)}
       />
-      <AddProductModal
-        open={modal === "add-product"}
+      <LogExpenseModal
+        open={modal === "log-expense"}
         onClose={() => setModal(null)}
       />
       <UploadInvoiceModal

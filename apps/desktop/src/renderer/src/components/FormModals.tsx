@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";
-import { createEstimate } from "../lib/store";
+import { createEstimate, useClients } from "../lib/store";
 
 /* ── New Estimate Modal ── */
 
@@ -14,9 +14,14 @@ interface NewEstimateModalProps {
 export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalProps) {
   const [projectType, setProjectType] = useState("General");
   const [address, setAddress] = useState("");
+  const [clientId, setClientId] = useState("");
   const [tier, setTier] = useState("better");
   const [notes, setNotes] = useState("");
+  const [validThrough, setValidThrough] = useState("");
+  const [scopeInclusions, setScopeInclusions] = useState("");
+  const [scopeExclusions, setScopeExclusions] = useState("");
   const [saving, setSaving] = useState(false);
+  const { data: clients } = useClients();
 
   const handleSubmit = async () => {
     setSaving(true);
@@ -25,8 +30,12 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
       await supabase.from("estimates").update({
         project_type: projectType,
         project_address: address || null,
+        client_id: clientId || null,
         tier,
         site_conditions: notes || null,
+        valid_through: validThrough || null,
+        scope_inclusions: scopeInclusions ? scopeInclusions.split("\n").filter(Boolean) : [],
+        scope_exclusions: scopeExclusions ? scopeExclusions.split("\n").filter(Boolean) : [],
       }).eq("id", est.id);
     }
     setSaving(false);
@@ -37,31 +46,50 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
   const resetAndClose = () => {
     setProjectType("General");
     setAddress("");
+    setClientId("");
     setTier("better");
     setNotes("");
+    setValidThrough("");
+    setScopeInclusions("");
+    setScopeExclusions("");
     onClose();
   };
 
   return (
     <Modal open={open} onClose={resetAndClose} title="New Estimate" description="Create a new construction estimate">
       <div className="space-y-4 px-6 py-5">
-        <Field label="Project Type">
-          <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className={selectClass}>
-            <option>General</option>
-            <option>Kitchen Remodel</option>
-            <option>Bathroom Remodel</option>
-            <option>Flooring</option>
-            <option>Roofing</option>
-            <option>Painting</option>
-            <option>Siding</option>
-            <option>Deck / Patio</option>
-            <option>Addition</option>
-            <option>Full Renovation</option>
-          </select>
-        </Field>
-        <Field label="Project Address">
-          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, City, State" className={inputClass} />
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Project Type">
+            <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className={selectClass}>
+              <option>General</option>
+              <option>Kitchen Remodel</option>
+              <option>Bathroom Remodel</option>
+              <option>Flooring</option>
+              <option>Roofing</option>
+              <option>Painting</option>
+              <option>Siding</option>
+              <option>Deck / Patio</option>
+              <option>Addition</option>
+              <option>Full Renovation</option>
+            </select>
+          </Field>
+          <Field label="Client">
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className={selectClass}>
+              <option value="">— No client —</option>
+              {clients?.map((c: any) => (
+                <option key={c.id} value={c.id}>{c.full_name}</option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Project Address">
+            <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, City, State" className={inputClass} />
+          </Field>
+          <Field label="Valid Through">
+            <input type="date" value={validThrough} onChange={(e) => setValidThrough(e.target.value)} className={inputClass} />
+          </Field>
+        </div>
         <Field label="Pricing Tier">
           <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
             {(["good", "better", "best"] as const).map((t) => (
@@ -70,6 +98,12 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
               </button>
             ))}
           </div>
+        </Field>
+        <Field label="Scope Inclusions">
+          <textarea value={scopeInclusions} onChange={(e) => setScopeInclusions(e.target.value)} placeholder="One per line: Material supply and installation..." rows={3} className={textareaClass} />
+        </Field>
+        <Field label="Scope Exclusions">
+          <textarea value={scopeExclusions} onChange={(e) => setScopeExclusions(e.target.value)} placeholder="One per line: Structural modifications..." rows={3} className={textareaClass} />
         </Field>
         <Field label="Site Conditions / Notes">
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any special conditions..." rows={3} className={textareaClass} />
@@ -168,83 +202,95 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
   );
 }
 
-/* ── Add Product Modal ── */
+/* ── Log Expense Modal ── */
 
-interface AddProductModalProps {
+interface LogExpenseModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function AddProductModal({ open, onClose }: AddProductModalProps) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("Flooring");
-  const [brand, setBrand] = useState("");
-  const [unit, setUnit] = useState("sq ft");
-  const [sku, setSku] = useState("");
-  const [tier, setTier] = useState("mid");
+export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
+  const [category, setCategory] = useState("Materials");
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+  const [vendor, setVendor] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [paymentMethod, setPaymentMethod] = useState("Company Card");
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
-    if (!name.trim() || !supabase) return;
+    if (!description.trim() || !amount || !supabase) return;
     setSaving(true);
-    await supabase.from("products").insert({
-      name: name.trim(),
-      category,
-      brand: brand || null,
-      unit,
-      sku_hd: sku || null,
-      tier,
-      is_active: true,
-    });
+    await supabase.from("company_settings").upsert({
+      key: `expense_${Date.now()}`,
+      value: {
+        category,
+        description: description.trim(),
+        amount: parseFloat(amount),
+        vendor: vendor || null,
+        date,
+        payment_method: paymentMethod,
+        notes: notes || null,
+        created_at: new Date().toISOString(),
+      },
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "key" });
     setSaving(false);
     resetAndClose();
   };
 
   const resetAndClose = () => {
-    setName(""); setBrand(""); setSku("");
+    setCategory("Materials");
+    setDescription("");
+    setAmount("");
+    setVendor("");
+    setDate(new Date().toISOString().split("T")[0]);
+    setPaymentMethod("Company Card");
+    setNotes("");
     onClose();
   };
 
   return (
-    <Modal open={open} onClose={resetAndClose} title="Add Product" description="Add a new product to the materials catalog">
+    <Modal open={open} onClose={resetAndClose} title="Log Expense" description="Record a business expense">
       <div className="space-y-4 px-6 py-5">
-        <Field label="Product Name *">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="LVP Flooring 7mm" className={inputClass} />
-        </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Category">
             <select value={category} onChange={(e) => setCategory(e.target.value)} className={selectClass}>
-              {["Flooring","Countertops","Cabinetry","Paint","Roofing","Lumber","Plumbing","Electrical","Hardware","Other"].map((c) => <option key={c}>{c}</option>)}
+              {["Materials", "Labor", "Equipment Rental", "Permits", "Fuel & Travel", "Office / Admin", "Insurance", "Subcontractor", "Tools", "Other"].map((c) => <option key={c}>{c}</option>)}
             </select>
           </Field>
-          <Field label="Unit">
-            <select value={unit} onChange={(e) => setUnit(e.target.value)} className={selectClass}>
-              {["sq ft","lin ft","each","bundle","gallon","sheet","box","roll","bag","ton"].map((u) => <option key={u}>{u}</option>)}
-            </select>
+          <Field label="Date">
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
           </Field>
         </div>
+        <Field label="Description *">
+          <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Lumber for framing — 2x4s" className={inputClass} />
+        </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Brand">
-            <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="LifeProof" className={inputClass} />
+          <Field label="Amount *">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[var(--secondary)]">$</span>
+              <input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className={`${inputClass} pl-7`} />
+            </div>
           </Field>
-          <Field label="HD SKU">
-            <input value={sku} onChange={(e) => setSku(e.target.value)} placeholder="SKU #" className={inputClass} />
+          <Field label="Vendor">
+            <input value={vendor} onChange={(e) => setVendor(e.target.value)} placeholder="Home Depot" className={inputClass} />
           </Field>
         </div>
-        <Field label="Tier">
-          <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
-            {(["budget", "mid", "premium"] as const).map((t) => (
-              <button key={t} onClick={() => setTier(t)} className={`flex-1 rounded-md py-1.5 text-[12px] font-medium capitalize transition-all ${tier === t ? "bg-[var(--card)] text-[var(--label)] shadow-sm" : "text-[var(--secondary)]"}`}>
-                {t}
-              </button>
-            ))}
-          </div>
+        <Field label="Payment Method">
+          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className={selectClass}>
+            {["Company Card", "Personal Card", "Cash", "Check", "ACH / Transfer", "Other"].map((m) => <option key={m}>{m}</option>)}
+          </select>
+        </Field>
+        <Field label="Notes">
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Receipt #, job reference, etc." rows={2} className={textareaClass} />
         </Field>
       </div>
       <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
         <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving || !name.trim()} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Saving…" : "Add Product"}
+        <button onClick={handleSubmit} disabled={saving || !description.trim() || !amount} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
+          {saving ? "Saving…" : "Log Expense"}
         </button>
       </div>
     </Modal>
@@ -263,6 +309,7 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
   const [invoiceNum, setInvoiceNum] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
   const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
@@ -280,7 +327,7 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
   };
 
   const resetAndClose = () => {
-    setSupplier(""); setInvoiceNum(""); setInvoiceDate(""); setFileName("");
+    setSupplier(""); setInvoiceNum(""); setInvoiceDate(""); setFileName(""); setFile(null);
     onClose();
   };
 
@@ -295,8 +342,11 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
             input.type = "file";
             input.accept = ".pdf,.png,.jpg,.jpeg";
             input.onchange = (e) => {
-              const file = (e.target as HTMLInputElement).files?.[0];
-              if (file) setFileName(file.name);
+              const f = (e.target as HTMLInputElement).files?.[0];
+              if (f) {
+                setFileName(f.name);
+                setFile(f);
+              }
             };
             input.click();
           }}
@@ -305,9 +355,16 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
           </svg>
           <p className="mt-2 text-[13px] font-medium text-[var(--secondary)]">
-            {fileName || "Click to select a file"}
+            {fileName ? `${fileName}` : "Click to select a file"}
           </p>
-          <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">PDF, PNG, or JPG</p>
+          {file && (
+            <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">
+              {(file.size / 1024).toFixed(0)} KB
+            </p>
+          )}
+          {!file && (
+            <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">PDF, PNG, or JPG</p>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Supplier Name">
