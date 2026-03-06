@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+out/
+.next/
+.turbo/
+
+# Electron
+apps/desktop/release/
+
+# Environment — NEVER commit secrets
+.env
+.env.*
+!.env.*.example
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Keys & credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+service-account*.json
+credentials*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Supabase
+supabase/.temp/
+supabase/.env
+
+# Test coverage
+coverage/
+*.lcov
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Misc
+.cache/
+*.tsbuildinfo

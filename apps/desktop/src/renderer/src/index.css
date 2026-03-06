@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --sep: rgba(60, 60, 67, 0.12);
+    --accent: #007aff;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --yellow: #ffcc00;
+    --purple: #af52de;
+    --teal: #5ac8fa;
+    --label: #000000;
+    --secondary: rgba(60, 60, 67, 0.6);
+    --tertiary: rgba(60, 60, 67, 0.3);
+    --fill: rgba(120, 120, 128, 0.2);
+    --gray1: #8e8e93;
+    --gray2: #aeaeb2;
+    --gray3: #c7c7cc;
+    --gray4: #d1d1d6;
+    --gray5: #e5e5ea;
+    --gray6: #f2f2f7;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--label);
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .drag { -webkit-app-region: drag; }
+  .no-drag { -webkit-app-region: no-drag; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray2); }
+
+  input, button, textarea { font-family: inherit; }
+}
