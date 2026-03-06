@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@elevenlabs/react": "^0.14.1",
     "@proestimate/estimation-engine": "workspace:*",
     "@proestimate/shared": "workspace:*",
     "@proestimate/ui": "workspace:*",

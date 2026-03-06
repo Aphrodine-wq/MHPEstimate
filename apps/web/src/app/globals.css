@@ -1,3 +1,84 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --sep: rgba(60, 60, 67, 0.12);
+    --accent: #007aff;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --yellow: #ffcc00;
+    --purple: #af52de;
+    --teal: #5ac8fa;
+    --label: #000000;
+    --secondary: rgba(60, 60, 67, 0.6);
+    --tertiary: rgba(60, 60, 67, 0.3);
+    --fill: rgba(120, 120, 128, 0.2);
+    --gray1: #8e8e93;
+    --gray2: #aeaeb2;
+    --gray3: #c7c7cc;
+    --gray4: #d1d1d6;
+    --gray5: #e5e5ea;
+    --gray6: #f2f2f7;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--label);
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .drag { -webkit-app-region: drag; }
+  .no-drag { -webkit-app-region: no-drag; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray2); }
+
+  input, button, textarea, select { font-family: inherit; }
+}
+
+/* ── Splash screen animations ── */
+
+@keyframes splash-logo {
+  0% { opacity: 0; transform: scale(0.8) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes splash-text {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes splash-bar {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-splash-logo { animation: splash-logo 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.animate-splash-text  { animation: splash-text 0.5s ease-out 0.35s both; }
+.animate-splash-bar   { animation: splash-bar 0.4s ease-out 0.55s both; }
+
+/* ── Modal animations ── */
+
+@keyframes modal-overlay {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes modal-content {
+  0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-modal-overlay { animation: modal-overlay 0.15s ease-out both; }
+.animate-modal-content { animation: modal-content 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
