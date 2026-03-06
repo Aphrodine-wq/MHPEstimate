@@ -17,7 +17,7 @@ export const estimateCreateSchema = z.object({
   client_id: z.string().uuid().optional().nullable(),
   project_type: z.string().min(1, "Project type is required"),
   project_address: z.string().optional().nullable(),
-  tier: z.enum(["good", "better", "best"]).default("better"),
+  tier: z.enum(["budget", "midrange", "high_end", "good", "better", "best"]).default("midrange"),
   source: z.enum(["manual", "voice", "template"]).default("manual"),
   scope_inclusions: z.array(z.string()).default([]),
   scope_exclusions: z.array(z.string()).default([]),

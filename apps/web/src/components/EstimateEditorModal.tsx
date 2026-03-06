@@ -53,7 +53,13 @@ const UNIT_OPTIONS = [
   "lot",
 ];
 
-const TIERS = ["good", "better", "best"] as const;
+const TIERS = ["budget", "midrange", "high_end"] as const;
+const TIER_LABELS: Record<string, string> = { budget: "Budget", midrange: "Midrange", high_end: "High End" };
+const TIER_DESC: Record<string, string> = {
+  budget: "Economy-grade materials, basic finishes, cost-effective labor",
+  midrange: "Quality brand-name materials, standard upgrades, professional finishes",
+  high_end: "Premium designer-grade materials, custom craftsmanship, luxury finishes",
+};
 
 const TABS = [
   { key: "material", label: "Materials" },
@@ -94,7 +100,11 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
   /* Header state */
   const [projectType, setProjectType] = useState("General");
   const [clientId, setClientId] = useState<string | null>(null);
-  const [tier, setTier] = useState<(typeof TIERS)[number]>("better");
+  const [tier, setTier] = useState<(typeof TIERS)[number]>("midrange");
+  const normalizeTier = (t: string): (typeof TIERS)[number] => {
+    const map: Record<string, (typeof TIERS)[number]> = { good: "budget", better: "midrange", best: "high_end" };
+    return map[t] ?? (TIERS.includes(t as any) ? t as (typeof TIERS)[number] : "midrange");
+  };
   const [projectAddress, setProjectAddress] = useState("");
   const [validThrough, setValidThrough] = useState("");
 
@@ -117,7 +127,7 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
     if (!open || !estimate) return;
     setProjectType(estimate.project_type ?? "General");
     setClientId(estimate.client_id);
-    setTier(estimate.tier ?? "better");
+    setTier(normalizeTier(estimate.tier ?? "midrange"));
     setProjectAddress(estimate.project_address ?? "");
     setValidThrough(estimate.valid_through ? estimate.valid_through.slice(0, 10) : "");
     setSiteConditions(estimate.site_conditions ?? "");
@@ -357,16 +367,17 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
                     key={t}
                     type="button"
                     onClick={() => setTier(t)}
-                    className={`flex-1 rounded-md px-2 py-1.5 text-[12px] font-medium capitalize transition-all ${
+                    className={`flex-1 rounded-md px-2 py-1.5 text-[12px] font-medium transition-all ${
                       tier === t
                         ? "bg-[var(--card)] text-[var(--label)] shadow-sm"
                         : "text-[var(--secondary)]"
                     }`}
                   >
-                    {t}
+                    {TIER_LABELS[t]}
                   </button>
                 ))}
               </div>
+              <p className="mt-1 text-[10px] text-[var(--tertiary)]">{TIER_DESC[tier]}</p>
             </Field>
           </div>
 

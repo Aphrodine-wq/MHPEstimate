@@ -6,8 +6,7 @@ export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCa
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-8 pt-6 pb-1">
-        <h1 className="text-[24px] font-bold tracking-tight">Profile</h1>
+      <header className="px-8 pt-4 pb-1">
         <p className="text-[12px] text-[var(--secondary)]">Account and preferences</p>
       </header>
 

@@ -22,12 +22,9 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="flex items-center justify-between px-8 pt-6 pb-1">
-        <div>
-          <h1 className="text-[24px] font-bold tracking-tight">Invoices</h1>
-          <p className="text-[12px] text-[var(--secondary)]">{invoices.length} uploaded invoices</p>
-        </div>
-        <button onClick={() => onModal?.("upload-invoice")} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
+      <header className="flex items-center justify-between px-8 pt-4 pb-1">
+        <p className="text-[12px] text-[var(--secondary)]">{invoices.length} uploaded invoices</p>
+        <button onClick={() => onModal?.("upload-invoice")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
           Upload Invoice
         </button>
       </header>

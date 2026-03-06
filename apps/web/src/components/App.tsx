@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
 import { Dashboard } from "./Dashboard";
 import { EstimatesList } from "./EstimatesList";
 import { MaterialsPage } from "./MaterialsPage";
@@ -18,6 +19,18 @@ import { EstimateEditorModal } from "./EstimateEditorModal";
 import { useCurrentUser } from "../lib/store";
 
 type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
+
+const PAGE_TITLES: Record<string, string> = {
+  dashboard: "Dashboard",
+  estimates: "Estimates",
+  materials: "Materials",
+  invoices: "Invoices",
+  clients: "Clients",
+  calls: "Call History",
+  analytics: "Analytics",
+  settings: "Settings",
+  profile: "Profile",
+};
 
 const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }>> = {
   dashboard: Dashboard,
@@ -53,9 +66,17 @@ export function App() {
       {!booted && <SplashScreen onReady={handleReady} />}
       <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
         <Sidebar active={active} onNavigate={setActive} />
-        <main className="flex-1 overflow-hidden">
-          <Page onNavigate={setActive} onCallAlex={openCall} onModal={(m) => setModal(m as ModalType)} onEditEstimate={openEstimateEditor} />
-        </main>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <TopBar
+            title={PAGE_TITLES[active] ?? "Dashboard"}
+            onModal={(m) => setModal(m as ModalType)}
+            onNavigate={setActive}
+            user={user}
+          />
+          <main className="flex-1 overflow-hidden">
+            <Page onNavigate={setActive} onCallAlex={openCall} onModal={(m) => setModal(m as ModalType)} onEditEstimate={openEstimateEditor} />
+          </main>
+        </div>
         {!callOpen && <CallAlexFAB onCall={openCall} />}
         {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} />}
       </div>

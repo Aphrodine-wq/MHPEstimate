@@ -26,11 +26,14 @@ const FILTER_MAP: Record<string, string> = {
   Approved: "approved", Accepted: "accepted", Declined: "declined",
 };
 
+const PAGE_SIZE = 25;
+
 export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }) {
   const { data: estimates, loading } = useEstimates();
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   const filtered = estimates.filter((e) => {
     if (filter !== "All" && e.status !== FILTER_MAP[filter]) return false;
@@ -45,16 +48,17 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
     return true;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const paged = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   const detail = selected ? estimates.find((e) => e.id === selected) : null;
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between px-8 pt-6 pb-1">
-        <div>
-          <h1 className="text-[24px] font-bold tracking-tight">Estimates</h1>
-          <p className="text-[12px] text-[var(--secondary)]">{estimates.length} total</p>
-        </div>
-        <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
+      <header className="flex items-center justify-between px-8 pt-4 pb-1">
+        <p className="text-[12px] text-[var(--secondary)]">{estimates.length} total estimates</p>
+        <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
           New Estimate
         </button>
       </header>
@@ -103,32 +107,68 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
               onAction={() => onModal?.("new-estimate")}
             />
           ) : (
-            filtered.map((est, i, arr) => (
-              <button
-                key={est.id}
-                onClick={() => setSelected(est.id === selected ? null : est.id)}
-                className={`flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
-                  est.id === selected ? "bg-[var(--accent)]/5" : "hover:bg-[var(--bg)]"
-                } ${i < arr.length - 1 ? "border-b border-[var(--sep)]" : ""}`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[13px] font-medium truncate">{est.estimate_number}</p>
-                    <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[est.status] ?? ""}`}>
-                      {STATUS_LABEL[est.status] ?? est.status}
-                    </span>
+            <>
+              {paged.map((est, i, arr) => (
+                <button
+                  key={est.id}
+                  onClick={() => setSelected(est.id === selected ? null : est.id)}
+                  className={`flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                    est.id === selected ? "bg-[var(--accent)]/5" : "hover:bg-[var(--bg)]"
+                  } ${i < arr.length - 1 ? "border-b border-[var(--sep)]" : ""}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[13px] font-medium truncate">{est.estimate_number}</p>
+                      <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[est.status] ?? ""}`}>
+                        {STATUS_LABEL[est.status] ?? est.status}
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-[var(--secondary)] truncate">{est.project_type}</p>
+                    <p className="text-[11px] text-[var(--tertiary)] truncate">{est.project_address}</p>
                   </div>
-                  <p className="text-[12px] text-[var(--secondary)] truncate">{est.project_type}</p>
-                  <p className="text-[11px] text-[var(--tertiary)] truncate">{est.project_address}</p>
+                  <div className="flex-shrink-0 text-right">
+                    <p className="text-[14px] font-semibold">${Number(est.grand_total).toLocaleString()}</p>
+                    {est.gross_margin_pct != null && (
+                      <p className="text-[11px] text-[var(--secondary)]">{Number(est.gross_margin_pct).toFixed(1)}%</p>
+                    )}
+                  </div>
+                </button>
+              ))}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-[var(--sep)] px-4 py-2.5">
+                  <p className="text-[11px] text-[var(--secondary)]">
+                    {safePage * PAGE_SIZE + 1}–{Math.min((safePage + 1) * PAGE_SIZE, filtered.length)} of {filtered.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setPage(Math.max(0, safePage - 1))}
+                      disabled={safePage === 0}
+                      className="rounded-md px-2 py-1 text-[11px] font-medium transition-colors hover:bg-[var(--bg)] disabled:opacity-30"
+                    >
+                      Prev
+                    </button>
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`h-6 w-6 rounded-md text-[11px] font-medium transition-colors ${
+                          i === safePage ? "bg-[var(--accent)] text-white" : "hover:bg-[var(--bg)]"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
+                      disabled={safePage >= totalPages - 1}
+                      className="rounded-md px-2 py-1 text-[11px] font-medium transition-colors hover:bg-[var(--bg)] disabled:opacity-30"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-                <div className="flex-shrink-0 text-right">
-                  <p className="text-[14px] font-semibold">${Number(est.grand_total).toLocaleString()}</p>
-                  {est.gross_margin_pct != null && (
-                    <p className="text-[11px] text-[var(--secondary)]">{Number(est.gross_margin_pct).toFixed(1)}%</p>
-                  )}
-                </div>
-              </button>
-            ))
+              )}
+            </>
           )}
         </div>
 
@@ -162,7 +202,7 @@ function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate
 
       <Section title="Details">
         <Row label="Address" value={estimate.project_address ?? "—"} />
-        <Row label="Tier" value={estimate.tier} />
+        <Row label="Tier" value={({ budget: "Budget", midrange: "Midrange", high_end: "High End", good: "Budget", better: "Midrange", best: "High End" } as Record<string, string>)[estimate.tier] ?? estimate.tier} />
         <Row label="Source" value={estimate.source} />
       </Section>
 

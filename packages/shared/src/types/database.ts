@@ -44,7 +44,7 @@ export type EstimateStatus =
   | "declined"
   | "expired";
 
-export type EstimateTier = "good" | "better" | "best";
+export type EstimateTier = "budget" | "midrange" | "high_end" | "good" | "better" | "best";
 export type EstimateSource = "manual" | "voice" | "template";
 
 export interface Estimate {

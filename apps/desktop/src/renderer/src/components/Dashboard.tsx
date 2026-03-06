@@ -101,18 +101,24 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-8 pt-6 pb-1">
-        <h1 className="text-[24px] font-bold tracking-tight">Dashboard</h1>
-        <p className="text-[12px] text-[var(--secondary)]">
-          {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-          {!isConnected() && " — Supabase not connected"}
-        </p>
+      <header className="flex items-center justify-between px-8 pt-5 pb-1">
+        <div>
+          <p className="text-[12px] text-[var(--secondary)]">
+            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            {!isConnected() && " -- Supabase not connected"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
+            New Estimate
+          </button>
+        </div>
       </header>
 
       {/* KPIs row: 4 metrics + quote of the day */}
       <div className="grid grid-cols-7 gap-3 px-8 py-4">
         <div className="col-span-5 grid grid-cols-4 gap-3">
-          <Metric label="Pipeline" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
+          <Metric label="Estimate Tracker" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
           <Metric label="Won" value={fmt(totalWon)} sub={`${accepted.length} accepted`} />
           <Metric label="Avg Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "—"} sub="Target 35–42%" />
           <Metric label="Drafts" value={drafts.length.toString()} sub="In progress" />
@@ -164,7 +170,7 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
               </div>
             </div>
             <div>
-              <p className="mb-2 text-[13px] font-semibold">Pipeline</p>
+              <p className="mb-2 text-[13px] font-semibold">Estimate Tracker</p>
               <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
                 <p className="text-[22px] font-bold tracking-tight">{fmt(totalPipeline)}</p>
                 <p className="mb-4 text-[11px] text-[var(--secondary)]">Total pending value</p>

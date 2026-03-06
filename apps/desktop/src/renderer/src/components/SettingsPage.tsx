@@ -11,8 +11,7 @@ export function SettingsPage() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-8 pt-6 pb-1">
-        <h1 className="text-[24px] font-bold tracking-tight">Settings</h1>
+      <header className="px-8 pt-4 pb-1">
         <p className="text-[12px] text-[var(--secondary)]">Company configuration and preferences</p>
       </header>
 
@@ -80,13 +79,14 @@ function EstimatesTab({ settings }: { settings: Record<string, any> }) {
           label="Default Pricing Tier"
           settingKey="default_tier"
           settings={settings}
-          options={["good", "better", "best"]}
-          defaultValue="better"
+          options={["budget", "midrange", "high_end"]}
+          defaultValue="midrange"
+          labels={{ budget: "Budget", midrange: "Midrange", high_end: "High End" }}
         />
         <EditableRow label="Estimate Validity Days" settingKey="valid_for_days" settings={settings} defaultValue={30} type="number" />
         <EditableRow label="Target Gross Margin %" settingKey="target_margin" settings={settings} defaultValue="35-42" />
       </Group>
-      <Group title="Templates">
+      <Group title="Uploaded Documents">
         <EditableRow label="Payment Terms" settingKey="payment_terms" settings={settings} multiline />
         <EditableRow label="Warranty Text" settingKey="warranty_text" settings={settings} multiline />
         <EditableRow label="Default Scope Inclusions" settingKey="scope_inclusions_template" settings={settings} multiline />
@@ -216,12 +216,14 @@ function SegmentedRow({
   settingKey,
   settings,
   options,
+  labels,
   defaultValue,
 }: {
   label: string;
   settingKey: string;
   settings: Record<string, any>;
   options: string[];
+  labels?: Record<string, string>;
   defaultValue: string;
 }) {
   const current = (settings[settingKey] as string) ?? defaultValue;
@@ -232,24 +234,35 @@ function SegmentedRow({
     }
   };
 
+  const TIER_DESC: Record<string, string> = {
+    budget: "Economy-grade materials, basic finishes, cost-effective labor. Best for rental properties, quick flips, or tight budgets.",
+    midrange: "Quality brand-name materials, standard upgrades, professional finishes. The most popular choice for homeowner renovations.",
+    high_end: "Premium and designer-grade materials, custom craftsmanship, luxury finishes. For high-end homes and clients who want the best.",
+  };
+
   return (
-    <div className="flex items-center justify-between px-4 py-3">
-      <p className="text-[13px]">{label}</p>
-      <div className="inline-flex rounded-md bg-[var(--gray5)] p-0.5">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => select(opt)}
-            className={`rounded px-3 py-1 text-[12px] font-medium capitalize transition-colors ${
-              current === opt
-                ? "bg-[var(--card)] text-[var(--foreground)] shadow-sm"
-                : "text-[var(--secondary)] hover:text-[var(--foreground)]"
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
+    <div className="px-4 py-3">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px]">{label}</p>
+        <div className="inline-flex rounded-md bg-[var(--gray5)] p-0.5">
+          {options.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => select(opt)}
+              className={`rounded px-3 py-1 text-[12px] font-medium transition-colors ${
+                current === opt
+                  ? "bg-[var(--card)] text-[var(--foreground)] shadow-sm"
+                  : "text-[var(--secondary)] hover:text-[var(--foreground)]"
+              }`}
+            >
+              {labels?.[opt] ?? opt}
+            </button>
+          ))}
+        </div>
       </div>
+      {TIER_DESC[current] && (
+        <p className="mt-1.5 text-[11px] text-[var(--secondary)]">{TIER_DESC[current]}</p>
+      )}
     </div>
   );
 }

@@ -1,7 +1,10 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, Menu, ipcMain } from "electron";
 import path from "path";
 
 function createWindow() {
+  // Remove the default menu bar (File, Edit, View, Window, Help)
+  Menu.setApplicationMenu(null);
+
   const mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -12,7 +15,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    titleBarStyle: "hiddenInset",
+    frame: false,
     title: "ProEstimate AI",
     icon: path.join(__dirname, "../../build/icon.png"),
   });

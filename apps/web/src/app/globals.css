@@ -31,16 +31,12 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     background: var(--bg);
     color: var(--label);
     margin: 0;
     overflow: hidden;
-    user-select: none;
   }
-
-  .drag { -webkit-app-region: drag; }
-  .no-drag { -webkit-app-region: no-drag; }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }

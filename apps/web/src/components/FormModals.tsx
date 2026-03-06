@@ -15,7 +15,7 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
   const [projectType, setProjectType] = useState("General");
   const [address, setAddress] = useState("");
   const [clientId, setClientId] = useState("");
-  const [tier, setTier] = useState("better");
+  const [tier, setTier] = useState("midrange");
   const [notes, setNotes] = useState("");
   const [validThrough, setValidThrough] = useState("");
   const [scopeInclusions, setScopeInclusions] = useState("");
@@ -47,7 +47,7 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
     setProjectType("General");
     setAddress("");
     setClientId("");
-    setTier("better");
+    setTier("midrange");
     setNotes("");
     setValidThrough("");
     setScopeInclusions("");
@@ -92,12 +92,17 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
         </div>
         <Field label="Pricing Tier">
           <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
-            {(["good", "better", "best"] as const).map((t) => (
-              <button key={t} onClick={() => setTier(t)} className={`flex-1 rounded-md py-1.5 text-[12px] font-medium capitalize transition-all ${tier === t ? "bg-[var(--card)] text-[var(--label)] shadow-sm" : "text-[var(--secondary)]"}`}>
-                {t}
+            {([["budget", "Budget"], ["midrange", "Midrange"], ["high_end", "High End"]] as const).map(([val, label]) => (
+              <button key={val} onClick={() => setTier(val)} className={`flex-1 rounded-md py-1.5 text-[12px] font-medium transition-all ${tier === val ? "bg-[var(--card)] text-[var(--label)] shadow-sm" : "text-[var(--secondary)]"}`}>
+                {label}
               </button>
             ))}
           </div>
+          <p className="mt-1.5 text-[11px] text-[var(--secondary)]">
+            {tier === "budget" && "Economy-grade materials, basic finishes, cost-effective labor. Best for rental properties, quick flips, or tight budgets."}
+            {tier === "midrange" && "Quality brand-name materials, standard upgrades, professional finishes. The most popular choice for homeowner renovations."}
+            {tier === "high_end" && "Premium and designer-grade materials, custom craftsmanship, luxury finishes. For high-end homes and clients who want the best."}
+          </p>
         </Field>
         <Field label="Scope Inclusions">
           <textarea value={scopeInclusions} onChange={(e) => setScopeInclusions(e.target.value)} placeholder="One per line: Material supply and installation..." rows={3} className={textareaClass} />
