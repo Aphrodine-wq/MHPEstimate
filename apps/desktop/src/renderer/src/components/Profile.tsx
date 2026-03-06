@@ -1,6 +1,6 @@
 import { useCurrentUser } from "../lib/store";
 
-export function Profile() {
+export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
   const { user, loading } = useCurrentUser();
   const initials = user ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2) : "—";
 
@@ -22,7 +22,7 @@ export function Profile() {
             <p className="text-[13px] text-[var(--secondary)]">{user?.role ?? "Connect Supabase to sign in"}</p>
             {user && <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">Member since {new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>}
           </div>
-          <button className="rounded-lg border border-[var(--sep)] px-3 py-1.5 text-[13px] font-medium text-[var(--accent)] transition-colors hover:bg-[var(--bg)]">
+          <button onClick={() => onModal?.("edit-profile")} className="rounded-lg border border-[var(--sep)] px-3 py-1.5 text-[13px] font-medium text-[var(--accent)] transition-colors hover:bg-[var(--bg)]">
             Edit
           </button>
         </div>

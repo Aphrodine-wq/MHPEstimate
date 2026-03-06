@@ -47,5 +47,38 @@
   ::-webkit-scrollbar-thumb { background: var(--gray4); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--gray2); }
 
-  input, button, textarea { font-family: inherit; }
+  input, button, textarea, select { font-family: inherit; }
 }
+
+/* ── Splash screen animations ── */
+
+@keyframes splash-logo {
+  0% { opacity: 0; transform: scale(0.8) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes splash-text {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes splash-bar {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-splash-logo { animation: splash-logo 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.animate-splash-text  { animation: splash-text 0.5s ease-out 0.35s both; }
+.animate-splash-bar   { animation: splash-bar 0.4s ease-out 0.55s both; }
+
+/* ── Modal animations ── */
+
+@keyframes modal-overlay {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes modal-content {
+  0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-modal-overlay { animation: modal-overlay 0.15s ease-out both; }
+.animate-modal-content { animation: modal-content 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }

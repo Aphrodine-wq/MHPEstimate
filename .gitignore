@@ -51,6 +51,11 @@ supabase/.env
 coverage/
 *.lcov
 
+# Playwright
+playwright-report/
+test-results/
+tests/.auth/
+
 # Debug
 npm-debug.log*
 pnpm-debug.log*

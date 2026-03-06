@@ -3,7 +3,7 @@ import { useClients } from "../lib/store";
 import { EmptyState } from "./EmptyState";
 import type { Client } from "@proestimate/shared/types";
 
-export function ClientsPage() {
+export function ClientsPage({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
   const { data: clients, loading } = useClients();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function ClientsPage() {
           <h1 className="text-[24px] font-bold tracking-tight">Clients</h1>
           <p className="text-[12px] text-[var(--secondary)]">{clients.length} clients</p>
         </div>
-        <button className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
+        <button onClick={() => onModal?.("add-client")} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
           Add Client
         </button>
       </header>
