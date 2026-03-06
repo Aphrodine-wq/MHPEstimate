@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useEstimates, createEstimate } from "../lib/store";
+import { useEstimates } from "../lib/store";
 import { EmptyState } from "./EmptyState";
 import type { Estimate } from "@proestimate/shared/types";
 
@@ -26,13 +26,8 @@ const FILTER_MAP: Record<string, string> = {
   Approved: "approved", Accepted: "accepted", Declined: "declined",
 };
 
-export function EstimatesList() {
-  const { data: estimates, loading, refresh } = useEstimates();
-
-  const handleNewEstimate = async () => {
-    await createEstimate();
-    await refresh();
-  };
+export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }) {
+  const { data: estimates, loading } = useEstimates();
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -59,7 +54,7 @@ export function EstimatesList() {
           <h1 className="text-[24px] font-bold tracking-tight">Estimates</h1>
           <p className="text-[12px] text-[var(--secondary)]">{estimates.length} total</p>
         </div>
-        <button onClick={handleNewEstimate} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
+        <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97]">
           New Estimate
         </button>
       </header>
@@ -105,7 +100,7 @@ export function EstimatesList() {
               title="No estimates found"
               description={search || filter !== "All" ? "Try adjusting your filters" : "Create your first estimate to get started"}
               action={!search && filter === "All" ? "New Estimate" : undefined}
-              onAction={handleNewEstimate}
+              onAction={() => onModal?.("new-estimate")}
             />
           ) : (
             filtered.map((est, i, arr) => (
@@ -139,7 +134,7 @@ export function EstimatesList() {
 
         {detail && (
           <div className="ml-3 w-[45%] overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)] p-5">
-            <DetailPanel estimate={detail} onClose={() => setSelected(null)} />
+            <DetailPanel estimate={detail} onClose={() => setSelected(null)} onEditEstimate={onEditEstimate} />
           </div>
         )}
       </div>
@@ -147,7 +142,7 @@ export function EstimatesList() {
   );
 }
 
-function DetailPanel({ estimate, onClose }: { estimate: Estimate; onClose: () => void }) {
+function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate; onClose: () => void; onEditEstimate?: (estimate: any) => void }) {
   return (
     <div>
       <div className="flex items-start justify-between mb-4">
@@ -193,7 +188,7 @@ function DetailPanel({ estimate, onClose }: { estimate: Estimate; onClose: () =>
       </Section>
 
       <div className="mt-4 space-y-2">
-        <button className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-[13px] font-medium text-white transition-all active:scale-[0.99]">
+        <button onClick={() => onEditEstimate?.(estimate)} className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-[13px] font-medium text-white transition-all active:scale-[0.99]">
           Open Estimate
         </button>
         <div className="flex gap-2">
