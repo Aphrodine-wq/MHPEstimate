@@ -1,6 +1,10 @@
 [project]
 id = "proestimate-ai"
 
+[auth]
+site_url = "https://mhpestimate.cloud"
+additional_redirect_urls = ["https://mhpestimate.cloud/**"]
+
 [api]
 port = 54321
 

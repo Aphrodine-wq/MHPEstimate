@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ProEstimate AI",
+  metadataBase: new URL("https://mhpestimate.cloud"),
+  title: "MHP Estimate",
   description: "AI-powered estimation platform for MHP Construction",
 };
 
