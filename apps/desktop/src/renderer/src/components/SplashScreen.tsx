@@ -12,7 +12,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
   useEffect(() => {
     let frame: number;
     let start: number | null = null;
-    const duration = 2200;
+    const duration = 1000;
 
     function tick(ts: number) {
       if (!start) start = ts;
@@ -26,14 +26,14 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
         frame = requestAnimationFrame(tick);
       } else {
         setPhase("done");
-        setTimeout(onReady, 600);
+        setTimeout(onReady, 300);
       }
     }
 
     // Small delay before starting the bar
     const t = setTimeout(() => {
       frame = requestAnimationFrame(tick);
-    }, 400);
+    }, 200);
 
     return () => {
       clearTimeout(t);

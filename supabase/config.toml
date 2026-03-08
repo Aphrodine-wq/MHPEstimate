@@ -1,9 +1,11 @@
-[project]
-id = "proestimate-ai"
-
 [auth]
 site_url = "https://mhpestimate.cloud"
-additional_redirect_urls = ["https://mhpestimate.cloud/**"]
+additional_redirect_urls = ["https://mhpestimate.cloud/auth/callback", "http://localhost:3000/auth/callback", "proestimate://auth/callback"]
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
 
 [api]
 port = 54321

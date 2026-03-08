@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useProducts } from "../lib/store";
 import { EmptyState } from "./EmptyState";
-import { PRICE_FRESHNESS_THRESHOLDS } from "@proestimate/shared/constants";
-
 const CATEGORIES = ["All", "Flooring", "Countertops", "Cabinetry", "Paint", "Roofing", "Lumber", "Plumbing", "Electrical"];
 
 export function MaterialsPage({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
@@ -10,14 +8,14 @@ export function MaterialsPage({ onModal }: { onNavigate?: (page: string) => void
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
-  const filtered = products.filter((p) => {
+  const filtered = useMemo(() => products.filter((p) => {
     if (category !== "All" && p.category.toLowerCase() !== category.toLowerCase()) return false;
     if (search) {
       const q = search.toLowerCase();
       return p.name.toLowerCase().includes(q) || (p.brand ?? "").toLowerCase().includes(q) || (p.sku_hd ?? "").includes(q);
     }
     return true;
-  });
+  }), [products, category, search]);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">

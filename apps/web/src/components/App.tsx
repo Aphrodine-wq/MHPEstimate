@@ -1,24 +1,42 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
-import { Dashboard } from "./Dashboard";
-import { EstimatesList } from "./EstimatesList";
-import { MaterialsPage } from "./MaterialsPage";
-import { InvoicesPage } from "./InvoicesPage";
-import { ClientsPage } from "./ClientsPage";
-import { CallHistoryPage } from "./CallHistoryPage";
-import { AnalyticsPage } from "./AnalyticsPage";
-import { SettingsPage } from "./SettingsPage";
-import { Profile } from "./Profile";
-import { CallAlexFAB, CallAlexPanel } from "./CallAlex";
+import dynamic from "next/dynamic";
+import type { Estimate } from "@proestimate/shared/types";
+
+function PageSkeleton() {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--sep)] border-t-[var(--accent)]" />
+    </div>
+  );
+}
+
+const Dashboard = dynamic(() => import("./Dashboard").then(m => ({ default: m.Dashboard })), { ssr: false, loading: () => <PageSkeleton /> });
+const EstimatesList = dynamic(() => import("./EstimatesList").then(m => ({ default: m.EstimatesList })), { ssr: false, loading: () => <PageSkeleton /> });
+const MaterialsPage = dynamic(() => import("./MaterialsPage").then(m => ({ default: m.MaterialsPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const InvoicesPage = dynamic(() => import("./InvoicesPage").then(m => ({ default: m.InvoicesPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const ClientsPage = dynamic(() => import("./ClientsPage").then(m => ({ default: m.ClientsPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const CallHistoryPage = dynamic(() => import("./CallHistoryPage").then(m => ({ default: m.CallHistoryPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const AnalyticsPage = dynamic(() => import("./AnalyticsPage").then(m => ({ default: m.AnalyticsPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const SettingsPage = dynamic(() => import("./SettingsPage").then(m => ({ default: m.SettingsPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const Profile = dynamic(() => import("./Profile").then(m => ({ default: m.Profile })), { ssr: false, loading: () => <PageSkeleton /> });
+const CallAlexFAB = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexFAB })), { ssr: false });
+const CallAlexPanel = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexPanel })), { ssr: false });
 import { SplashScreen } from "./SplashScreen";
+import { AuthScreen } from "./AuthScreen";
+import { OnboardingWizard } from "./OnboardingWizard";
 import { NewEstimateModal, AddClientModal, LogExpenseModal, UploadInvoiceModal, EditProfileModal } from "./FormModals";
 import { EstimateEditorModal } from "./EstimateEditorModal";
-import { useCurrentUser } from "../lib/store";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { useCurrentUser, useEstimates } from "../lib/store";
+import { supabase, getSession, signOut } from "../lib/supabase";
+import { Toaster } from "react-hot-toast";
 
 type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
+type AppPhase = "splash" | "auth" | "reset-password" | "ready";
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
@@ -32,7 +50,7 @@ const PAGE_TITLES: Record<string, string> = {
   profile: "Profile",
 };
 
-const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }>> = {
+const pages: Record<string, React.ComponentType<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void; onSignOut?: () => void }>> = {
   dashboard: Dashboard,
   estimates: EstimatesList,
   materials: MaterialsPage,
@@ -45,36 +63,100 @@ const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCa
 };
 
 export function App() {
-  const [booted, setBooted] = useState(false);
+  const [phase, setPhase] = useState<AppPhase>("splash");
   const [active, setActive] = useState("dashboard");
   const [callOpen, setCallOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modal, setModal] = useState<ModalType>(null);
-  const [editingEstimate, setEditingEstimate] = useState<any>(null);
+  const [editingEstimate, setEditingEstimate] = useState<Estimate | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { user } = useCurrentUser();
+  const { data: estimates, loading: estimatesLoading } = useEstimates();
 
-  const openCall = () => setCallOpen(true);
-  const openEstimateEditor = useCallback((estimate: any) => {
+  const openCall = useCallback(() => setCallOpen(true), []);
+  const handleModal = useCallback((m: string) => setModal(m as ModalType), []);
+  const openEstimateEditor = useCallback((estimate: Estimate) => {
     setEditingEstimate(estimate);
     setModal("edit-estimate");
   }, []);
-  const handleReady = useCallback(() => setBooted(true), []);
+
+  // After splash completes, check auth
+  const handleSplashReady = useCallback(async () => {
+    const session = await getSession();
+    setPhase(session ? "ready" : "auth");
+  }, []);
+
+  const handleDevBypass = useCallback(() => {
+    setPhase("ready");
+  }, []);
+
+  const handleAuthenticated = useCallback(() => {
+    setPhase("ready");
+  }, []);
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    setPhase("auth");
+    setActive("dashboard");
+  }, []);
+
+  // Check if onboarding should show (new user with no estimates)
+  useEffect(() => {
+    if (phase !== "ready" || estimatesLoading) return;
+    const alreadyDone = localStorage.getItem("onboarding_complete") === "true";
+    if (!alreadyDone && estimates.length === 0) {
+      setShowOnboarding(true);
+    }
+  }, [phase, estimates, estimatesLoading]);
+
+  const handleOnboardingComplete = useCallback(() => {
+    setShowOnboarding(false);
+  }, []);
+
+  // Listen for auth state changes (e.g., token expiry, password recovery)
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        setPhase("auth");
+      } else if (event === "PASSWORD_RECOVERY") {
+        setPhase("reset-password");
+      }
+    });
+    return () => { subscription.unsubscribe(); };
+  }, []);
 
   const Page = pages[active] ?? Dashboard;
 
   return (
-    <>
-      {!booted && <SplashScreen onReady={handleReady} />}
-      <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
-        <Sidebar active={active} onNavigate={setActive} />
+    <ErrorBoundary>
+      {phase === "splash" && <SplashScreen onReady={handleSplashReady} />}
+      {phase === "auth" && <AuthScreen onAuthenticated={handleAuthenticated} onDevBypass={handleDevBypass} />}
+      {phase === "reset-password" && <AuthScreen onAuthenticated={handleAuthenticated} initialView="reset-password" />}
+      {showOnboarding && phase === "ready" && (
+        <OnboardingWizard
+          userName={user?.full_name?.split(" ")[0] ?? null}
+          onComplete={handleOnboardingComplete}
+          onNavigate={setActive}
+          onNewEstimate={() => handleModal("new-estimate")}
+        />
+      )}
+      <div className={`flex h-screen overflow-hidden bg-[var(--bg)] ${phase !== "ready" ? "invisible" : ""}`}
+          aria-hidden={phase !== "ready"}>
+        <Sidebar active={active} onNavigate={(page) => { setActive(page); setMobileMenuOpen(false); }} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <TopBar
             title={PAGE_TITLES[active] ?? "Dashboard"}
-            onModal={(m) => setModal(m as ModalType)}
+            onModal={handleModal}
             onNavigate={setActive}
             user={user}
+            onSignOut={handleSignOut}
+            onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)}
           />
-          <main className="flex-1 overflow-hidden">
-            <Page onNavigate={setActive} onCallAlex={openCall} onModal={(m) => setModal(m as ModalType)} onEditEstimate={openEstimateEditor} />
+          <main id="main-content" className="flex-1 overflow-hidden" tabIndex={-1}>
+            <ErrorBoundary key={active}>
+              <Page onNavigate={setActive} onCallAlex={openCall} onModal={handleModal} onEditEstimate={openEstimateEditor} onSignOut={handleSignOut} />
+            </ErrorBoundary>
           </main>
         </div>
         {!callOpen && <CallAlexFAB onCall={openCall} />}
@@ -86,6 +168,20 @@ export function App() {
       <UploadInvoiceModal open={modal === "upload-invoice"} onClose={() => setModal(null)} />
       <EditProfileModal open={modal === "edit-profile"} onClose={() => setModal(null)} user={user} />
       <EstimateEditorModal open={modal === "edit-estimate"} onClose={() => { setModal(null); setEditingEstimate(null); }} estimate={editingEstimate} />
-    </>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: "var(--card)",
+            color: "var(--text)",
+            borderRadius: "0.5rem",
+            fontSize: "0.875rem",
+          },
+          success: { duration: 3000 },
+          error: { duration: 5000 },
+        }}
+      />
+      <div aria-live="polite" aria-atomic="true" className="sr-only" id="live-region" />
+    </ErrorBoundary>
   );
 }

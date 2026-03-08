@@ -289,6 +289,9 @@ function ToggleRow({
       <p className="text-[13px]">{label}</p>
       <button
         onClick={toggle}
+        role="switch"
+        aria-checked={enabled}
+        aria-label={label}
         className={`relative h-[28px] w-[46px] rounded-full transition-colors ${enabled ? "bg-[var(--green)]" : "bg-[var(--gray4)]"}`}
       >
         <div className={`absolute top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-[20px]" : "translate-x-[2px]"}`} />

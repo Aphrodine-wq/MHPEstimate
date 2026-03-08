@@ -1,8 +1,13 @@
+import { useState } from "react";
 import { useCurrentUser } from "../lib/store";
+import { signOut } from "../lib/supabase";
 
-export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
+export function Profile({ onModal, onSignOut }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onSignOut?: () => void }) {
   const { user, loading } = useCurrentUser();
-  const initials = user ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2) : "—";
+  const [pushNotif, setPushNotif] = useState(true);
+  const [emailNotif, setEmailNotif] = useState(true);
+  const [autoSave, setAutoSave] = useState(true);
+  const initials = user?.full_name ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--" : "--";
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -33,9 +38,9 @@ export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCa
         </Group>
 
         <Group title="Preferences">
-          <ToggleRow label="Push Notifications" on />
-          <ToggleRow label="Email Notifications" on />
-          <ToggleRow label="Auto-save Drafts" on />
+          <ToggleRow label="Push Notifications" on={pushNotif} onToggle={() => setPushNotif((v) => !v)} />
+          <ToggleRow label="Email Notifications" on={emailNotif} onToggle={() => setEmailNotif((v) => !v)} />
+          <ToggleRow label="Auto-save Drafts" on={autoSave} onToggle={() => setAutoSave((v) => !v)} />
         </Group>
 
         <Group title="Estimation Defaults">
@@ -45,7 +50,16 @@ export function Profile({ onModal }: { onNavigate?: (page: string) => void; onCa
         </Group>
 
         <div className="mt-2">
-          <button className="w-full rounded-xl border border-[var(--sep)] bg-[var(--card)] px-4 py-3 text-left text-[13px] font-medium text-[var(--red)] transition-colors hover:bg-[var(--red)]/5">
+          <button
+            onClick={async () => {
+              if (onSignOut) {
+                onSignOut();
+              } else {
+                await signOut();
+              }
+            }}
+            className="w-full rounded-xl border border-[var(--sep)] bg-[var(--card)] px-4 py-3 text-left text-[13px] font-medium text-[var(--red)] transition-colors hover:bg-[var(--red)]/5"
+          >
             Sign Out
           </button>
         </div>
@@ -75,13 +89,19 @@ function Row({ label, value, action }: { label: string; value: string; action?: 
   );
 }
 
-function ToggleRow({ label, on }: { label: string; on: boolean }) {
+function ToggleRow({ label, on, onToggle }: { label: string; on: boolean; onToggle?: () => void }) {
   return (
     <div className="flex items-center justify-between px-4 py-3">
       <p className="text-[13px]">{label}</p>
-      <div className={`relative h-[28px] w-[46px] rounded-full ${on ? "bg-[var(--green)]" : "bg-[var(--gray4)]"}`}>
-        <div className={`absolute top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow ${on ? "translate-x-[20px]" : "translate-x-[2px]"}`} />
-      </div>
+      <button
+        onClick={onToggle}
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        className={`relative h-[28px] w-[46px] rounded-full transition-colors ${on ? "bg-[var(--green)]" : "bg-[var(--gray4)]"}`}
+      >
+        <div className={`absolute top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow transition-transform ${on ? "translate-x-[20px]" : "translate-x-[2px]"}`} />
+      </button>
     </div>
   );
 }

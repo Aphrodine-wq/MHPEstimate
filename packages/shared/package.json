@@ -18,10 +18,15 @@
     "./validation": {
       "types": "./src/validation/index.ts",
       "default": "./src/validation/index.ts"
+    },
+    "./utils": {
+      "types": "./src/utils.ts",
+      "default": "./src/utils.ts"
     }
   },
   "scripts": {
     "lint": "eslint src/",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -29,6 +34,7 @@
   },
   "devDependencies": {
     "@proestimate/tsconfig": "workspace:*",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
   }
 }

@@ -2,7 +2,15 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";
 import { useLineItems, useClients } from "../lib/store";
+import { runValidation } from "@proestimate/estimation-engine";
 import type { Estimate } from "@proestimate/shared/types";
+
+interface ValidationResult {
+  check_id: number;
+  name: string;
+  status: "PASS" | "WARN" | "FAIL";
+  message: string;
+}
 
 /* ── Types ── */
 
@@ -122,6 +130,11 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
   const [activeTab, setActiveTab] = useState<TabKey>("material");
   const [saving, setSaving] = useState(false);
 
+  /* Validation */
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
+  const [validationOpen, setValidationOpen] = useState(false);
+  const [validating, setValidating] = useState(false);
+
   /* Sync from estimate prop on open */
   useEffect(() => {
     if (!open || !estimate) return;
@@ -221,6 +234,75 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
     setLines((prev) => prev.filter((l) => l._key !== key));
   }, []);
 
+  /* Build current estimate snapshot for validation */
+  const buildEstimateSnapshot = useCallback(() => {
+    const inclusions = inclusionsText.split("\n").map((s) => s.trim()).filter(Boolean);
+    const exclusions = exclusionsText.split("\n").map((s) => s.trim()).filter(Boolean);
+    const snapshot: Estimate = {
+      ...estimate!,
+      project_type: projectType,
+      client_id: clientId || null,
+      tier,
+      project_address: projectAddress || null,
+      valid_through: validThrough || null,
+      site_conditions: siteConditions || null,
+      scope_inclusions: inclusions,
+      scope_exclusions: exclusions,
+      materials_subtotal: calcs.materialsSubtotal,
+      labor_subtotal: calcs.laborSubtotal,
+      subcontractor_total: calcs.subcontractorTotal,
+      permits_fees: permitsFees,
+      overhead_profit: calcs.overheadDollar,
+      contingency: calcs.contingencyDollar,
+      tax: calcs.taxDollar,
+      grand_total: calcs.grandTotal,
+      gross_margin_pct: calcs.grossMarginPct,
+    };
+    const lineItems = lines
+      .filter((l) => l.description.trim() !== "")
+      .map((l, i) => ({
+        id: l.id ?? "",
+        estimate_id: estimate!.id,
+        line_number: i + 1,
+        category: l.category,
+        description: l.description,
+        quantity: l.quantity,
+        unit: l.unit,
+        unit_price: l.unit_price,
+        extended_price: l.quantity * l.unit_price,
+        notes: null,
+        product_id: null,
+        price_source: null,
+        price_date: null,
+        created_at: new Date().toISOString(),
+      }));
+    return { estimate: snapshot, lineItems };
+  }, [estimate, projectType, clientId, tier, projectAddress, validThrough, siteConditions, inclusionsText, exclusionsText, permitsFees, calcs, lines]);
+
+  /* Run validation */
+  const handleRunValidation = useCallback(async () => {
+    if (!estimate) return;
+    setValidating(true);
+    try {
+      const { estimate: snap, lineItems } = buildEstimateSnapshot();
+      const results: ValidationResult[] = await runValidation({ estimate: snap, lineItems });
+      setValidationResults(results);
+      setValidationOpen(true);
+    } finally {
+      setValidating(false);
+    }
+  }, [estimate, buildEstimateSnapshot]);
+
+  /* Validation summary counts */
+  const validationCounts = useMemo(() => {
+    const pass = validationResults.filter((r) => r.status === "PASS").length;
+    const warn = validationResults.filter((r) => r.status === "WARN").length;
+    const fail = validationResults.filter((r) => r.status === "FAIL").length;
+    return { pass, warn, fail, total: validationResults.length };
+  }, [validationResults]);
+
+  const validationAllPassed = validationCounts.fail === 0 && validationCounts.warn === 0;
+
   /* Save */
   const handleSave = useCallback(
     async (sendAfter: boolean) => {
@@ -235,6 +317,17 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
           .split("\n")
           .map((s) => s.trim())
           .filter(Boolean);
+
+        // Run validation before saving
+        const { estimate: snap, lineItems: snapLines } = buildEstimateSnapshot();
+        let results: ValidationResult[] = validationResults;
+        try {
+          results = await runValidation({ estimate: snap, lineItems: snapLines });
+          setValidationResults(results);
+        } catch {
+          // If validation fails, proceed with existing results
+        }
+        const allPassed = results.length > 0 && results.every((r) => r.status === "PASS");
 
         const updatePayload: Record<string, unknown> = {
           project_type: projectType,
@@ -254,6 +347,8 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
           tax: calcs.taxDollar,
           grand_total: calcs.grandTotal,
           gross_margin_pct: calcs.grossMarginPct,
+          validation_results: results,
+          validation_passed: allPassed,
           updated_at: new Date().toISOString(),
         };
 
@@ -304,6 +399,8 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
       calcs,
       lines,
       onClose,
+      buildEstimateSnapshot,
+      validationResults,
     ]
   );
 
@@ -692,6 +789,93 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
         </div>
       </div>
 
+      {/* ── Validation Results Panel ── */}
+      {validationResults.length > 0 && (
+        <div className="px-6 pb-4">
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--bg)] overflow-hidden">
+            {/* Collapsible header */}
+            <button
+              type="button"
+              onClick={() => setValidationOpen((v) => !v)}
+              className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-[var(--card)]"
+            >
+              <div className="flex items-center gap-2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className={`transition-transform ${validationOpen ? "rotate-90" : ""}`}
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+                <span className="text-[12px] font-semibold">Validation Checklist</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {validationCounts.pass > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-[var(--green)]">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[var(--green)]" />
+                    {validationCounts.pass} Pass
+                  </span>
+                )}
+                {validationCounts.warn > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-[var(--orange)]">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[var(--orange)]" />
+                    {validationCounts.warn} Warn
+                  </span>
+                )}
+                {validationCounts.fail > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-[var(--red)]">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[var(--red)]" />
+                    {validationCounts.fail} Fail
+                  </span>
+                )}
+              </div>
+            </button>
+
+            {/* Expandable results list */}
+            {validationOpen && (
+              <div className="border-t border-[var(--sep)] px-4 py-2 space-y-1 max-h-[220px] overflow-y-auto">
+                {validationResults.map((r) => {
+                  const statusColor =
+                    r.status === "PASS"
+                      ? "text-[var(--green)]"
+                      : r.status === "WARN"
+                        ? "text-[var(--orange)]"
+                        : "text-[var(--red)]";
+                  const dotColor =
+                    r.status === "PASS"
+                      ? "bg-[var(--green)]"
+                      : r.status === "WARN"
+                        ? "bg-[var(--orange)]"
+                        : "bg-[var(--red)]";
+                  return (
+                    <div
+                      key={r.check_id}
+                      className="flex items-start gap-2 rounded-lg px-2 py-1.5 hover:bg-[var(--card)]"
+                    >
+                      <span className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${dotColor}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] font-medium">{r.name}</span>
+                          <span className={`text-[10px] font-semibold uppercase ${statusColor}`}>
+                            {r.status}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[var(--tertiary)] leading-tight">{r.message}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Footer ── */}
       <div className="flex items-center justify-between border-t border-[var(--sep)] px-6 py-3">
         <span className="text-[11px] text-[var(--tertiary)]">
@@ -699,6 +883,14 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
         </span>
 
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleRunValidation}
+            disabled={validating}
+            className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)] disabled:opacity-50"
+          >
+            {validating ? "Validating..." : "Run Validation"}
+          </button>
           <button
             type="button"
             onClick={onClose}

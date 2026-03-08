@@ -1,0 +1,1067 @@
+{
+  "metadata": {
+    "analysis_date": "2026-03-07",
+    "total_docx_files": 798,
+    "source_directory": "/Users/jameswalton/Desktop/Construction Projects",
+    "company_names": ["Mississippi Home Professionals (MHP)", "North Mississippi Home Professionals (NMHP)", "DSC (earlier company name)"],
+    "analysis_method": "filename_and_folder_structure_analysis",
+    "note": "Analysis derived from comprehensive file/folder naming patterns across 798 .docx files and associated PDFs/spreadsheets. MHP uses highly descriptive filenames that encode project type, client name, document type, and date. A python-docx based deep-content extraction script is available at /Users/jameswalton/Desktop/MHPEstimate/data/analyze_docs.py for future content-level analysis."
+  },
+
+  "document_categories": {
+    "scope_of_services": {
+      "count_estimated": 95,
+      "naming_patterns": [
+        "{Client} Scope of Services - {Date}.docx",
+        "{Client} {Project Type} (Scope of Services).docx",
+        "{Client} {Project Type} Scope of Services {Date} FV.docx",
+        "NMHP Scope of Services - {Trade} {Date}.docx",
+        "Contract Schedule C - Cost Plus Scope of Services - {Date}.docx"
+      ],
+      "sample_filenames": [
+        "Tommy Patton Scope of Services - September 29 2024.docx",
+        "Micheal Mason GUEST HOME Scope of Services.docx",
+        "Butler Backyard & Concrete Project - Scope of Services FV Sept 3 2024.docx",
+        "Scope of Services Courtney Love Screen Porch Oct 5 2023.docx",
+        "Decking_Outdoor Area Eustice Scope of Services March 18 2024.docx",
+        "Cheryl Waldron Scope of Services 12182023.docx",
+        "Wade's Garage Project Scope of Services - September 24 2024 FV.docx",
+        "Deer Run Scope of Services - June 3 2024.docx",
+        "Joanna Harrelson Patio Scope of Services - June 30 2024 - RV1.docx",
+        "Dustin Parson Scope of Services RV1 - May 9 2024.docx",
+        "Malone Fence Scope of Services April 24 2024.docx",
+        "Wade Hardscape Project The Lamar - Scope of Services March 8 2023 RV2.docx",
+        "Brooke Krizbai Screen Porch Project Scope of Services.docx",
+        "Brooke Krizbai Fence Project Scope of Services.docx",
+        "Chandler Interior Project Scope of Services - Febuary 12 2025.docx",
+        "The Taylors Outdoor Project Scope of Services - Jan 23 2025.docx",
+        "Braddock Law Project Scope of Services - Feb 6 2025.docx",
+        "Yentere Exterior Improvements Scope of Services FV.docx",
+        "Dan Sterns House Pad and Utilites Scope of Services.docx",
+        "Dru Jones Fence and Retaining Wall Project Scope of Services 12232024.docx",
+        "Dru Jones Driveway Project Scope of Services DEcember 23 2024.docx"
+      ]
+    },
+    "estimates_proposals": {
+      "count_estimated": 120,
+      "naming_patterns": [
+        "MHP Project Estimate {Client} {Project Type} - {Date}.docx",
+        "NMHP Project Estimate {Client} - {Project Type} - {Date}.docx",
+        "NMHS Project Estimate {Client} {Project Type} - {Date}.docx",
+        "DSC Project Estimate {Client} {Project Type} {Date}.docx",
+        "MHP Project Estimate Binder {Client} - {Date}.pdf",
+        "NMHP Project Proposal {Date} - {Client}.docx"
+      ],
+      "sample_filenames": [
+        "MHP Project Estimate Tommy Patton Porch - September 27 2024 FV.docx",
+        "MHP Project Estimate Medley Carport - September 24 2024 FV.docx",
+        "NMHP Project Estimate Michael Mason - Kitchen Reno - Jan 10 2024.docx",
+        "NMHP Project Estimate Michael Mason - Guest House Project - Jan 26 2024 RV1.docx",
+        "MHP Project Estimate Butler Retaining Wall & Porch FV1 - September 9 2024.docx",
+        "NMHP Project Proposal Estimate - Don and Sarah Wallick - May 22 2024 - FV2.docx",
+        "NMHP Bathroom Remodel Project Estimate Dustin Parson - May 9 2024.docx",
+        "NMHS Project Estimate Savage Bathroom Remodel Project - December 6 2023.docx",
+        "DSC Project Estimate Chris Latimer Deck Project Feb 15 2023 RV.docx",
+        "MHP Project Estimate Harrelson Patio - June 30 2024.docx",
+        "MHP Project Estimate Krizbai Fence Project December 16 2024.docx",
+        "MHP Porch Project Estimate Krizbai - December 16 2024.docx",
+        "MHP Project Estimate Taylor Wall & Porch - Jan 23 2025.docx",
+        "MHP Braddock Law Firm Repair Project Estimate - Feb 6 2025.docx",
+        "MHP Interior Project Estimate Christine Chandler - Feb 12 2025.docx"
+      ]
+    },
+    "change_orders_and_overages": {
+      "count_estimated": 35,
+      "naming_patterns": [
+        "MHP Change Order Memo - {Client} {Description} - {Date}.docx",
+        "NMHP Change Order Memo - {Client} {Description} {Date}.docx",
+        "MHP Allowance Overage Memo - {Client} {Item} - {Date}.docx",
+        "NMHP Overage Memo - {Client} {Description}.docx",
+        "NMHP Project Memo - {Client} Allowance {Item} {Date}.docx"
+      ],
+      "sample_filenames": [
+        "MHP Change Order Memo - Tommy Patton Rails and Gutters - Oct 9 2024.docx",
+        "MHP Allowance Overage Memo - Tommy Patton Exterior Front Door - Oct 28 2024.docx",
+        "NMHP Change Order Memo - Mason increase Shower Size April 23 2024.docx",
+        "NMHP Overage Memo - Mason Guest House Cabinets and Countertops.docx",
+        "MHP Change Order Memo - Flooring Labor and Materials for Project - Oct 17 2024.docx",
+        "MHP Change Order Memo - Windows - September 11 2024.docx",
+        "MHP Change Order Memo - Wallick Addtional HVAC Memo July 12 2024.docx",
+        "MHP Change Order Memo - Wallick additional Sheetrock.docx",
+        "MHP Change Order Memo - Wallick Addtional Electrical Materials and Labor Sept 29 2024.docx",
+        "MHP Change Order Memo - Flooring Labor for Master Suite - September 11 2024.docx",
+        "MHP Change Order Memo - Wallick additional interior painting.docx",
+        "MHP Change Order Memo - Wallick additional interior Ceiling Finish.docx",
+        "NMHP Change Order Memo - Hot tub addition to Project.docx",
+        "NMHP Change Order Memo - Office Bookcase Built In 07082023.docx",
+        "NMHP Change Order Memo - Weis Project Bedroom Built-in with Shelves.docx",
+        "NMHP Change Order Memo - Additonal Fireplace Tile 08302023.docx",
+        "NMHP Change Order Memo - Woods Tile Shower Change Order May 7 2024.docx",
+        "NMHP Change Order Memo - Gill Additoanl Room Rough-in April 7 2024.docx",
+        "NMHP Change Order Memo - Gill Additoanl Room Complete Finish April 7 2024.docx",
+        "MHP Hakes Project Change Order CO-002 - Front Steps Tile - Walkway-Second Vent Hood.docx",
+        "Hora Carport Repair Change Order (Scope of Services).docx",
+        "MHP Wallick Allowance Overage Memo - Brick - Plumbing Fixtues - Door Hardware - Oct 17 2024.docx",
+        "MHP Wallick Allowance Overage Memo - Countertops - Sept 19 2024.docx",
+        "NMHP Allowance Overage Memo - Woods Appliances 08072024.docx",
+        "NMHP Project Memo - Woods Back up Generator Change Order June 4 2024.docx"
+      ]
+    },
+    "contracts": {
+      "count_estimated": 55,
+      "naming_patterns": [
+        "MHP Prime Construction Contract {Client} {Date}.docx",
+        "NMHP Prime Construction Contract {Client} {Date}.docx",
+        "MHP Contract Agreement - {Client} Services {Date}.docx",
+        "NMHP Contract Retainer Agreement {Client} {Date}.docx",
+        "Professional Services Contract {Client} {Date}.docx",
+        "NMHP Prime Construction Cost Plus Contract {Client} {Date}.docx"
+      ],
+      "contract_types_observed": [
+        "Prime Construction Contract (standard fixed-price)",
+        "Prime Construction Cost Plus Contract",
+        "Contract Retainer Agreement",
+        "Professional Services Contract",
+        "Contract Agreement for Services",
+        "Fixed Cost with Allowances Disclosure Form",
+        "Market Fluctuation Clause"
+      ]
+    },
+    "project_reports": {
+      "count_estimated": 45,
+      "naming_patterns": [
+        "{Client} Project Report {Date}.docx",
+        "NMHP Project Report {Client} {Date}.docx",
+        "{Client} Closing Project Report - {Date}.docx",
+        "{Client} Project Progress Report and Completion Plan {Date}.docx"
+      ]
+    },
+    "intake_documents": {
+      "count_estimated": 30,
+      "naming_patterns": [
+        "{Client} Project Intake.docx",
+        "New Project Intake.docx"
+      ]
+    },
+    "other": {
+      "includes": [
+        "Budget Discussion documents",
+        "Meeting notes",
+        "Email correspondence",
+        "Draw Request Memos",
+        "Value Engineering Memos",
+        "City planning/permitting documents",
+        "Material lists and invoices",
+        "Storm water reports",
+        "Service call reports",
+        "Marketing and sales materials"
+      ]
+    }
+  },
+
+  "project_folders": {
+    "active_projects": [
+      "Tommy Patton Front Porch",
+      "Westlake - Stillwater Door",
+      "Wade Medley (Garage/Carport)",
+      "Michael Mason (Guest House + Kitchen Reno)",
+      "Don and Sara Wallick - Addition",
+      "James Butler (Backyard/Concrete/Retaining Wall)",
+      "Lachlan McQueen - Oxford Veterinary (Commercial)",
+      "Davis Ross (Porch)",
+      "Dan Stearns - New Build Project",
+      "Christina Yates"
+    ],
+    "completed_projects": [
+      "Cheryl Waldron (Home Improvement)",
+      "AS Fornea South Lamar Storage (Commercial)",
+      "Courtney Love Bonus Room/Screen Porch",
+      "Allysa Thornton (Bonus Room Buildout)",
+      "Chris Latimer Deck",
+      "Charles Allen - Grand Oaks (Barn + House Repairs)",
+      "Curtis Eustis - The Lamar (Deck + Modifications)",
+      "Dustin Parsons Shower",
+      "Gianna Savage Project (Bathroom Remodel + Home Improvement)",
+      "Dave and Kristen Malone Lamar (Modifications + Fence)",
+      "David Monteleone (Deck Walkway)",
+      "Eric Wade - The Lamar (Hardscape/Outdoor/Fence/Cabinetry)",
+      "Jenn Weis Backyard Project",
+      "Jenn Weis Bonus Room",
+      "Jooste Project (Full Build + Carport)",
+      "John Cromeans Repair",
+      "Joanna Harrelson (Patio/Screen Porch)",
+      "JP Corp - Paragon Bank (Commercial)",
+      "Lance Felker (Kitchen Reno + Home Improvement)",
+      "Lawana McLeananna (Gutters)",
+      "Larry Hardy (Interior Paint)",
+      "Marylyn Long - Chickasaw (Window + Retaining Wall + Roof)",
+      "Megan Carpenter - Lamar (Home Improvement/Cabinets/Vent Hood)",
+      "Oxford Farm Beau Ridge (Punch List/Wall Repair/Fire Damage)",
+      "Oxford University United Methodist Church (Commercial Repair)",
+      "Semmes Van Brocklin (Home Addition)",
+      "Sandi Woods (Small Cottage Build)",
+      "Springer South Construction / Beard Project (Demo)",
+      "Shawan and Heather Gill - Shop House (Home Build)",
+      "Braddock Law Firm Project (Commercial Repair)",
+      "Christie Chandler Project (Patio + Interior)",
+      "Bill Taylor Outdoor Project (Wall + Porch)",
+      "Brooke Krizbai Project (Fence + Porch)",
+      "Denise Strub / Family Crisis Center (Commercial)",
+      "Dustin Parsons - Home Improvements",
+      "Crystal & Bill McMahan - Screen Porch",
+      "Gina Van Klaveren - Bathroom Remodel and Flooring",
+      "Joesph May - Gutter Installation and Awning",
+      "James Butler (Backyard/Concrete/Retaining Wall)"
+    ],
+    "paused_projects": [
+      "Dru Jones (Driveway + Fence + Retaining Wall)",
+      "Eaton (New Build House Plans)",
+      "Brooke Krizbai (Porch + Pergola follow-up)",
+      "Lee Pitman",
+      "Nicole Yenter (Interior + Exterior Improvements)",
+      "Randy Payne (Home Modifications)",
+      "Glen Hickerson (Home Build + Land Clearing)",
+      "Sub Text Development (Land Development)",
+      "The Humanities Hub - Oxford (Commercial)",
+      "The Hamlett at Metts Meadows",
+      "Willie Jones",
+      "Tia Bryant (Tiny House)",
+      "Hunter Carpenter"
+    ]
+  },
+
+  "project_types_catalog": {
+    "porch_screened_porch": {
+      "frequency": "HIGH - Most common project type",
+      "example_projects": [
+        "Tommy Patton Front Porch",
+        "Courtney Love Screen Porch/Bonus Room",
+        "Davis Ross Porch",
+        "Bill Taylor Wall & Porch",
+        "Brooke Krizbai Screen Porch",
+        "Joanna Harrelson Patio/Porch",
+        "Crystal & Bill McMahan Screen Porch",
+        "Butler Porch (combined with retaining wall)"
+      ],
+      "standard_scope_items": [
+        "Demolition of existing porch structure (if applicable)",
+        "Foundation/footing work (concrete piers or continuous footer)",
+        "Framing - porch structure, headers, posts",
+        "Roofing - tie-in to existing roof structure, shingles/metal",
+        "Decking/flooring material installation (composite, wood, or concrete/epoxy)",
+        "Railing installation (wood, metal, or composite)",
+        "Screen installation (for screened porches)",
+        "Gutter installation",
+        "Ceiling finish (bead board, tongue and groove, painted)",
+        "Electrical - lighting, outlets, ceiling fan pre-wire",
+        "Trim and finish carpentry",
+        "Painting - exterior trim, ceiling, posts",
+        "Concrete steps/landing",
+        "HOA documentation (if applicable)"
+      ],
+      "common_allowance_items": [
+        "Exterior door",
+        "Railing materials",
+        "Gutter materials",
+        "Screen materials",
+        "Ceiling fan",
+        "Lighting fixtures"
+      ]
+    },
+    "deck_outdoor_area": {
+      "frequency": "HIGH",
+      "example_projects": [
+        "Chris Latimer Deck",
+        "Curtis Eustis Deck/Outdoor Area",
+        "David Monteleone Deck Walkway",
+        "Eric Wade Hardscape/Outdoor",
+        "Bill Taylor Outdoor Project",
+        "Jenn Weis Backyard Project"
+      ],
+      "standard_scope_items": [
+        "Site preparation and grading",
+        "Foundation/footing installation",
+        "Structural framing",
+        "Decking material installation (Trex composite or pressure treated lumber options)",
+        "Railing and post installation",
+        "Staircase/steps construction",
+        "Lighting installation",
+        "Staining/sealing",
+        "Hardscape elements (pavers, stone, concrete)",
+        "French drain/drainage solutions",
+        "Pergola or shade structure (if included)"
+      ],
+      "material_options_observed": [
+        "Trex composite decking",
+        "Pressure-treated lumber",
+        "Hardwood decking"
+      ]
+    },
+    "kitchen_renovation": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Michael Mason Kitchen Reno",
+        "Lance Felker Kitchen Reno",
+        "Megan Carpenter Home Improvement (Cabinets/Vent Hood)"
+      ],
+      "standard_scope_items": [
+        "Demolition of existing kitchen elements",
+        "Cabinet removal and new cabinet installation",
+        "Countertop fabrication and installation (granite, quartz)",
+        "Backsplash tile installation",
+        "Plumbing - sink, faucet, garbage disposal",
+        "Electrical - outlets, switches, under-cabinet lighting",
+        "Vent hood installation",
+        "Flooring replacement",
+        "Painting",
+        "Appliance installation (allowance-based)",
+        "Trim and finish work"
+      ],
+      "common_allowance_items": [
+        "Cabinetry",
+        "Countertops (granite/quartz)",
+        "Flooring and tile",
+        "Appliances",
+        "Plumbing fixtures",
+        "Lighting"
+      ]
+    },
+    "bathroom_renovation": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Dustin Parsons Shower/Bathroom Remodel",
+        "Gianna Savage Bathroom Remodel",
+        "Sarah Wallick Bathroom Remodels - Guest Bathroom",
+        "Gina Van Klaveren - Bathroom Remodel and Flooring",
+        "Gill Bathroom/Shower Repair"
+      ],
+      "standard_scope_items": [
+        "Demolition of existing fixtures and finishes",
+        "Plumbing rough-in and fixture installation",
+        "Shower construction/tile work",
+        "Glass shower door installation",
+        "Vanity and countertop installation",
+        "Tile flooring installation",
+        "Electrical - lighting, GFCI outlets, exhaust fan",
+        "Drywall repair/replacement",
+        "Painting",
+        "Trim and finish carpentry",
+        "Tub installation (if applicable)"
+      ],
+      "common_allowance_items": [
+        "Tile (shower and floor)",
+        "Vanity/cabinets",
+        "Countertops",
+        "Plumbing fixtures",
+        "Glass shower door",
+        "Lighting"
+      ]
+    },
+    "home_addition": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Don and Sara Wallick - Addition",
+        "Semmes Van Brocklin - Home Addition"
+      ],
+      "standard_scope_items": [
+        "Architectural plan review and permitting",
+        "Foundation work (slab or crawlspace)",
+        "Structural framing",
+        "Roofing - tie-in to existing structure",
+        "Exterior siding/brick",
+        "Window and door installation",
+        "Electrical rough-in and finish",
+        "Plumbing rough-in and finish",
+        "HVAC system extension or new installation",
+        "Insulation",
+        "Drywall/sheetrock installation",
+        "Interior painting",
+        "Ceiling finish",
+        "Flooring installation",
+        "Trim and finish carpentry",
+        "Cabinet and countertop installation (if kitchen/bath included)",
+        "Exterior painting and trim"
+      ],
+      "common_change_orders_for_additions": [
+        "Additional HVAC capacity/ductwork",
+        "Additional electrical materials and labor",
+        "Additional sheetrock",
+        "Window upgrades",
+        "Flooring labor and materials",
+        "Interior painting",
+        "Ceiling finish",
+        "New roof for main house",
+        "Brick and masonry changes",
+        "Plumbing fixture upgrades",
+        "Door hardware"
+      ]
+    },
+    "guest_house_adu": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Michael Mason Guest House/ADU",
+        "Sandi Woods Small Cottage"
+      ],
+      "standard_scope_items": [
+        "City planning/permitting (ADU restrictive covenant)",
+        "Site preparation and grading",
+        "Foundation",
+        "Full structural framing",
+        "Roofing",
+        "Exterior siding/finish",
+        "Windows and exterior doors",
+        "Electrical - full system",
+        "Plumbing - full system",
+        "HVAC (mini-split system observed)",
+        "Tankless water heater",
+        "Insulation",
+        "Drywall",
+        "Interior painting",
+        "Flooring",
+        "Kitchen cabinetry and countertops",
+        "Bathroom tile and fixtures",
+        "Trim and finish carpentry"
+      ],
+      "common_allowance_items": [
+        "Cabinets and countertops",
+        "Flooring and tile",
+        "Plumbing fixtures",
+        "Appliances",
+        "HVAC system",
+        "Lighting"
+      ]
+    },
+    "new_home_build": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Dan Stearns - New Build Project",
+        "Shawan and Heather Gill - Shop House",
+        "Glen Hickerson - Home Build",
+        "Jennifer Eaton - New Build",
+        "Tia Bryant - Tiny House"
+      ],
+      "standard_scope_items": [
+        "Land clearing (separate estimate)",
+        "House pad and utilities infrastructure",
+        "Foundation",
+        "Full structural framing",
+        "Roofing",
+        "Exterior finish (siding, brick, stone)",
+        "Windows and doors",
+        "Full electrical system",
+        "Full plumbing system",
+        "HVAC system",
+        "Insulation",
+        "Drywall",
+        "Interior finish (paint, trim, doors)",
+        "Flooring",
+        "Cabinetry and countertops",
+        "All bathroom and kitchen fixtures",
+        "Exterior concrete (driveway, walkways)",
+        "Landscaping grading"
+      ],
+      "contract_type": "Often Cost Plus or Fixed Cost with Allowances"
+    },
+    "garage_carport": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Wade Medley Garage/Carport",
+        "Jooste Detached Carport",
+        "Hora Carport Repair"
+      ],
+      "standard_scope_items": [
+        "Permitting",
+        "Foundation/slab work",
+        "Structural framing",
+        "Roofing (metal or shingle)",
+        "Siding or exterior finish",
+        "Electrical (lighting, outlets)",
+        "Garage door installation (if enclosed)",
+        "Concrete floor/slab",
+        "Painting"
+      ]
+    },
+    "retaining_wall": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "James Butler Retaining Wall",
+        "Marilyn Long Retaining Wall",
+        "Dru Jones Fence and Retaining Wall",
+        "Bill Taylor Wall",
+        "Oxford Farms Beau Ridge Wall Repair"
+      ],
+      "standard_scope_items": [
+        "Site survey and engineering",
+        "Excavation and grading",
+        "Footing/foundation for wall",
+        "Wall construction (block, stone, or poured)",
+        "Drainage system behind wall (French drain, weep holes)",
+        "Backfill and compaction",
+        "Cap installation",
+        "Landscape restoration"
+      ],
+      "note": "Often requires structural engineering scope - separate Butler Wall Engineer Scope of Services documents observed"
+    },
+    "fencing": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Brooke Krizbai Fence Project",
+        "Malone Fence Project",
+        "Dru Jones Fence",
+        "Eric Wade Fence"
+      ],
+      "standard_scope_items": [
+        "Site layout and marking",
+        "Post hole excavation",
+        "Post installation and setting",
+        "Rail and picket installation",
+        "Gate installation",
+        "Staining/sealing or painting"
+      ]
+    },
+    "roofing": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Charles Allen Main House Roof Replacement",
+        "Marilyn Long Roof Maintenance",
+        "Wallick Addition New Roof (change order for main house)"
+      ],
+      "standard_scope_items": [
+        "Tear-off existing roofing materials",
+        "Inspect and repair decking/sheathing",
+        "Install underlayment/ice and water shield",
+        "Install new shingles or metal roofing",
+        "Flash around penetrations and valleys",
+        "Install ridge vent",
+        "Gutter installation or reattachment",
+        "Clean up and haul away debris"
+      ]
+    },
+    "interior_renovation_home_improvement": {
+      "frequency": "HIGH",
+      "example_projects": [
+        "Cheryl Waldron Home Improvement",
+        "Gianna Savage Home Improvement",
+        "Lance Felker Home Improvement",
+        "Megan Carpenter Home Improvement",
+        "Curtis Eustis Modification Project",
+        "Nicole Yenter Interior Improvements",
+        "Christie Chandler Interior Project",
+        "Randy Payne Home Modifications"
+      ],
+      "standard_scope_items": [
+        "Demolition of existing finishes",
+        "Drywall repair/replacement",
+        "Painting (interior walls, ceilings, trim)",
+        "Flooring replacement (hardwood, LVP, tile)",
+        "Cabinet installation or refinishing",
+        "Countertop replacement",
+        "Lighting fixture installation",
+        "Trim and finish carpentry",
+        "Built-in shelving/bookcases",
+        "Door replacement (interior)",
+        "Ceiling finish work"
+      ]
+    },
+    "painting": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Larry Hardy Interior Paint Project",
+        "Courtney Love Exterior Painting and Board Siding",
+        "Oxford Farms at Beau Ridge Facility Painting",
+        "Wallick additional interior painting (change order)"
+      ],
+      "standard_scope_items": [
+        "Surface preparation (scraping, sanding, priming)",
+        "Caulking and patching",
+        "Interior wall painting",
+        "Ceiling painting",
+        "Trim painting",
+        "Exterior wall painting",
+        "Exterior trim painting",
+        "Staining (decks, fences)"
+      ]
+    },
+    "concrete_hardscape": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "James Butler Backyard & Concrete Project",
+        "Dru Jones Driveway",
+        "Eric Wade Hardscape",
+        "Carla Scallorn Driveway and Demo"
+      ],
+      "standard_scope_items": [
+        "Site preparation and grading",
+        "Form work",
+        "Rebar/reinforcement",
+        "Concrete pour and finish",
+        "Sawcuts/control joints",
+        "Drainage considerations",
+        "Stamped or decorative concrete (if specified)",
+        "Epoxy application (for porch/patio floors)"
+      ]
+    },
+    "door_window_replacement": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Westlake - Stillwater Door Replacement",
+        "Marilyn Long Living Room Window Replacement",
+        "Wallick Windows (change order)"
+      ],
+      "standard_scope_items": [
+        "Remove existing door/window",
+        "Prepare rough opening",
+        "Install new unit",
+        "Flash and weatherproof",
+        "Install interior and exterior trim",
+        "Paint/stain trim",
+        "Hardware installation"
+      ]
+    },
+    "commercial_buildout_renovation": {
+      "frequency": "MEDIUM",
+      "example_projects": [
+        "Lachlan McQueen - Oxford Veterinary Clinic (new construction)",
+        "AS Fornea South Lamar Storage",
+        "Renasant Bank Branch (demo and ITM installation)",
+        "Braddock Law Firm Repair Project",
+        "Oxford University United Methodist Church Repair",
+        "Denise Strub / Family Crisis Center",
+        "Rayner Eye Clinic (Drywall and Painting)",
+        "Buchanan Clinic",
+        "The Humanities Hub"
+      ],
+      "standard_scope_items": [
+        "Site management/owners representative services",
+        "Demolition",
+        "Structural steel and metal work",
+        "Concrete and foundation",
+        "Framing",
+        "Mechanical/Electrical/Plumbing (MEP)",
+        "HVAC",
+        "Drywall and ceiling systems",
+        "Flooring",
+        "Painting",
+        "Security systems",
+        "Parking lot and drainage",
+        "Value engineering reviews"
+      ],
+      "contract_types": ["Cost Plus", "Fixed Cost with Allowances", "Professional Services (Owners Rep)"]
+    },
+    "bonus_room_buildout": {
+      "frequency": "LOW-MEDIUM",
+      "example_projects": [
+        "Allysa Thornton Bonus Room Buildout",
+        "Courtney Love Bonus Room",
+        "Jenn Weis Bonus Room"
+      ],
+      "standard_scope_items": [
+        "Framing modifications",
+        "Insulation",
+        "Drywall installation",
+        "Electrical (outlets, lighting, ceiling fan)",
+        "HVAC extension",
+        "Flooring",
+        "Painting",
+        "Trim and finish carpentry",
+        "Built-in shelving/storage",
+        "Window installation (if needed)"
+      ]
+    },
+    "foundation_repair": {
+      "frequency": "LOW",
+      "example_projects": [
+        "Deer Run Foundation Repair (Wallick property)"
+      ],
+      "standard_scope_items": [
+        "Assessment and engineering",
+        "Excavation",
+        "Foundation repair/reinforcement",
+        "Waterproofing",
+        "Drainage improvements",
+        "Backfill and restoration"
+      ]
+    },
+    "gutter_installation": {
+      "frequency": "LOW-MEDIUM",
+      "example_projects": [
+        "Courtney Love Gutter Installation",
+        "Megan Carpenter Gutter Installation",
+        "Lawana McLeananna Gutter Materials and Installation",
+        "Joesph May Gutter Installation and Awning",
+        "Tommy Patton Rails and Gutters (change order)"
+      ],
+      "standard_scope_items": [
+        "Measure and fabricate gutters",
+        "Install gutter runs",
+        "Install downspouts",
+        "Install gutter guards (if specified)",
+        "Connect to drainage system"
+      ]
+    },
+    "barn_outbuilding": {
+      "frequency": "LOW",
+      "example_projects": [
+        "Charles Allen Barn Project (multiple phases)"
+      ],
+      "standard_scope_items": [
+        "Foundation/slab",
+        "Structural framing",
+        "Roofing",
+        "Siding/exterior finish",
+        "Shop enclosure (if converting open space)",
+        "Electrical",
+        "Plumbing (if applicable)",
+        "Interior finishes (multiple phases observed)",
+        "Tankless water heater",
+        "Fascia repair"
+      ]
+    },
+    "demolition": {
+      "frequency": "LOW-MEDIUM",
+      "example_projects": [
+        "Renasant Bank Project Demo",
+        "Beard Project Demo",
+        "Carla Scallorn Demo"
+      ],
+      "standard_scope_items": [
+        "Interior demolition",
+        "Debris removal and hauling",
+        "Salvage of reusable materials",
+        "Site cleanup"
+      ]
+    },
+    "landscaping_grading_drainage": {
+      "frequency": "LOW-MEDIUM",
+      "example_projects": [
+        "Charles Allen Drainage Project",
+        "Jenn Weis Backyard Play Area",
+        "Oxford Vet Clinic Parking Lot Drainage",
+        "Glen Hickerson Land Clearing"
+      ],
+      "standard_scope_items": [
+        "Grading and earthwork",
+        "French drain installation",
+        "Storm water management",
+        "Erosion control (silt fencing)",
+        "Turf/sod installation",
+        "Play area construction",
+        "Retaining features"
+      ]
+    },
+    "gas_line_installation": {
+      "frequency": "LOW",
+      "example_projects": [
+        "540 Sumner Court Gas Line (Wade)",
+        "512 Sumner Court Gas Line (Eustis)"
+      ],
+      "standard_scope_items": [
+        "Trench excavation",
+        "Gas line installation",
+        "Pressure testing",
+        "Connection to appliance",
+        "Backfill and restoration"
+      ]
+    }
+  },
+
+  "change_order_patterns": {
+    "summary": "Change orders are documented as 'Change Order Memos' or 'Allowance Overage Memos'. The Wallick Addition project had the most change orders (10+), reflecting the complexity of large addition projects.",
+    "most_common_categories": [
+      {
+        "category": "Flooring Labor and Materials",
+        "frequency": "HIGHEST",
+        "examples": [
+          "Flooring Labor and Materials for Project - Oct 17 2024",
+          "Flooring Labor for Master Suite - September 11 2024",
+          "Allowance Flooring and Tile May 2 2024",
+          "Allowance Flooring and Tile May 7 2024 (Woods)"
+        ]
+      },
+      {
+        "category": "HVAC Additional Work",
+        "frequency": "HIGH",
+        "examples": [
+          "Wallick Additional HVAC Memo July 12 2024",
+          "Wallick Additional HVAC Memo July 9 2024",
+          "HVAC Remaining task May 16 2023 (Weis)"
+        ]
+      },
+      {
+        "category": "Electrical Materials and Labor",
+        "frequency": "HIGH",
+        "examples": [
+          "Wallick Additional Electrical Materials and Labor Sept 29 2024"
+        ]
+      },
+      {
+        "category": "Windows and Doors",
+        "frequency": "HIGH",
+        "examples": [
+          "Windows - September 11 2024 (Wallick)",
+          "Exterior Front Door overage (Patton)",
+          "Door Hardware overage (Wallick)"
+        ]
+      },
+      {
+        "category": "Cabinets and Countertops",
+        "frequency": "HIGH",
+        "examples": [
+          "Mason Guest House Cabinets and Countertops overage",
+          "Countertops overage (Wallick Sept 19 2024)"
+        ]
+      },
+      {
+        "category": "Interior Painting and Finish",
+        "frequency": "MEDIUM-HIGH",
+        "examples": [
+          "Wallick additional interior painting",
+          "Wallick additional interior Ceiling Finish"
+        ]
+      },
+      {
+        "category": "Sheetrock/Drywall",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Wallick additional Sheetrock"
+        ]
+      },
+      {
+        "category": "Tile Work (Shower/Floor/Fireplace)",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Additonal Fireplace Tile (Van Brocklin)",
+          "Woods Tile Shower Change Order May 7 2024",
+          "Front Steps Tile (Hakes)"
+        ]
+      },
+      {
+        "category": "Plumbing Fixtures",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Plumbing Fixtures overage (Wallick)",
+          "Mason increase Shower Size April 23 2024"
+        ]
+      },
+      {
+        "category": "Custom Built-ins",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Office Bookcase Built In (Jooste)",
+          "Bedroom Built-in with Shelves (Weis)"
+        ]
+      },
+      {
+        "category": "Additional Room/Scope",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Gill Additional Room Rough-in April 7 2024",
+          "Gill Additional Room Complete Finish April 7 2024",
+          "Hot tub addition to Project (Jooste)"
+        ]
+      },
+      {
+        "category": "Railings and Gutters",
+        "frequency": "MEDIUM",
+        "examples": [
+          "Tommy Patton Rails and Gutters - Oct 9 2024"
+        ]
+      },
+      {
+        "category": "Appliance Overages",
+        "frequency": "LOW-MEDIUM",
+        "examples": [
+          "Woods Appliances overage 08072024"
+        ]
+      },
+      {
+        "category": "Concrete Steps/Walkway",
+        "frequency": "LOW",
+        "examples": [
+          "Krizbai Change Order - Concrete Steps Jan 24 2025",
+          "Hakes Front Steps Tile - Walkway"
+        ]
+      },
+      {
+        "category": "Brick/Masonry",
+        "frequency": "LOW",
+        "examples": [
+          "Brick overage (Wallick Oct 17 2024)"
+        ]
+      },
+      {
+        "category": "Generator/Specialty Equipment",
+        "frequency": "LOW",
+        "examples": [
+          "Woods Back up Generator Change Order June 4 2024"
+        ]
+      },
+      {
+        "category": "Additional Roofing on Existing Structure",
+        "frequency": "LOW",
+        "examples": [
+          "Main House New Roof Additional Services June 25 2024 (Wallick)"
+        ]
+      }
+    ],
+    "change_order_naming_convention": "MHP Change Order Memo or NMHP Change Order Memo, followed by dash, client name, brief description, and date",
+    "allowance_overage_naming_convention": "MHP/NMHP Allowance Overage Memo - {Client} {Item Category} - {Date}",
+    "key_insight": "Most change orders cluster around material allowance overages (client selects more expensive materials than budgeted) and scope additions discovered during construction (additional HVAC, electrical, structural needs). Addition projects generate the most change orders."
+  },
+
+  "common_line_items_by_project_category": {
+    "porch_deck_outdoor": [
+      "Demolition and removal of existing structure",
+      "Concrete footings/piers",
+      "Structural framing (posts, beams, joists, rafters)",
+      "Decking/flooring material and installation",
+      "Roofing tie-in and shingle/metal installation",
+      "Ceiling finish (bead board or T&G)",
+      "Railing system installation",
+      "Screen system installation (screened porches)",
+      "Gutter installation",
+      "Electrical - outlets, lighting, fan pre-wire",
+      "Painting - exterior trim, ceiling, posts",
+      "Concrete steps/landing",
+      "Staining/sealing (decks)",
+      "Epoxy floor application (covered porches)",
+      "Permit fees"
+    ],
+    "kitchen_bathroom_renovation": [
+      "Demolition of existing fixtures, cabinets, flooring",
+      "Plumbing rough-in modifications",
+      "Electrical rough-in modifications",
+      "Drywall repair/patching",
+      "Cabinet installation (allowance item)",
+      "Countertop fabrication and installation (allowance item)",
+      "Tile installation - backsplash, shower, floor",
+      "Plumbing fixture installation (allowance item)",
+      "Glass shower door installation",
+      "Flooring installation (allowance item)",
+      "Painting",
+      "Trim and finish carpentry",
+      "Vent hood installation (kitchens)",
+      "Appliance installation",
+      "Lighting fixture installation"
+    ],
+    "home_addition_new_build": [
+      "Permitting and plan review",
+      "Site preparation and grading",
+      "Foundation (slab, crawlspace, or pier)",
+      "Structural framing - walls, floor, roof",
+      "Roofing system",
+      "Exterior finish - siding, brick, stone (allowance)",
+      "Window installation (allowance)",
+      "Exterior door installation (allowance)",
+      "Electrical rough-in and finish",
+      "Plumbing rough-in and finish",
+      "HVAC system installation",
+      "Insulation (spray foam or batt)",
+      "Drywall/sheetrock installation and finish",
+      "Interior painting",
+      "Ceiling finish",
+      "Flooring installation (allowance)",
+      "Cabinet and countertop installation (allowance)",
+      "Tile work (allowance)",
+      "Interior trim - baseboards, door casing, crown molding",
+      "Interior door installation",
+      "Hardware installation (allowance)",
+      "Final cleanup"
+    ],
+    "retaining_wall_concrete": [
+      "Site survey and layout",
+      "Excavation and earthwork",
+      "Footing/foundation pour",
+      "Wall construction (block, stone, poured)",
+      "Structural reinforcement (rebar, engineer specs)",
+      "Drainage system (French drain, weep holes)",
+      "Backfill and compaction",
+      "Cap/finish installation",
+      "Concrete form work and pour (driveways/walkways)",
+      "Sawcuts and control joints",
+      "Grade restoration",
+      "Erosion control"
+    ],
+    "fencing": [
+      "Site layout and utility marking",
+      "Post hole digging",
+      "Post setting (wood or metal)",
+      "Rail installation",
+      "Picket/panel installation",
+      "Gate(s) installation with hardware",
+      "Staining or painting"
+    ],
+    "commercial_projects": [
+      "Pre-construction services / owners representation",
+      "Demolition and hazardous materials handling",
+      "Structural steel fabrication and installation",
+      "Concrete and foundation work",
+      "Metal building/framing",
+      "Roofing system",
+      "MEP (Mechanical, Electrical, Plumbing) systems",
+      "Fire suppression / life safety",
+      "HVAC system",
+      "Drywall and ceiling systems",
+      "Commercial flooring",
+      "Painting",
+      "Security/alarm system",
+      "Parking lot and drainage",
+      "Storm water management",
+      "ADA compliance items",
+      "Value engineering reviews",
+      "Draw request processing"
+    ]
+  },
+
+  "pricing_structure_patterns": {
+    "estimate_format": "MHP uses a standardized Project Estimate document with line items. Supporting Excel estimation sheets are created alongside (e.g., 'MHP Patton Porch Project Estimate 09272024.xlsx'). A Project Estimate Binder (PDF) compiles estimate, scope, allowances, and timeline into one package.",
+    "allowance_system": "MHP uses a 'Project Selection Allowances' worksheet (Excel) for client-selected materials. Observed examples: 'Project Selection Allowances - Tommy Patton Sept 27 2024.xlsx', 'Project Selection Allowances - Taylor Wall and Porch Jan 23 2025.xlsx', 'Brooke Fence Project Selection Allowances - Dec 16 2024.xlsx'. When clients exceed allowance budgets, an Allowance Overage Memo is issued.",
+    "contract_types": {
+      "fixed_price": "MHP Prime Construction Contract - standard for most residential projects",
+      "cost_plus": "NMHP Prime Construction Cost Plus Contract - used for complex or uncertain-scope projects (e.g., Lance Felker, Lachlan McQueen Vet Clinic)",
+      "fixed_with_allowances": "Fixed Cost with Allowances Disclosure Form - hybrid approach for projects with client-selected materials",
+      "retainer": "Contract Retainer Agreement - initial engagement before full contract",
+      "professional_services": "NMHP Professional Services Contract - for owners rep / consulting roles"
+    },
+    "market_fluctuation": "MHP uses a Market Fluctuation Clause (MFC) for materials susceptible to price volatility. Observed on commercial projects (Oxford Vet Clinic).",
+    "project_timeline": "Separate Project Timeline worksheets (Excel) are created per project.",
+    "draw_schedule": "Construction Draw Schedule used for larger projects; Draw Request Memos submitted for progress payments."
+  },
+
+  "document_workflow": {
+    "typical_project_lifecycle": [
+      "1. Project Intake form completed",
+      "2. Initial meeting / budget discussion",
+      "3. Scope of Services drafted (may go through RV1, RV2 revisions)",
+      "4. Project Estimate created with supporting Excel estimation sheet",
+      "5. Project Selection Allowances worksheet prepared",
+      "6. Project Timeline worksheet created",
+      "7. Estimate Binder compiled (PDF package)",
+      "8. Contract executed (Prime Construction Contract or variant)",
+      "9. Change Order Memos issued as needed during construction",
+      "10. Allowance Overage Memos issued when client selections exceed budget",
+      "11. Draw Request Memos for progress payments",
+      "12. Project Progress Reports during construction",
+      "13. Closing Project Report at completion"
+    ],
+    "revision_tracking": "Documents use FV (Final Version), RV/RV1/RV2 (Revision), and Draft suffixes",
+    "company_evolution": "Document prefixes show company name evolution: DSC (2022) -> NMHP (2023-early 2024) -> MHP (mid 2024-present)"
+  },
+
+  "service_work_tracking": {
+    "description": "MHP tracks post-construction service calls separately",
+    "observed_service_calls": [
+      "Nancy Woods - Back door weather stripping & Backyard Turf Sinkage",
+      "Harrelson - French Drain Clog and Resolution",
+      "Tommy Patton - Front Porch Water Leak",
+      "Ken Williams - Porch Water Leak and Resolution",
+      "Bill Taylor - Water Damage Investigation and Resolution"
+    ],
+    "common_service_issues": [
+      "Water leaks (porch/roof connections)",
+      "French drain clogs",
+      "Weather stripping issues",
+      "Ground settling/sinkage"
+    ]
+  }
+}

@@ -1,32 +1,24 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Homepage", () => {
-  test("loads with correct title", async ({ page }) => {
+test.describe("App Load", () => {
+  test("loads and shows splash screen", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/ProEstimate AI/);
+    await expect(page).toHaveTitle(/MHP Estimate/);
   });
 
-  test("displays brand heading", async ({ page }) => {
+  test("displays ProEstimate AI branding on splash", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("heading", { name: "ProEstimate AI" })
-    ).toBeVisible();
+    await expect(page.getByText("ProEstimate AI")).toBeVisible();
   });
 
-  test("shows CTA buttons", async ({ page }) => {
+  test("transitions to auth screen after splash", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("button", { name: "Get Started" })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Learn More" })
-    ).toBeVisible();
+    // Wait for splash to complete (splash has a timeout)
+    await expect(page.getByText("Sign in")).toBeVisible({ timeout: 10000 });
   });
 
-  test("displays description text", async ({ page }) => {
+  test("shows email input on auth screen", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByText("AI-powered estimation platform")
-    ).toBeVisible();
+    await expect(page.getByPlaceholder(/email/i)).toBeVisible({ timeout: 10000 });
   });
 });

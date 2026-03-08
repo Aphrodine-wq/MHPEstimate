@@ -1,24 +1,12 @@
-import { useState } from "react";
-import { useEstimates } from "../lib/store";
+import { useCallback, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { useEstimates, createEstimate } from "../lib/store";
+import { supabase } from "../lib/supabase";
+import { usePersistedState } from "../lib/usePersistedState";
 import { EmptyState } from "./EmptyState";
-import type { Estimate } from "@proestimate/shared/types";
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Draft", in_review: "In Review", approved: "Approved",
-  sent: "Sent", accepted: "Accepted", declined: "Declined",
-  revision_requested: "Revision", expired: "Expired",
-};
-
-const STATUS_STYLE: Record<string, string> = {
-  draft: "bg-[var(--gray5)] text-[var(--gray1)]",
-  in_review: "bg-[#fff3e0] text-[#e65100]",
-  approved: "bg-[#e3f2fd] text-[#1565c0]",
-  sent: "bg-[#f3e5f5] text-[#7b1fa2]",
-  accepted: "bg-[#e8f5e9] text-[#2e7d32]",
-  declined: "bg-[#ffebee] text-[#c62828]",
-  revision_requested: "bg-[#fff8e1] text-[#f57f17]",
-  expired: "bg-[var(--gray5)] text-[var(--gray1)]",
-};
+import { StatusBadge } from "@proestimate/ui/components";
+import { generateEstimatePDF } from "./EstimatePDF";
+import type { Estimate, Client } from "@proestimate/shared/types";
 
 const FILTERS = ["All", "Draft", "In Review", "Sent", "Approved", "Accepted", "Declined"];
 const FILTER_MAP: Record<string, string> = {
@@ -30,10 +18,10 @@ const PAGE_SIZE = 25;
 
 export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }) {
   const { data: estimates, loading } = useEstimates();
-  const [filter, setFilter] = useState("All");
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = usePersistedState("estimates_filter", "All");
+  const [search, setSearch] = usePersistedState("estimates_search", "");
   const [selected, setSelected] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = usePersistedState("estimates_page", 0);
 
   const filtered = estimates.filter((e) => {
     if (filter !== "All" && e.status !== FILTER_MAP[filter]) return false;
@@ -53,10 +41,30 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
   const paged = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const detail = selected ? estimates.find((e) => e.id === selected) : null;
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const handleListKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!listRef.current) return;
+      const items = listRef.current.querySelectorAll<HTMLElement>('[data-estimate-item]');
+      if (items.length === 0) return;
+      const currentIndex = Array.from(items).findIndex((el) => el === document.activeElement);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+        items[next]?.focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+        items[prev]?.focus();
+      }
+    },
+    []
+  );
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between px-8 pt-4 pb-1">
+      <header className="flex items-center justify-between px-4 md:px-8 pt-4 pb-1">
         <p className="text-[12px] text-[var(--secondary)]">{estimates.length} total estimates</p>
         <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
           New Estimate
@@ -64,27 +72,39 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
       </header>
 
       {/* Search */}
-      <div className="px-8 py-3">
-        <div className="relative mb-2">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--gray2)" strokeWidth="2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search by number, type, or address..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-[var(--sep)] bg-[var(--card)] py-2 pl-9 pr-3 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20"
-          />
+      <div className="px-4 md:px-8 py-3">
+        <div className="relative mb-2 flex gap-2">
+          <div className="relative flex-1">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--gray2)" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by number, type, or address..."
+              aria-label="Search estimates by number, type, or address"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-[var(--sep)] bg-[var(--card)] py-2 pl-9 pr-3 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20"
+            />
+          </div>
+          {(search || filter !== "All" || page !== 0) && (
+            <button
+              onClick={() => { setSearch(""); setFilter("All"); setPage(0); }}
+              className="flex-shrink-0 rounded-lg border border-[var(--sep)] px-3 py-2 text-[12px] font-medium text-[var(--secondary)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
 
         {/* Segmented control */}
-        <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
+        <div className="flex overflow-x-auto rounded-lg bg-[var(--gray5)] p-0.5">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`flex-1 rounded-md px-1 py-1.5 text-[11px] font-medium transition-all ${
+              aria-pressed={filter === f}
+              className={`flex-1 shrink-0 rounded-md px-2 md:px-1 py-1.5 text-[11px] font-medium transition-all whitespace-nowrap ${
                 filter === f ? "bg-[var(--card)] text-[var(--label)] shadow-sm" : "text-[var(--secondary)]"
               }`}
             >
@@ -95,8 +115,8 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
       </div>
 
       {/* List + Detail */}
-      <div className="flex flex-1 gap-0 overflow-hidden px-8 pb-6">
-        <div className={`flex flex-col overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)] ${detail ? "w-[55%]" : "w-full"}`}>
+      <div className="flex flex-1 gap-0 overflow-hidden px-4 md:px-8 pb-6">
+        <div ref={listRef} onKeyDown={handleListKeyDown} role="listbox" aria-label="Estimates list" className={`flex flex-col overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)] ${detail ? "hidden md:flex md:w-[55%]" : "w-full"}`}>
           {loading ? (
             <LoadingRows />
           ) : filtered.length === 0 ? (
@@ -111,6 +131,10 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
               {paged.map((est, i, arr) => (
                 <button
                   key={est.id}
+                  data-estimate-item
+                  role="option"
+                  aria-selected={est.id === selected}
+                  aria-label={`${est.estimate_number} - ${est.project_type} - $${Number(est.grand_total).toLocaleString()}`}
                   onClick={() => setSelected(est.id === selected ? null : est.id)}
                   className={`flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
                     est.id === selected ? "bg-[var(--accent)]/5" : "hover:bg-[var(--bg)]"
@@ -119,9 +143,7 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-medium truncate">{est.estimate_number}</p>
-                      <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[est.status] ?? ""}`}>
-                        {STATUS_LABEL[est.status] ?? est.status}
-                      </span>
+                      <StatusBadge status={est.status} />
                     </div>
                     <p className="text-[12px] text-[var(--secondary)] truncate">{est.project_type}</p>
                     <p className="text-[11px] text-[var(--tertiary)] truncate">{est.project_address}</p>
@@ -143,6 +165,7 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
                     <button
                       onClick={() => setPage(Math.max(0, safePage - 1))}
                       disabled={safePage === 0}
+                      aria-label="Previous page"
                       className="rounded-md px-2 py-1 text-[11px] font-medium transition-colors hover:bg-[var(--bg)] disabled:opacity-30"
                     >
                       Prev
@@ -151,6 +174,8 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
                       <button
                         key={i}
                         onClick={() => setPage(i)}
+                        aria-label={`Page ${i + 1}`}
+                        aria-current={i === safePage ? "page" : undefined}
                         className={`h-6 w-6 rounded-md text-[11px] font-medium transition-colors ${
                           i === safePage ? "bg-[var(--accent)] text-white" : "hover:bg-[var(--bg)]"
                         }`}
@@ -161,6 +186,7 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
                     <button
                       onClick={() => setPage(Math.min(totalPages - 1, safePage + 1))}
                       disabled={safePage >= totalPages - 1}
+                      aria-label="Next page"
                       className="rounded-md px-2 py-1 text-[11px] font-medium transition-colors hover:bg-[var(--bg)] disabled:opacity-30"
                     >
                       Next
@@ -173,7 +199,7 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
         </div>
 
         {detail && (
-          <div className="ml-3 w-[45%] overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)] p-5">
+          <div className="w-full md:ml-3 md:w-[45%] overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)] p-5">
             <DetailPanel estimate={detail} onClose={() => setSelected(null)} onEditEstimate={onEditEstimate} />
           </div>
         )}
@@ -183,17 +209,92 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
 }
 
 function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate; onClose: () => void; onEditEstimate?: (estimate: any) => void }) {
+  const [duplicating, setDuplicating] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    if (!supabase || generatingPdf) return;
+    setGeneratingPdf(true);
+    try {
+      // Fetch line items
+      const { data: lineItems } = await supabase
+        .from("estimate_line_items")
+        .select("*")
+        .eq("estimate_id", estimate.id)
+        .order("line_number");
+
+      // Fetch client if assigned
+      let client: Client | null = null;
+      if (estimate.client_id) {
+        const { data: clientData } = await supabase
+          .from("clients")
+          .select("*")
+          .eq("id", estimate.client_id)
+          .single();
+        client = clientData as Client | null;
+      }
+
+      await generateEstimatePDF(estimate, lineItems ?? [], client);
+    } catch (err) {
+      console.error("Failed to generate PDF:", err);
+      toast.error("Failed to generate PDF");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!supabase || duplicating) return;
+    setDuplicating(true);
+    try {
+      // Create a new estimate (gets next estimate number)
+      const newEst = await createEstimate();
+      if (!newEst) { setDuplicating(false); return; }
+
+      // Copy fields from the original estimate (excluding id, estimate_number, status, created_at, updated_at)
+      const {
+        id: _id, estimate_number: _num, status: _status,
+        created_at: _ca, updated_at: _ua,
+        ...copyFields
+      } = estimate;
+
+      await supabase.from("estimates").update({
+        ...copyFields,
+        status: "draft",
+      }).eq("id", newEst.id);
+
+      // Copy line items from the original estimate
+      const { data: lineItems } = await supabase
+        .from("estimate_line_items")
+        .select("*")
+        .eq("estimate_id", estimate.id)
+        .order("line_number");
+
+      if (lineItems && lineItems.length > 0) {
+        const copiedItems = lineItems.map((item: any) => {
+          const { id: _itemId, estimate_id: _estId, created_at: _itemCa, updated_at: _itemUa, ...rest } = item;
+          return { ...rest, estimate_id: newEst.id };
+        });
+        await supabase.from("estimate_line_items").insert(copiedItems);
+      }
+      toast.success("Estimate duplicated");
+    } catch (err) {
+      console.error("Failed to duplicate estimate:", err);
+      toast.error("Failed to duplicate estimate");
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-[11px] text-[var(--secondary)]">{estimate.estimate_number}</p>
           <h2 className="text-[18px] font-bold">{estimate.project_type}</h2>
-          <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[estimate.status] ?? ""}`}>
-            {STATUS_LABEL[estimate.status] ?? estimate.status}
-          </span>
+          <StatusBadge status={estimate.status} className="mt-1 inline-block" />
         </div>
-        <button onClick={onClose} className="rounded-md p-1 hover:bg-[var(--bg)]">
+        <button onClick={onClose} aria-label="Close detail panel" className="rounded-md p-1 hover:bg-[var(--bg)]">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gray1)" strokeWidth="2" strokeLinecap="round">
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
@@ -232,8 +333,20 @@ function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate
           Open Estimate
         </button>
         <div className="flex gap-2">
-          <button className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)]">Duplicate</button>
-          <button className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)]">PDF</button>
+          <button
+            onClick={handleDuplicate}
+            disabled={duplicating}
+            className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
+          >
+            {duplicating ? "Duplicating..." : "Duplicate"}
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={generatingPdf}
+            className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
+          >
+            {generatingPdf ? "Generating..." : "PDF"}
+          </button>
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ const mhpLogo = "/mhp-logo.png";
 interface SidebarProps {
   active: string;
   onNavigate: (page: string) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const mainNav = [
@@ -21,15 +23,28 @@ const toolsNav = [
   { id: "settings", label: "Settings", icon: IconGear },
 ];
 
-export function Sidebar({ active, onNavigate }: SidebarProps) {
+export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
-  const initials = user
-    ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2)
+  const initials = user?.full_name
+    ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--"
     : "--";
 
+  const handleNavigate = (page: string) => {
+    onNavigate(page);
+    onMobileClose?.();
+  };
+
   return (
-    <div className={`sidebar-root flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-[width] duration-200 ${collapsed ? "w-[68px]" : "w-[252px]"}`}>
+    <>
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] md:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+      <div className={`sidebar-root flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-all duration-200 ${collapsed ? "w-[68px]" : "w-[252px]"} fixed inset-y-0 left-0 z-50 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}>
       {/* Brand header */}
       <div className={`flex items-center gap-2.5 pt-5 pb-4 ${collapsed ? "justify-center px-3" : "px-5"}`}>
         <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
@@ -42,15 +57,15 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
       </div>
 
       {/* Main Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 pt-1">
+      <nav role="navigation" aria-label="Main navigation" className="flex-1 overflow-y-auto px-3 pt-1">
         <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
           {collapsed ? "" : "Main"}
         </p>
-        <NavGroup items={mainNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
+        <NavGroup items={mainNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
         <p className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
           {collapsed ? "" : "Tools"}
         </p>
-        <NavGroup items={toolsNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
+        <NavGroup items={toolsNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
       </nav>
 
       {/* Collapse toggle */}
@@ -59,6 +74,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
           onClick={() => setCollapsed(!collapsed)}
           className="flex w-full items-center justify-center rounded-lg p-2 text-[var(--gray2)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--gray1)]"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             {collapsed ? (
@@ -73,7 +89,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
       {/* User */}
       <div className="border-t border-[var(--sep)] p-3">
         <button
-          onClick={() => onNavigate("profile")}
+          onClick={() => handleNavigate("profile")}
           className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors ${
             active === "profile" ? "bg-[var(--accent)]/8" : "hover:bg-[var(--bg)]"
           }`}
@@ -90,6 +106,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
         </button>
       </div>
     </div>
+    </>
   );
 }
 
@@ -113,6 +130,7 @@ function NavGroup({
             key={item.id}
             onClick={() => onNavigate(item.id)}
             title={collapsed ? item.label : undefined}
+            aria-current={isActive ? "page" : undefined}
             className={`group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all ${
               isActive
                 ? "bg-[var(--accent)] font-semibold text-white shadow-sm shadow-[var(--accent)]/20"

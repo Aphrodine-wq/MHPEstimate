@@ -4,11 +4,11 @@ directories:
   buildResources: build
   output: release
 files:
-  - dist/**/*
+  - out/**/*
 win:
   target:
     - nsis
-  icon: build/icon.ico
+  icon: build/icon.png
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
@@ -18,3 +18,16 @@ mac:
     - dmg
   icon: build/icon.icns
   category: public.app-category.business
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: true
+  protocols:
+    - name: ProEstimate AI
+      schemes:
+        - proestimate
+linux:
+  target:
+    - AppImage
+  icon: build/icon.png

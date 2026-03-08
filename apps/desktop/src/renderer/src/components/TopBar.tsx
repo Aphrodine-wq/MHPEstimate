@@ -1,21 +1,15 @@
 import { useState } from "react";
+import { useNotifications } from "../lib/store";
 
 interface TopBarProps {
   title: string;
   onModal: (m: string) => void;
   onNavigate: (page: string) => void;
   user: any;
+  onSignOut?: () => void;
 }
 
-const MOCK_NOTIFICATIONS = [
-  { id: "1", title: "Estimate Accepted", desc: "Kitchen Remodel #EST-0042 was accepted by client", time: "2m ago", read: false },
-  { id: "2", title: "Invoice Processed", desc: "INV-00189 from Home Depot has been processed", time: "1h ago", read: false },
-  { id: "3", title: "Estimate Expiring", desc: "#EST-0038 expires in 3 days — follow up with client", time: "3h ago", read: false },
-  { id: "4", title: "Price Alert", desc: "Lumber prices updated — 2x4 up 4.2% this week", time: "5h ago", read: true },
-  { id: "5", title: "New Client Added", desc: "Sarah Johnson was added to your client list", time: "1d ago", read: true },
-];
-
-export function TopBar({ title, onModal, onNavigate, user }: TopBarProps) {
+export function TopBar({ title, onModal, onNavigate, user, onSignOut }: TopBarProps) {
   return (
     <header className="flex h-12 flex-shrink-0 items-center justify-between border-b border-[var(--sep)] bg-[var(--card)]">
       {/* Left: Draggable area + breadcrumb */}
@@ -42,17 +36,20 @@ export function TopBar({ title, onModal, onNavigate, user }: TopBarProps) {
         {/* Notifications */}
         <NotificationsButton />
 
+        {/* User menu */}
+        <UserMenu user={user} onNavigate={onNavigate} onSignOut={onSignOut} />
+
         {/* Divider */}
         <div className="mx-1 h-5 w-px bg-[var(--sep)]" />
 
         {/* Window controls */}
-        <button onClick={() => (window as any).electronAPI?.minimize?.()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Minimize">
+        <button onClick={() => window.electronAPI?.minimize()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Minimize">
           <svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="5.5" width="8" height="1" rx="0.5" fill="currentColor" /></svg>
         </button>
-        <button onClick={() => (window as any).electronAPI?.maximize?.()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Maximize">
+        <button onClick={() => window.electronAPI?.maximize()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Maximize">
           <svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" /></svg>
         </button>
-        <button onClick={() => (window as any).electronAPI?.close?.()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--red)]/10 hover:text-[var(--red)]" title="Close">
+        <button onClick={() => window.electronAPI?.close()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--red)]/10 hover:text-[var(--red)]" title="Close">
           <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
         </button>
       </div>
@@ -62,16 +59,8 @@ export function TopBar({ title, onModal, onNavigate, user }: TopBarProps) {
 
 function NotificationsButton() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const { notifications, markRead, markAllRead } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const markRead = (id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  };
 
   return (
     <div className="relative">
@@ -155,6 +144,63 @@ function QuickAddButton({ onModal }: { onModal: (m: string) => void }) {
             <DropdownItem label="Add Client" desc="New client record" onClick={() => { onModal("add-client"); setOpen(false); }} />
             <DropdownItem label="Log Expense" desc="Record a purchase" onClick={() => { onModal("log-expense"); setOpen(false); }} />
             <DropdownItem label="Upload Invoice" desc="Supplier invoice" onClick={() => { onModal("upload-invoice"); setOpen(false); }} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function UserMenu({ user, onNavigate, onSignOut }: { user: any; onNavigate: (page: string) => void; onSignOut?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const initials = user ? user.full_name.split(" ").map((n: string) => n[0]).join("").slice(0, 2) : "--";
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 rounded-lg px-1.5 py-1 transition-colors hover:bg-[var(--bg)]"
+      >
+        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)] text-[9px] font-bold text-white">
+          {initials}
+        </div>
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="var(--gray2)" strokeWidth="2.5" strokeLinecap="round">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full z-50 mt-1.5 w-48 rounded-xl border border-[var(--sep)] bg-[var(--card)] p-1.5 shadow-lg shadow-black/8 animate-modal-content">
+            {user && (
+              <div className="px-3 py-2 border-b border-[var(--sep)] mb-1">
+                <p className="text-[13px] font-medium truncate">{user.full_name}</p>
+                <p className="text-[11px] text-[var(--secondary)] truncate">{user.email}</p>
+              </div>
+            )}
+            <button
+              onClick={() => { onNavigate("profile"); setOpen(false); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => { onNavigate("settings"); setOpen(false); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+            >
+              Settings
+            </button>
+            {onSignOut && (
+              <>
+                <div className="my-1 h-px bg-[var(--sep)]" />
+                <button
+                  onClick={() => { onSignOut(); setOpen(false); }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] text-[var(--red)] transition-colors hover:bg-[var(--red)]/5"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
           </div>
         </>
       )}

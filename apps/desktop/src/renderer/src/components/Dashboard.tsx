@@ -1,6 +1,7 @@
 import { useEstimates, useActivityFeed } from "../lib/store";
 import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";
+import { StatusBadge } from "@proestimate/ui/components";
 import type { Estimate } from "@proestimate/shared/types";
 
 interface DashboardProps {
@@ -8,23 +9,6 @@ interface DashboardProps {
   onCallAlex?: () => void;
   onModal?: (m: string) => void;
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Draft", in_review: "In Review", approved: "Approved",
-  sent: "Sent", accepted: "Accepted", declined: "Declined",
-  revision_requested: "Revision", expired: "Expired",
-};
-
-const STATUS_STYLE: Record<string, string> = {
-  draft: "bg-[var(--gray5)] text-[var(--gray1)]",
-  in_review: "bg-[#fff3e0] text-[#e65100]",
-  approved: "bg-[#e3f2fd] text-[#1565c0]",
-  sent: "bg-[#f3e5f5] text-[#7b1fa2]",
-  accepted: "bg-[#e8f5e9] text-[#2e7d32]",
-  declined: "bg-[#ffebee] text-[#c62828]",
-  revision_requested: "bg-[#fff8e1] text-[#f57f17]",
-  expired: "bg-[var(--gray5)] text-[var(--gray1)]",
-};
 
 const QUOTES = [
   { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin" },
@@ -252,9 +236,7 @@ function EstimateRow({ estimate, last, onNavigate }: { estimate: Estimate; last:
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-[13px] font-medium truncate">{estimate.estimate_number}</p>
-          <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[estimate.status] ?? STATUS_STYLE.draft}`}>
-            {STATUS_LABEL[estimate.status] ?? estimate.status}
-          </span>
+          <StatusBadge status={estimate.status} />
         </div>
         <p className="text-[12px] text-[var(--secondary)] truncate">{estimate.project_type}</p>
       </div>

@@ -1,0 +1,3319 @@
+{
+  "metadata": {
+    "total_line_items_with_cost": 10915,
+    "unique_item_descriptions": 197,
+    "project_types_found": 17,
+    "labor_entries": 2042,
+    "material_entries": 3862,
+    "margin_entries": 7
+  },
+  "pricing_by_item_type": {
+    "doors": {
+      "count": 569,
+      "min": 20.0,
+      "max": 6685.0,
+      "avg": 1108.15,
+      "median": 900.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "painting": {
+      "count": 449,
+      "min": 0.25,
+      "max": 7500.0,
+      "avg": 1484.07,
+      "median": 3.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "plumbing": {
+      "count": 448,
+      "min": 60.0,
+      "max": 13500.0,
+      "avg": 2712.15,
+      "median": 2800.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "trim_finish": {
+      "count": 445,
+      "min": 0.75,
+      "max": 13500.0,
+      "avg": 917.3,
+      "median": 5.25,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "masonry": {
+      "count": 422,
+      "min": 3.0,
+      "max": 14905.0,
+      "avg": 520.27,
+      "median": 80.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "concrete": {
+      "count": 413,
+      "min": 0.25,
+      "max": 15600.0,
+      "avg": 418.88,
+      "median": 19.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "flooring": {
+      "count": 401,
+      "min": 0.85,
+      "max": 48500.0,
+      "avg": 169.31,
+      "median": 4.28,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "electrical": {
+      "count": 372,
+      "min": 2.25,
+      "max": 6508.8,
+      "avg": 1947.18,
+      "median": 750.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "roofing": {
+      "count": 276,
+      "min": 1.25,
+      "max": 4763.0,
+      "avg": 975.24,
+      "median": 100.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "tile": {
+      "count": 230,
+      "min": 2.0,
+      "max": 16000.0,
+      "avg": 2973.9,
+      "median": 4970.15,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "countertops": {
+      "count": 229,
+      "min": 17.5,
+      "max": 20000.0,
+      "avg": 2006.76,
+      "median": 80.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "framing": {
+      "count": 223,
+      "min": 3.5,
+      "max": 30143.49,
+      "avg": 4894.51,
+      "median": 8.55,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "insulation": {
+      "count": 222,
+      "min": 0.25,
+      "max": 5333.95,
+      "avg": 829.37,
+      "median": 4.4,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "gutters": {
+      "count": 201,
+      "min": 4.5,
+      "max": 1430.0,
+      "avg": 621.37,
+      "median": 946.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "hvac": {
+      "count": 168,
+      "min": 300.0,
+      "max": 84000.0,
+      "avg": 4817.65,
+      "median": 1220.59,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "cabinets": {
+      "count": 161,
+      "min": 6.0,
+      "max": 40000.0,
+      "avg": 5503.83,
+      "median": 850.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "appliances": {
+      "count": 148,
+      "min": 800.0,
+      "max": 28500.0,
+      "avg": 4636.01,
+      "median": 4850.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "general conditions": {
+      "count": 116,
+      "min": 250.0,
+      "max": 6500.0,
+      "avg": 2422.41,
+      "median": 2000.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "final cleaning": {
+      "count": 116,
+      "min": 100.0,
+      "max": 3500.0,
+      "avg": 1026.72,
+      "median": 750.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "permits": {
+      "count": 115,
+      "min": 50.0,
+      "max": 1550.0,
+      "avg": 1030.04,
+      "median": 1215.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "all subtotals": {
+      "count": 115,
+      "min": 2684.7,
+      "max": 1591794.79,
+      "avg": 235689.16,
+      "median": 284557.6,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "profit margin": {
+      "count": 115,
+      "min": 342.0,
+      "max": 144309.64,
+      "avg": 19943.84,
+      "median": 20225.64,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "subtotal ohp": {
+      "count": 115,
+      "min": 404.7,
+      "max": 186574.27,
+      "avg": 28505.97,
+      "median": 31737.07,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "cost": {
+      "count": 115,
+      "min": 2280.0,
+      "max": 1406572.3,
+      "avg": 207183.19,
+      "median": 252820.53,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "precontract bid wo mpc": {
+      "count": 115,
+      "min": 2684.7,
+      "max": 1591794.79,
+      "avg": 235689.16,
+      "median": 284557.6,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "total project bid w": {
+      "count": 115,
+      "min": 2782.07,
+      "max": 1649528.23,
+      "avg": 244237.46,
+      "median": 294878.33,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "sov": {
+      "count": 115,
+      "min": 0.11,
+      "max": 0.31,
+      "avg": 0.16,
+      "median": 0.13,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "drywall": {
+      "count": 114,
+      "min": 0.65,
+      "max": 13623.24,
+      "avg": 6225.87,
+      "median": 3.75,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "overhead": {
+      "count": 114,
+      "min": 62.7,
+      "max": 38680.74,
+      "avg": 5734.3,
+      "median": 6952.56,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "project coordination supervision": {
+      "count": 113,
+      "min": 500.0,
+      "max": 3000.0,
+      "avg": 2097.35,
+      "median": 1850.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "waste management": {
+      "count": 113,
+      "min": 50.0,
+      "max": 625.0,
+      "avg": 357.75,
+      "median": 350.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "architectural plans": {
+      "count": 112,
+      "min": 100.0,
+      "max": 3500.0,
+      "avg": 725.89,
+      "median": 675.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "stair material": {
+      "count": 111,
+      "min": 25.0,
+      "max": 883.0,
+      "avg": 470.32,
+      "median": 165.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "stair labor": {
+      "count": 111,
+      "min": 65.0,
+      "max": 800.0,
+      "avg": 451.44,
+      "median": 150.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "grading": {
+      "count": 111,
+      "min": 400.0,
+      "max": 81500.0,
+      "avg": 3904.5,
+      "median": 1000.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "general liability self performed": {
+      "count": 109,
+      "min": 34.43,
+      "max": 1884.81,
+      "avg": 650.54,
+      "median": 750.84,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "progess cleaning": {
+      "count": 103,
+      "min": 225.0,
+      "max": 2500.0,
+      "avg": 1599.76,
+      "median": 2500.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "new_build",
+        "bathroom_renovation",
+        "addition_remodel",
+        "commercial",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "temporary power": {
+      "count": 100,
+      "min": 40.0,
+      "max": 800.0,
+      "avg": 391.8,
+      "median": 40.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "temporary water": {
+      "count": 100,
+      "min": 20.0,
+      "max": 500.0,
+      "avg": 250.4,
+      "median": 20.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "sanitary facilities portajohns": {
+      "count": 100,
+      "min": 85.6,
+      "max": 135.0,
+      "avg": 102.11,
+      "median": 85.6,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "construction staking": {
+      "count": 100,
+      "min": 0.35,
+      "max": 250.0,
+      "avg": 130.17,
+      "median": 250.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "fireplace material": {
+      "count": 100,
+      "min": 2000.0,
+      "max": 7000.0,
+      "avg": 3020.5,
+      "median": 2500.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "water heaters": {
+      "count": 100,
+      "min": 850.0,
+      "max": 2500.0,
+      "avg": 1507.0,
+      "median": 1325.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "water service": {
+      "count": 100,
+      "min": 6.0,
+      "max": 7500.0,
+      "avg": 643.62,
+      "median": 300.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "payroll tax": {
+      "count": 100,
+      "min": 80.85,
+      "max": 4425.99,
+      "avg": 1527.72,
+      "median": 1763.15,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "termite pretreat": {
+      "count": 99,
+      "min": 0.15,
+      "max": 0.25,
+      "avg": 0.15,
+      "median": 0.15,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "landscaping": {
+      "count": 79,
+      "min": 3.78,
+      "max": 39500.0,
+      "avg": 4736.34,
+      "median": 5000.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "windows": {
+      "count": 74,
+      "min": 335.0,
+      "max": 7306.0,
+      "avg": 5329.28,
+      "median": 7306.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "general liability subcost per": {
+      "count": 74,
+      "min": 5.27,
+      "max": 302.7,
+      "avg": 224.3,
+      "median": 288.91,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "railing": {
+      "count": 71,
+      "min": 12.0,
+      "max": 49500.0,
+      "avg": 4942.21,
+      "median": 850.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "siding": {
+      "count": 64,
+      "min": 1.85,
+      "max": 12.0,
+      "avg": 6.93,
+      "median": 4.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "bonus_room",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "closet shelving labor": {
+      "count": 60,
+      "min": 15.0,
+      "max": 50.0,
+      "avg": 21.92,
+      "median": 25.0,
+      "project_types": [
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "commercial",
+        "porch",
+        "new_build",
+        "general",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "bathroom vanities": {
+      "count": 60,
+      "min": 165.0,
+      "max": 1850.0,
+      "avg": 428.33,
+      "median": 325.0,
+      "project_types": [
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "commercial",
+        "porch",
+        "new_build",
+        "general",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "demolition": {
+      "count": 58,
+      "min": 35.0,
+      "max": 32000.0,
+      "avg": 1566.9,
+      "median": 600.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "pump truck": {
+      "count": 58,
+      "min": 1800.0,
+      "max": 2250.0,
+      "avg": 1954.14,
+      "median": 1880.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "closet shelving material": {
+      "count": 58,
+      "min": 10.0,
+      "max": 25.0,
+      "avg": 14.64,
+      "median": 15.0,
+      "project_types": [
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "commercial",
+        "porch",
+        "new_build",
+        "general",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mobilization": {
+      "count": 57,
+      "min": 250.0,
+      "max": 6500.0,
+      "avg": 1888.6,
+      "median": 1200.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mantelwood beam material": {
+      "count": 57,
+      "min": 500.0,
+      "max": 500.0,
+      "avg": 500.0,
+      "median": 500.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mantelwood beam labor": {
+      "count": 57,
+      "min": 500.0,
+      "max": 550.0,
+      "avg": 503.51,
+      "median": 500.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "driveway labor": {
+      "count": 57,
+      "min": 1.25,
+      "max": 4.25,
+      "avg": 1.43,
+      "median": 1.25,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "driveway material": {
+      "count": 56,
+      "min": 1.9,
+      "max": 107.0,
+      "avg": 99.51,
+      "median": 107.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "workers comp rate per": {
+      "count": 56,
+      "min": 80.52,
+      "max": 1755.96,
+      "avg": 1665.7,
+      "median": 1755.96,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "irrigation includes french drains": {
+      "count": 55,
+      "min": 30.0,
+      "max": 2000.0,
+      "avg": 1903.82,
+      "median": 2000.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "shutters material": {
+      "count": 54,
+      "min": 80.0,
+      "max": 220.0,
+      "avg": 214.81,
+      "median": 220.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "shutters labor": {
+      "count": 54,
+      "min": 80.0,
+      "max": 100.0,
+      "avg": 99.26,
+      "median": 100.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "alarm installation material": {
+      "count": 53,
+      "min": 609.6,
+      "max": 2500.0,
+      "avg": 645.27,
+      "median": 609.6,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "alarm installation labor": {
+      "count": 53,
+      "min": 406.4,
+      "max": 2500.0,
+      "avg": 445.9,
+      "median": 406.4,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "builders risk insurance": {
+      "count": 52,
+      "min": 1200.0,
+      "max": 1200.0,
+      "avg": 1200.0,
+      "median": 1200.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "wastersewer tap fees": {
+      "count": 52,
+      "min": 740.0,
+      "max": 740.0,
+      "avg": 740.0,
+      "median": 740.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "temporary gas": {
+      "count": 52,
+      "min": 50.0,
+      "max": 50.0,
+      "avg": 50.0,
+      "median": 50.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "sewer service": {
+      "count": 52,
+      "min": 300.0,
+      "max": 300.0,
+      "avg": 300.0,
+      "median": 300.0,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mpc": {
+      "count": 52,
+      "min": 10320.74,
+      "max": 10320.74,
+      "avg": 10320.74,
+      "median": 10320.74,
+      "project_types": [
+        "gutter",
+        "deck",
+        "barn_outbuilding",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "commercial",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "wood post column labor": {
+      "count": 50,
+      "min": 20.0,
+      "max": 125.0,
+      "avg": 24.1,
+      "median": 20.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "wood post column material": {
+      "count": 48,
+      "min": 15.0,
+      "max": 125.0,
+      "avg": 20.42,
+      "median": 15.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "porch",
+        "bathroom_renovation",
+        "addition_remodel",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "fireplace labor": {
+      "count": 48,
+      "min": 650.0,
+      "max": 2500.0,
+      "avg": 1193.75,
+      "median": 750.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "engineering site surveys": {
+      "count": 46,
+      "min": 250.0,
+      "max": 1250.0,
+      "avg": 569.57,
+      "median": 450.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mantel material": {
+      "count": 46,
+      "min": 350.0,
+      "max": 500.0,
+      "avg": 496.74,
+      "median": 500.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "mantel labor": {
+      "count": 46,
+      "min": 350.0,
+      "max": 500.0,
+      "avg": 496.74,
+      "median": 500.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "bathroom_renovation",
+        "bonus_room",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "septic": {
+      "count": 46,
+      "min": 3500.0,
+      "max": 7500.0,
+      "avg": 5739.13,
+      "median": 5500.0,
+      "project_types": [
+        "deck",
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "concrete_hardscape",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "porch material": {
+      "count": 43,
+      "min": 3.0,
+      "max": 7.0,
+      "avg": 3.28,
+      "median": 3.0,
+      "project_types": [
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "porch labor": {
+      "count": 37,
+      "min": 2.0,
+      "max": 5.0,
+      "avg": 3.26,
+      "median": 3.25,
+      "project_types": [
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "commercial",
+        "new_build",
+        "porch",
+        "addition_remodel",
+        "guest_house",
+        "door_window"
+      ]
+    },
+    "fencing": {
+      "count": 21,
+      "min": 7.5,
+      "max": 800.0,
+      "avg": 133.07,
+      "median": 17.5,
+      "project_types": [
+        "deck",
+        "fencing",
+        "general",
+        "concrete_hardscape",
+        "new_build"
+      ]
+    },
+    "builtins": {
+      "count": 18,
+      "min": 60.0,
+      "max": 8500.0,
+      "avg": 2520.56,
+      "median": 2850.0,
+      "project_types": [
+        "fencing",
+        "kitchen_renovation",
+        "general",
+        "concrete_hardscape",
+        "bonus_room",
+        "bathroom_renovation",
+        "commercial",
+        "guest_house"
+      ]
+    },
+    "plaster labor": {
+      "count": 12,
+      "min": 1.6,
+      "max": 1.6,
+      "avg": 1.6,
+      "median": 1.6,
+      "project_types": [
+        "kitchen_renovation",
+        "general",
+        "porch",
+        "addition_remodel",
+        "guest_house"
+      ]
+    },
+    "equipment rental": {
+      "count": 12,
+      "min": 450.0,
+      "max": 3750.0,
+      "avg": 1929.17,
+      "median": 1800.0,
+      "project_types": [
+        "general",
+        "commercial",
+        "barn_outbuilding",
+        "porch"
+      ]
+    },
+    "mirrorrodsbars": {
+      "count": 12,
+      "min": 850.0,
+      "max": 850.0,
+      "avg": 850.0,
+      "median": 850.0,
+      "project_types": [
+        "commercial",
+        "bathroom_renovation",
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "plaster materials": {
+      "count": 11,
+      "min": 0.6,
+      "max": 0.6,
+      "avg": 0.6,
+      "median": 0.6,
+      "project_types": [
+        "general",
+        "kitchen_renovation",
+        "addition_remodel",
+        "porch"
+      ]
+    },
+    "plaster prep labor and": {
+      "count": 10,
+      "min": 0.5,
+      "max": 0.5,
+      "avg": 0.5,
+      "median": 0.5,
+      "project_types": [
+        "general",
+        "addition_remodel",
+        "porch"
+      ]
+    },
+    "shower insert option": {
+      "count": 10,
+      "min": 2500.0,
+      "max": 2500.0,
+      "avg": 2500.0,
+      "median": 2500.0,
+      "project_types": [
+        "commercial",
+        "bathroom_renovation",
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "stairs_steps": {
+      "count": 10,
+      "min": 225.0,
+      "max": 500.0,
+      "avg": 315.0,
+      "median": 285.0,
+      "project_types": [
+        "fencing",
+        "general",
+        "bonus_room",
+        "bathroom_renovation",
+        "door_window"
+      ]
+    },
+    "sidewalk labor": {
+      "count": 9,
+      "min": 3.5,
+      "max": 9500.0,
+      "avg": 1568.56,
+      "median": 500.0,
+      "project_types": [
+        "general",
+        "bonus_room",
+        "commercial",
+        "bathroom_renovation",
+        "door_window"
+      ]
+    },
+    "sidewalk material": {
+      "count": 9,
+      "min": 2.25,
+      "max": 1200.0,
+      "avg": 490.61,
+      "median": 400.0,
+      "project_types": [
+        "deck",
+        "general",
+        "bonus_room",
+        "bathroom_renovation",
+        "door_window"
+      ]
+    },
+    "progress cleaning": {
+      "count": 8,
+      "min": 350.0,
+      "max": 1800.0,
+      "avg": 568.75,
+      "median": 350.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation",
+        "commercial"
+      ]
+    },
+    "cleanup": {
+      "count": 8,
+      "min": 530.0,
+      "max": 12000.0,
+      "avg": 9132.5,
+      "median": 12000.0,
+      "project_types": [
+        "general",
+        "commercial"
+      ]
+    },
+    "patio paver": {
+      "count": 8,
+      "min": 5.0,
+      "max": 11.0,
+      "avg": 7.25,
+      "median": 5.0,
+      "project_types": [
+        "concrete_hardscape",
+        "guest_house",
+        "deck",
+        "fencing"
+      ]
+    },
+    "paver labor": {
+      "count": 8,
+      "min": 3.25,
+      "max": 4.0,
+      "avg": 3.53,
+      "median": 3.25,
+      "project_types": [
+        "concrete_hardscape",
+        "guest_house",
+        "deck",
+        "fencing"
+      ]
+    },
+    "rental equipment": {
+      "count": 7,
+      "min": 3500.0,
+      "max": 3500.0,
+      "avg": 3500.0,
+      "median": 3500.0,
+      "project_types": [
+        "fencing",
+        "commercial"
+      ]
+    },
+    "shower labor": {
+      "count": 7,
+      "min": 3.25,
+      "max": 10000.0,
+      "avg": 2150.18,
+      "median": 16.0,
+      "project_types": [
+        "door_window",
+        "fencing",
+        "general"
+      ]
+    },
+    "kitchen sink": {
+      "count": 7,
+      "min": 285.0,
+      "max": 899.0,
+      "avg": 416.29,
+      "median": 300.0,
+      "project_types": [
+        "guest_house",
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "bonds": {
+      "count": 6,
+      "min": 10000.0,
+      "max": 10000.0,
+      "avg": 10000.0,
+      "median": 10000.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "structural steel": {
+      "count": 6,
+      "min": 9500.0,
+      "max": 9500.0,
+      "avg": 9500.0,
+      "median": 9500.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "wall material": {
+      "count": 6,
+      "min": 15.5,
+      "max": 15.5,
+      "avg": 15.5,
+      "median": 15.5,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "wall labor": {
+      "count": 6,
+      "min": 10.25,
+      "max": 10.25,
+      "avg": 10.25,
+      "median": 10.25,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "glass allowance": {
+      "count": 6,
+      "min": 165000.0,
+      "max": 165000.0,
+      "avg": 165000.0,
+      "median": 165000.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "radiation room": {
+      "count": 6,
+      "min": 13500.0,
+      "max": 13500.0,
+      "avg": 13500.0,
+      "median": 13500.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "fire suppression system": {
+      "count": 6,
+      "min": 55000.0,
+      "max": 55000.0,
+      "avg": 55000.0,
+      "median": 55000.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "alarms and access": {
+      "count": 6,
+      "min": 17500.0,
+      "max": 17500.0,
+      "avg": 17500.0,
+      "median": 17500.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "parking lot sidewalk": {
+      "count": 6,
+      "min": 6500.0,
+      "max": 6500.0,
+      "avg": 6500.0,
+      "median": 6500.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "subtotal": {
+      "count": 6,
+      "min": 3339.61,
+      "max": 8214.74,
+      "avg": 5675.01,
+      "median": 5565.23,
+      "project_types": [
+        "general"
+      ]
+    },
+    "total cost": {
+      "count": 6,
+      "min": 3339.61,
+      "max": 8214.74,
+      "avg": 5675.01,
+      "median": 5565.23,
+      "project_types": [
+        "general"
+      ]
+    },
+    "trelis labor": {
+      "count": 5,
+      "min": 15.0,
+      "max": 15.0,
+      "avg": 15.0,
+      "median": 15.0,
+      "project_types": [
+        "concrete_hardscape",
+        "guest_house",
+        "fencing"
+      ]
+    },
+    "weed barrier and instalation": {
+      "count": 5,
+      "min": 1.1,
+      "max": 2.25,
+      "avg": 1.79,
+      "median": 2.25,
+      "project_types": [
+        "concrete_hardscape",
+        "guest_house",
+        "fencing"
+      ]
+    },
+    "tubshower combo": {
+      "count": 5,
+      "min": 295.0,
+      "max": 500.0,
+      "avg": 418.0,
+      "median": 500.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "toilet": {
+      "count": 5,
+      "min": 125.0,
+      "max": 200.0,
+      "avg": 170.0,
+      "median": 200.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "kitchen faucet": {
+      "count": 5,
+      "min": 135.0,
+      "max": 300.0,
+      "avg": 234.0,
+      "median": 300.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "vanity faucet": {
+      "count": 5,
+      "min": 115.0,
+      "max": 175.0,
+      "avg": 151.0,
+      "median": 175.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "vanity sink": {
+      "count": 5,
+      "min": 50.0,
+      "max": 65.0,
+      "avg": 56.0,
+      "median": 50.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "water heater": {
+      "count": 5,
+      "min": 850.0,
+      "max": 1900.0,
+      "avg": 1480.0,
+      "median": 1900.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "ceiling": {
+      "count": 5,
+      "min": 185.0,
+      "max": 250.0,
+      "avg": 224.0,
+      "median": 250.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "surface mounts": {
+      "count": 5,
+      "min": 65.0,
+      "max": 200.0,
+      "avg": 146.0,
+      "median": 200.0,
+      "project_types": [
+        "barn_outbuilding",
+        "general"
+      ]
+    },
+    "environmental": {
+      "count": 4,
+      "min": 850.0,
+      "max": 850.0,
+      "avg": 850.0,
+      "median": 850.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation",
+        "general"
+      ]
+    },
+    "data communications": {
+      "count": 4,
+      "min": 750.0,
+      "max": 1500.0,
+      "avg": 1125.0,
+      "median": 1125.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation",
+        "general"
+      ]
+    },
+    "gas meter": {
+      "count": 4,
+      "min": 500.0,
+      "max": 3000.0,
+      "avg": 1750.0,
+      "median": 1750.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation",
+        "general"
+      ]
+    },
+    "trelis material": {
+      "count": 4,
+      "min": 6.5,
+      "max": 10.0,
+      "avg": 8.25,
+      "median": 8.25,
+      "project_types": [
+        "concrete_hardscape",
+        "guest_house",
+        "fencing"
+      ]
+    },
+    "decking": {
+      "count": 4,
+      "min": 2.25,
+      "max": 12.0,
+      "avg": 7.06,
+      "median": 7.0,
+      "project_types": [
+        "deck"
+      ]
+    },
+    "poocket doots": {
+      "count": 3,
+      "min": 425.0,
+      "max": 425.0,
+      "avg": 425.0,
+      "median": 425.0,
+      "project_types": [
+        "addition_remodel"
+      ]
+    },
+    "metal gate": {
+      "count": 3,
+      "min": 1000.0,
+      "max": 1000.0,
+      "avg": 1000.0,
+      "median": 1000.0,
+      "project_types": [
+        "concrete_hardscape",
+        "fencing"
+      ]
+    },
+    "deck labor": {
+      "count": 3,
+      "min": 7.5,
+      "max": 7.5,
+      "avg": 7.5,
+      "median": 7.5,
+      "project_types": [
+        "deck"
+      ]
+    },
+    "weed barrier": {
+      "count": 3,
+      "min": 0.35,
+      "max": 0.35,
+      "avg": 0.35,
+      "median": 0.35,
+      "project_types": [
+        "general"
+      ]
+    },
+    "sand instalaltion": {
+      "count": 3,
+      "min": 15.0,
+      "max": 15.0,
+      "avg": 15.0,
+      "median": 15.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "pea gravel": {
+      "count": 3,
+      "min": 25.0,
+      "max": 25.0,
+      "avg": 25.0,
+      "median": 25.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "rubber mulch": {
+      "count": 3,
+      "min": 2.25,
+      "max": 2.25,
+      "avg": 2.25,
+      "median": 2.25,
+      "project_types": [
+        "general"
+      ]
+    },
+    "tub": {
+      "count": 3,
+      "min": 900.0,
+      "max": 900.0,
+      "avg": 900.0,
+      "median": 900.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "flood lights": {
+      "count": 3,
+      "min": 25.0,
+      "max": 25.0,
+      "avg": 25.0,
+      "median": 25.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "stiebel tankless water heater": {
+      "count": 3,
+      "min": 799.0,
+      "max": 799.0,
+      "avg": 799.0,
+      "median": 799.0,
+      "project_types": [
+        "guest_house",
+        "general"
+      ]
+    },
+    "homebuild": {
+      "count": 3,
+      "min": 380000.0,
+      "max": 655000.0,
+      "avg": 510000.0,
+      "median": 495000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "screen porch material": {
+      "count": 2,
+      "min": 13.25,
+      "max": 13.25,
+      "avg": 13.25,
+      "median": 13.25,
+      "project_types": [
+        "porch"
+      ]
+    },
+    "mirrorstowel barsglass": {
+      "count": 2,
+      "min": 750.0,
+      "max": 750.0,
+      "avg": 750.0,
+      "median": 750.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "closet shelving material mdf": {
+      "count": 2,
+      "min": 15.0,
+      "max": 15.0,
+      "avg": 15.0,
+      "median": 15.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "gas materiallabor": {
+      "count": 2,
+      "min": 500.0,
+      "max": 500.0,
+      "avg": 500.0,
+      "median": 500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "vent hood exhaust fan": {
+      "count": 2,
+      "min": 0.75,
+      "max": 0.75,
+      "avg": 0.75,
+      "median": 0.75,
+      "project_types": [
+        "general"
+      ]
+    },
+    "sewer": {
+      "count": 2,
+      "min": 8.0,
+      "max": 8.0,
+      "avg": 8.0,
+      "median": 8.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "closet shelving master": {
+      "count": 2,
+      "min": 1000.0,
+      "max": 1000.0,
+      "avg": 1000.0,
+      "median": 1000.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation"
+      ]
+    },
+    "closet shelving hardware": {
+      "count": 2,
+      "min": 450.0,
+      "max": 450.0,
+      "avg": 450.0,
+      "median": 450.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation"
+      ]
+    },
+    "spetic": {
+      "count": 2,
+      "min": 5500.0,
+      "max": 5500.0,
+      "avg": 5500.0,
+      "median": 5500.0,
+      "project_types": [
+        "bonus_room",
+        "bathroom_renovation"
+      ]
+    },
+    "site camera security": {
+      "count": 2,
+      "min": 150.0,
+      "max": 150.0,
+      "avg": 150.0,
+      "median": 150.0,
+      "project_types": [
+        "commercial",
+        "general"
+      ]
+    },
+    "security barrier": {
+      "count": 2,
+      "min": 2500.0,
+      "max": 2500.0,
+      "avg": 2500.0,
+      "median": 2500.0,
+      "project_types": [
+        "commercial",
+        "general"
+      ]
+    },
+    "curb material": {
+      "count": 2,
+      "min": 57.5,
+      "max": 57.5,
+      "avg": 57.5,
+      "median": 57.5,
+      "project_types": [
+        "commercial",
+        "general"
+      ]
+    },
+    "curb labor": {
+      "count": 2,
+      "min": 57.5,
+      "max": 57.5,
+      "avg": 57.5,
+      "median": 57.5,
+      "project_types": [
+        "commercial",
+        "general"
+      ]
+    },
+    "french drain": {
+      "count": 2,
+      "min": 28.5,
+      "max": 28.5,
+      "avg": 28.5,
+      "median": 28.5,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home depot": {
+      "count": 2,
+      "min": 2625.81,
+      "max": 2625.81,
+      "avg": 2625.81,
+      "median": 2625.81,
+      "project_types": [
+        "general"
+      ]
+    },
+    "exterior lights": {
+      "count": 2,
+      "min": 125.0,
+      "max": 125.0,
+      "avg": 125.0,
+      "median": 125.0,
+      "project_types": [
+        "barn_outbuilding"
+      ]
+    },
+    "smoke detectors": {
+      "count": 2,
+      "min": 25.0,
+      "max": 25.0,
+      "avg": 25.0,
+      "median": 25.0,
+      "project_types": [
+        "barn_outbuilding"
+      ]
+    },
+    "flush mounts": {
+      "count": 2,
+      "min": 25.0,
+      "max": 25.0,
+      "avg": 25.0,
+      "median": 25.0,
+      "project_types": [
+        "barn_outbuilding"
+      ]
+    },
+    "glacier bay in farmhouse": {
+      "count": 2,
+      "min": 390.0,
+      "max": 390.0,
+      "avg": 390.0,
+      "median": 390.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "proflo jerrit toilet": {
+      "count": 2,
+      "min": 169.99,
+      "max": 169.99,
+      "avg": 169.99,
+      "median": 169.99,
+      "project_types": [
+        "general"
+      ]
+    },
+    "kohler simplice kitchen sink": {
+      "count": 2,
+      "min": 189.99,
+      "max": 189.99,
+      "avg": 189.99,
+      "median": 189.99,
+      "project_types": [
+        "general"
+      ]
+    },
+    "toliet": {
+      "count": 2,
+      "min": 212.93,
+      "max": 252.0,
+      "avg": 232.47,
+      "median": 232.47,
+      "project_types": [
+        "guest_house"
+      ]
+    },
+    "kitchen sink fixture": {
+      "count": 2,
+      "min": 250.0,
+      "max": 450.0,
+      "avg": 350.0,
+      "median": 350.0,
+      "project_types": [
+        "guest_house"
+      ]
+    },
+    "dehumidifying and air movement": {
+      "count": 2,
+      "min": 1200.0,
+      "max": 1200.0,
+      "avg": 1200.0,
+      "median": 1200.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "shower air drying system": {
+      "count": 1,
+      "min": 3500.0,
+      "max": 3500.0,
+      "avg": 3500.0,
+      "median": 3500.0,
+      "project_types": [
+        "addition_remodel"
+      ]
+    },
+    "errosion": {
+      "count": 1,
+      "min": 9500.0,
+      "max": 9500.0,
+      "avg": 9500.0,
+      "median": 9500.0,
+      "project_types": [
+        "commercial"
+      ]
+    },
+    "lvl labor": {
+      "count": 1,
+      "min": 2.0,
+      "max": 2.0,
+      "avg": 2.0,
+      "median": 2.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "lvl maierials": {
+      "count": 1,
+      "min": 4.25,
+      "max": 4.25,
+      "avg": 4.25,
+      "median": 4.25,
+      "project_types": [
+        "general"
+      ]
+    },
+    "gate": {
+      "count": 1,
+      "min": 850.0,
+      "max": 850.0,
+      "avg": 850.0,
+      "median": 850.0,
+      "project_types": [
+        "fencing"
+      ]
+    },
+    "screen material": {
+      "count": 1,
+      "min": 350.0,
+      "max": 350.0,
+      "avg": 350.0,
+      "median": 350.0,
+      "project_types": [
+        "gutter"
+      ]
+    },
+    "screen labor": {
+      "count": 1,
+      "min": 600.0,
+      "max": 600.0,
+      "avg": 600.0,
+      "median": 600.0,
+      "project_types": [
+        "gutter"
+      ]
+    },
+    "sewer service treatment plant": {
+      "count": 1,
+      "min": 2500.0,
+      "max": 2500.0,
+      "avg": 2500.0,
+      "median": 2500.0,
+      "project_types": [
+        "guest_house"
+      ]
+    },
+    "double gate": {
+      "count": 1,
+      "min": 1350.0,
+      "max": 1350.0,
+      "avg": 1350.0,
+      "median": 1350.0,
+      "project_types": [
+        "fencing"
+      ]
+    },
+    "equipment": {
+      "count": 1,
+      "min": 1350.0,
+      "max": 1350.0,
+      "avg": 1350.0,
+      "median": 1350.0,
+      "project_types": [
+        "fencing"
+      ]
+    },
+    "driveway": {
+      "count": 1,
+      "min": 5.0,
+      "max": 5.0,
+      "avg": 5.0,
+      "median": 5.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "skylights": {
+      "count": 1,
+      "min": 650.0,
+      "max": 650.0,
+      "avg": 650.0,
+      "median": 650.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "gas lanterns": {
+      "count": 1,
+      "min": 150.0,
+      "max": 150.0,
+      "avg": 150.0,
+      "median": 150.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "bradford hot water heater": {
+      "count": 1,
+      "min": 495.0,
+      "max": 495.0,
+      "avg": 495.0,
+      "median": 495.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "bathroom project": {
+      "count": 1,
+      "min": 13000.0,
+      "max": 13000.0,
+      "avg": 13000.0,
+      "median": 13000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "pole barn": {
+      "count": 1,
+      "min": 47500.0,
+      "max": 47500.0,
+      "avg": 47500.0,
+      "median": 47500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "fish camp build": {
+      "count": 1,
+      "min": 275000.0,
+      "max": 275000.0,
+      "avg": 275000.0,
+      "median": 275000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "barn completion": {
+      "count": 1,
+      "min": 87500.0,
+      "max": 87500.0,
+      "avg": 87500.0,
+      "median": 87500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home renovation": {
+      "count": 1,
+      "min": 211000.0,
+      "max": 211000.0,
+      "avg": 211000.0,
+      "median": 211000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "rental renovation": {
+      "count": 1,
+      "min": 30000.0,
+      "max": 30000.0,
+      "avg": 30000.0,
+      "median": 30000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "office renovation": {
+      "count": 1,
+      "min": 24500.0,
+      "max": 24500.0,
+      "avg": 24500.0,
+      "median": 24500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "porch addition": {
+      "count": 1,
+      "min": 24000.0,
+      "max": 24000.0,
+      "avg": 24000.0,
+      "median": 24000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home addition": {
+      "count": 1,
+      "min": 60500.0,
+      "max": 60500.0,
+      "avg": 60500.0,
+      "median": 60500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home modification": {
+      "count": 1,
+      "min": 45000.0,
+      "max": 45000.0,
+      "avg": 45000.0,
+      "median": 45000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "bathroomcloset mod porch addition": {
+      "count": 1,
+      "min": 87000.0,
+      "max": 87000.0,
+      "avg": 87000.0,
+      "median": 87000.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "patio enclosure project": {
+      "count": 1,
+      "min": 9950.0,
+      "max": 9950.0,
+      "avg": 9950.0,
+      "median": 9950.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "retaining wall yard improvment": {
+      "count": 1,
+      "min": 28500.0,
+      "max": 28500.0,
+      "avg": 28500.0,
+      "median": 28500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "kitchen renovation": {
+      "count": 1,
+      "min": 59500.0,
+      "max": 59500.0,
+      "avg": 59500.0,
+      "median": 59500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home remodel": {
+      "count": 1,
+      "min": 49500.0,
+      "max": 49500.0,
+      "avg": 49500.0,
+      "median": 49500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "bathroom and kitchen project": {
+      "count": 1,
+      "min": 10500.0,
+      "max": 10500.0,
+      "avg": 10500.0,
+      "median": 10500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "medical clinic renovation": {
+      "count": 1,
+      "min": 153500.0,
+      "max": 153500.0,
+      "avg": 153500.0,
+      "median": 153500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "home improvement project": {
+      "count": 1,
+      "min": 8500.0,
+      "max": 8500.0,
+      "avg": 8500.0,
+      "median": 8500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "kitchenbathroomlaudry mod": {
+      "count": 1,
+      "min": 24300.0,
+      "max": 24300.0,
+      "avg": 24300.0,
+      "median": 24300.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "carport project": {
+      "count": 1,
+      "min": 13500.0,
+      "max": 13500.0,
+      "avg": 13500.0,
+      "median": 13500.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "carport and bathroom project": {
+      "count": 1,
+      "min": 7950.0,
+      "max": 7950.0,
+      "avg": 7950.0,
+      "median": 7950.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "backyard and porch project": {
+      "count": 1,
+      "min": 34950.0,
+      "max": 34950.0,
+      "avg": 34950.0,
+      "median": 34950.0,
+      "project_types": [
+        "general"
+      ]
+    },
+    "water damage project": {
+      "count": 1,
+      "min": 41850.0,
+      "max": 41850.0,
+      "avg": 41850.0,
+      "median": 41850.0,
+      "project_types": [
+        "general"
+      ]
+    }
+  },
+  "pricing_by_project_type": {
+    "porch": {
+      "project_count": 310,
+      "total_line_items": 1167,
+      "avg_line_item_cost": 7653.03,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "addition_remodel": {
+      "project_count": 301,
+      "total_line_items": 1166,
+      "avg_line_item_cost": 9987.98,
+      "total_cost_range": {
+        "min": 0.04,
+        "max": 294878.33
+      }
+    },
+    "commercial": {
+      "project_count": 353,
+      "total_line_items": 1186,
+      "avg_line_item_cost": 48277.8,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 1649528.23
+      }
+    },
+    "new_build": {
+      "project_count": 78,
+      "total_line_items": 111,
+      "avg_line_item_cost": 3875.27,
+      "total_cost_range": {
+        "min": 0.15,
+        "max": 52392.48
+      }
+    },
+    "general": {
+      "project_count": 984,
+      "total_line_items": 5506,
+      "avg_line_item_cost": 126960.43,
+      "total_cost_range": {
+        "min": 0.12,
+        "max": 64918650.0
+      }
+    },
+    "barn_outbuilding": {
+      "project_count": 292,
+      "total_line_items": 872,
+      "avg_line_item_cost": 10088.37,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "bathroom_renovation": {
+      "project_count": 294,
+      "total_line_items": 1078,
+      "avg_line_item_cost": 10114.99,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "bonus_room": {
+      "project_count": 192,
+      "total_line_items": 319,
+      "avg_line_item_cost": 6763.95,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "concrete_hardscape": {
+      "project_count": 179,
+      "total_line_items": 241,
+      "avg_line_item_cost": 8086.57,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "fencing": {
+      "project_count": 258,
+      "total_line_items": 804,
+      "avg_line_item_cost": 7307.46,
+      "total_cost_range": {
+        "min": 0.11,
+        "max": 294878.33
+      }
+    },
+    "deck": {
+      "project_count": 238,
+      "total_line_items": 797,
+      "avg_line_item_cost": 7489.02,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "gutter": {
+      "project_count": 115,
+      "total_line_items": 148,
+      "avg_line_item_cost": 11345.23,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "guest_house": {
+      "project_count": 254,
+      "total_line_items": 806,
+      "avg_line_item_cost": 9197.51,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "kitchen_renovation": {
+      "project_count": 183,
+      "total_line_items": 281,
+      "avg_line_item_cost": 10197.2,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "door_window": {
+      "project_count": 191,
+      "total_line_items": 761,
+      "avg_line_item_cost": 7779.92,
+      "total_cost_range": {
+        "min": 0.13,
+        "max": 294878.33
+      }
+    },
+    "retaining_wall": {
+      "project_count": 15,
+      "total_line_items": 20,
+      "avg_line_item_cost": 7029.0,
+      "total_cost_range": {
+        "min": 100.0,
+        "max": 24650.0
+      }
+    },
+    "painting": {
+      "project_count": 6,
+      "total_line_items": 6,
+      "avg_line_item_cost": 1275.0,
+      "total_cost_range": {
+        "min": 125.0,
+        "max": 3125.0
+      }
+    }
+  },
+  "pricing_by_category": {},
+  "labor_analysis": {
+    "entries": 2042,
+    "avg": 3318.91,
+    "min": 75.0,
+    "max": 60217.5,
+    "median": 950.0
+  },
+  "material_analysis": {
+    "entries": 3862,
+    "avg": 8540.54,
+    "min": 8.0,
+    "max": 511273.5,
+    "median": 3040.0
+  },
+  "margin_analysis": {
+    "entries": 7,
+    "avg_pct": 15.0,
+    "min_pct": 15.0,
+    "max_pct": 15.0
+  }
+}

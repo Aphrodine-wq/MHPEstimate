@@ -30,6 +30,8 @@ interface UseTableSyncOptions<T extends object> {
   select?: string;
   /** Optional order for initial fetch */
   orderBy?: { column: keyof T & string; ascending?: boolean };
+  /** When false, disables fetching and subscription (useful when supabase client may be null) */
+  enabled?: boolean;
 }
 
 interface UseTableSyncReturn<T> {
@@ -50,12 +52,14 @@ export function useTableSync<T extends object>({
   fetchOnMount = true,
   select = "*",
   orderBy,
+  enabled = true,
 }: UseTableSyncOptions<T>): UseTableSyncReturn<T> {
   const [rows, setRows] = useState<T[]>([]);
   const [status, setStatus] = useState<string>("CONNECTING");
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
+    if (!enabled) return;
     let query = supabase.from(table).select(select);
     if (filter) {
       const eqIdx = filter.indexOf("=");
@@ -77,15 +81,16 @@ export function useTableSync<T extends object>({
     } else {
       setRows((data as unknown as T[]) ?? []);
     }
-  }, [supabase, table, select, filter, orderBy]);
+  }, [supabase, table, select, filter, orderBy, enabled]);
 
   useEffect(() => {
-    if (fetchOnMount) {
+    if (fetchOnMount && enabled) {
       fetch();
     }
-  }, [fetchOnMount, fetch]);
+  }, [fetchOnMount, fetch, enabled]);
 
   useEffect(() => {
+    if (!enabled) return;
     const channelName = `sync-${table}-${filter ?? "all"}`;
     const channel = supabase
       .channel(channelName)

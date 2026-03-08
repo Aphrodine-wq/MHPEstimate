@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";
 import { createEstimate, useClients } from "../lib/store";
@@ -406,12 +406,13 @@ export function EditProfileModal({ open, onClose, user }: EditProfileModalProps)
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [saving, setSaving] = useState(false);
 
-  // Sync when user changes
   const userId = user?.id;
-  useState(() => {
+
+  // Sync form fields when user prop changes
+  useEffect(() => {
     setName(user?.full_name ?? "");
     setPhone(user?.phone ?? "");
-  });
+  }, [user?.full_name, user?.phone]);
 
   const handleSubmit = async () => {
     if (!supabase || !userId) return;

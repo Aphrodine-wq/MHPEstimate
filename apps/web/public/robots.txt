@@ -1,0 +1,6 @@
+# MHP Estimate — internal platform, not indexed
+User-agent: *
+Disallow: /
+
+# Allow health check for monitoring
+Allow: /api/health

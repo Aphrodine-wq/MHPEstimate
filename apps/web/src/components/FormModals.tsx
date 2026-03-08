@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Modal, Field, inputClass, selectClass, textareaClass } from "./Modal";
 import { supabase } from "../lib/supabase";
 import { createEstimate, useClients } from "../lib/store";
@@ -25,22 +26,29 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
 
   const handleSubmit = async () => {
     setSaving(true);
-    const est = await createEstimate();
-    if (est && supabase) {
-      await supabase.from("estimates").update({
-        project_type: projectType,
-        project_address: address || null,
-        client_id: clientId || null,
-        tier,
-        site_conditions: notes || null,
-        valid_through: validThrough || null,
-        scope_inclusions: scopeInclusions ? scopeInclusions.split("\n").filter(Boolean) : [],
-        scope_exclusions: scopeExclusions ? scopeExclusions.split("\n").filter(Boolean) : [],
-      }).eq("id", est.id);
+    try {
+      const est = await createEstimate();
+      if (est && supabase) {
+        const { error } = await supabase.from("estimates").update({
+          project_type: projectType,
+          project_address: address || null,
+          client_id: clientId || null,
+          tier,
+          site_conditions: notes || null,
+          valid_through: validThrough || null,
+          scope_inclusions: scopeInclusions ? scopeInclusions.split("\n").filter(Boolean) : [],
+          scope_exclusions: scopeExclusions ? scopeExclusions.split("\n").filter(Boolean) : [],
+        }).eq("id", est.id);
+        if (error) { console.error("Failed to update estimate:", error); toast.error("Failed to save estimate details"); }
+      }
+      setSaving(false);
+      resetAndClose();
+      if (est) onCreated?.(est);
+    } catch (err) {
+      console.error("Failed to create estimate:", err);
+      toast.error("Failed to create estimate");
+      setSaving(false);
     }
-    setSaving(false);
-    resetAndClose();
-    if (est) onCreated?.(est);
   };
 
   const resetAndClose = () => {
@@ -58,7 +66,7 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
   return (
     <Modal open={open} onClose={resetAndClose} title="New Estimate" description="Create a new construction estimate">
       <div className="space-y-4 px-6 py-5">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Project Type">
             <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className={selectClass}>
               <option>General</option>
@@ -82,7 +90,7 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
             </select>
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Project Address">
             <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, City, State" className={inputClass} />
           </Field>
@@ -145,19 +153,27 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
   const handleSubmit = async () => {
     if (!name.trim() || !supabase) return;
     setSaving(true);
-    await supabase.from("clients").insert({
-      full_name: name.trim(),
-      email: email || null,
-      phone: phone || null,
-      address_line1: address || null,
-      city: city || null,
-      state: state || null,
-      zip: zip || null,
-      notes: notes || null,
-      source: "manual",
-    });
-    setSaving(false);
-    resetAndClose();
+    try {
+      const { error } = await supabase.from("clients").insert({
+        full_name: name.trim(),
+        email: email || null,
+        phone: phone || null,
+        address_line1: address || null,
+        city: city || null,
+        state: state || null,
+        zip: zip || null,
+        notes: notes || null,
+        source: "manual",
+      });
+      if (error) { console.error("Failed to add client:", error); toast.error("Failed to add client"); setSaving(false); return; }
+      toast.success("Client added");
+      setSaving(false);
+      resetAndClose();
+    } catch (err) {
+      console.error("Failed to add client:", err);
+      toast.error("Failed to add client");
+      setSaving(false);
+    }
   };
 
   const resetAndClose = () => {
@@ -171,7 +187,7 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
         <Field label="Full Name *">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="John Smith" className={inputClass} />
         </Field>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Email">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="john@example.com" className={inputClass} />
           </Field>
@@ -182,7 +198,7 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
         <Field label="Street Address">
           <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St" className={inputClass} />
         </Field>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Field label="City">
             <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={inputClass} />
           </Field>
@@ -227,22 +243,30 @@ export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
   const handleSubmit = async () => {
     if (!description.trim() || !amount || !supabase) return;
     setSaving(true);
-    await supabase.from("company_settings").upsert({
-      key: `expense_${Date.now()}`,
-      value: {
-        category,
-        description: description.trim(),
-        amount: parseFloat(amount),
-        vendor: vendor || null,
-        date,
-        payment_method: paymentMethod,
-        notes: notes || null,
-        created_at: new Date().toISOString(),
-      },
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "key" });
-    setSaving(false);
-    resetAndClose();
+    try {
+      const { error } = await supabase.from("company_settings").upsert({
+        key: `expense_${Date.now()}`,
+        value: {
+          category,
+          description: description.trim(),
+          amount: parseFloat(amount),
+          vendor: vendor || null,
+          date,
+          payment_method: paymentMethod,
+          notes: notes || null,
+          created_at: new Date().toISOString(),
+        },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "key" });
+      if (error) { console.error("Failed to log expense:", error); toast.error("Failed to log expense"); setSaving(false); return; }
+      toast.success("Expense logged");
+      setSaving(false);
+      resetAndClose();
+    } catch (err) {
+      console.error("Failed to log expense:", err);
+      toast.error("Failed to log expense");
+      setSaving(false);
+    }
   };
 
   const resetAndClose = () => {
@@ -259,7 +283,7 @@ export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
   return (
     <Modal open={open} onClose={resetAndClose} title="Log Expense" description="Record a business expense">
       <div className="space-y-4 px-6 py-5">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Category">
             <select value={category} onChange={(e) => setCategory(e.target.value)} className={selectClass}>
               {["Materials", "Labor", "Equipment Rental", "Permits", "Fuel & Travel", "Office / Admin", "Insurance", "Subcontractor", "Tools", "Other"].map((c) => <option key={c}>{c}</option>)}
@@ -272,7 +296,7 @@ export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
         <Field label="Description *">
           <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Lumber for framing — 2x4s" className={inputClass} />
         </Field>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Amount *">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[var(--secondary)]">$</span>
@@ -320,15 +344,23 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
   const handleSubmit = async () => {
     if (!supabase) return;
     setSaving(true);
-    await supabase.from("invoices").insert({
-      supplier_name: supplier || null,
-      invoice_number: invoiceNum || null,
-      invoice_date: invoiceDate || null,
-      file_path: fileName || "pending-upload",
-      status: "pending",
-    });
-    setSaving(false);
-    resetAndClose();
+    try {
+      const { error } = await supabase.from("invoices").insert({
+        supplier_name: supplier || null,
+        invoice_number: invoiceNum || null,
+        invoice_date: invoiceDate || null,
+        file_path: fileName || "pending-upload",
+        status: "pending",
+      });
+      if (error) { console.error("Failed to upload invoice:", error); toast.error("Failed to upload invoice"); setSaving(false); return; }
+      toast.success("Invoice uploaded");
+      setSaving(false);
+      resetAndClose();
+    } catch (err) {
+      console.error("Failed to upload invoice:", err);
+      toast.error("Failed to upload invoice");
+      setSaving(false);
+    }
   };
 
   const resetAndClose = () => {
@@ -371,7 +403,7 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
             <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">PDF, PNG, or JPG</p>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Supplier Name">
             <input value={supplier} onChange={(e) => setSupplier(e.target.value)} placeholder="Home Depot" className={inputClass} />
           </Field>
@@ -406,26 +438,37 @@ export function EditProfileModal({ open, onClose, user }: EditProfileModalProps)
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [saving, setSaving] = useState(false);
 
-  // Sync when user changes
   const userId = user?.id;
-  useState(() => {
-    setName(user?.full_name ?? "");
-    setPhone(user?.phone ?? "");
-  });
+
+  // Sync form when user changes or modal opens
+  useEffect(() => {
+    if (open && user) {
+      setName(user.full_name ?? "");
+      setPhone(user.phone ?? "");
+    }
+  }, [open, user]);
 
   const handleSubmit = async () => {
     if (!supabase || !userId) return;
     setSaving(true);
-    await supabase.from("team_members").update({
-      full_name: name.trim(),
-      phone: phone || null,
-    }).eq("id", userId);
-    setSaving(false);
-    onClose();
+    try {
+      const { error } = await supabase.from("team_members").update({
+        full_name: name.trim(),
+        phone: phone || null,
+      }).eq("id", userId);
+      if (error) { console.error("Failed to update profile:", error); toast.error("Failed to update profile"); setSaving(false); return; }
+      toast.success("Profile updated");
+      setSaving(false);
+      onClose();
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+      toast.error("Failed to update profile");
+      setSaving(false);
+    }
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Edit Profile" width="w-[400px]">
+    <Modal open={open} onClose={onClose} title="Edit Profile" width="w-full max-w-[400px]">
       <div className="space-y-4 px-6 py-5">
         <Field label="Full Name">
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />

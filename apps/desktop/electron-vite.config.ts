@@ -7,5 +7,15 @@ export default defineConfig({
   renderer: {
     root: "src/renderer",
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "vendor-react": ["react", "react-dom"],
+            "vendor-supabase": ["@supabase/supabase-js"],
+          },
+        },
+      },
+    },
   },
 });

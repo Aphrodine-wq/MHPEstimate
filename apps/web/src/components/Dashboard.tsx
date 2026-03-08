@@ -1,6 +1,7 @@
-import { useEstimates, useActivityFeed } from "../lib/store";
+import { useEstimates, useClients, useInvoices, useActivityFeed } from "../lib/store";
 import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";
+import { StatusBadge } from "@proestimate/ui/components";
 import type { Estimate } from "@proestimate/shared/types";
 
 interface DashboardProps {
@@ -8,23 +9,6 @@ interface DashboardProps {
   onCallAlex?: () => void;
   onModal?: (m: string) => void;
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Draft", in_review: "In Review", approved: "Approved",
-  sent: "Sent", accepted: "Accepted", declined: "Declined",
-  revision_requested: "Revision", expired: "Expired",
-};
-
-const STATUS_STYLE: Record<string, string> = {
-  draft: "bg-[var(--gray5)] text-[var(--gray1)]",
-  in_review: "bg-[#fff3e0] text-[#e65100]",
-  approved: "bg-[#e3f2fd] text-[#1565c0]",
-  sent: "bg-[#f3e5f5] text-[#7b1fa2]",
-  accepted: "bg-[#e8f5e9] text-[#2e7d32]",
-  declined: "bg-[#ffebee] text-[#c62828]",
-  revision_requested: "bg-[#fff8e1] text-[#f57f17]",
-  expired: "bg-[var(--gray5)] text-[var(--gray1)]",
-};
 
 const QUOTES = [
   { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin" },
@@ -86,6 +70,8 @@ function timeAgo(dateStr: string): string {
 
 export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
   const { data: estimates, loading } = useEstimates();
+  const { data: clients } = useClients();
+  const { data: invoices } = useInvoices();
   const activityEntries = useActivityFeed();
 
   const todayQuote = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length]!;
@@ -101,7 +87,7 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="flex items-center justify-between px-8 pt-5 pb-1">
+      <header className="flex items-center justify-between px-4 md:px-8 pt-5 pb-1">
         <div>
           <p className="text-[12px] text-[var(--secondary)]">
             {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
@@ -116,14 +102,14 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
       </header>
 
       {/* KPIs row: 4 metrics + quote of the day */}
-      <div className="grid grid-cols-7 gap-3 px-8 py-4">
-        <div className="col-span-5 grid grid-cols-4 gap-3">
-          <Metric label="Estimate Tracker" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 px-4 md:px-8 py-4">
+        <div className="col-span-1 lg:col-span-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Metric label="Pipeline" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
           <Metric label="Won" value={fmt(totalWon)} sub={`${accepted.length} accepted`} />
+          <Metric label="Clients" value={clients.length.toString()} sub={`${clients.length === 1 ? "1 client" : `${clients.length} total`}`} />
           <Metric label="Avg Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "—"} sub="Target 35–42%" />
-          <Metric label="Drafts" value={drafts.length.toString()} sub="In progress" />
         </div>
-        <div className="col-span-2 flex flex-col rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
+        <div className="col-span-1 lg:col-span-2 flex flex-col rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
           <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Quote of the Day</p>
           <div className="mt-2 flex flex-1 items-start gap-2">
             <div className="mt-0.5 h-full w-[3px] flex-shrink-0 rounded-full bg-[var(--accent)]" />
@@ -136,13 +122,18 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
       </div>
 
       {/* Main content: left (estimates + actions/pipeline) + right (activity feed) */}
-      <div className="grid flex-1 grid-cols-7 gap-4 px-8 pb-6">
+      <div className="grid flex-1 grid-cols-1 lg:grid-cols-7 gap-4 px-4 md:px-8 pb-6">
         {/* Left column */}
-        <div className="col-span-5 flex flex-col gap-4">
+        <div className="col-span-1 lg:col-span-5 flex flex-col gap-4">
           {/* Recent estimates */}
           <div className="flex flex-1 flex-col">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[13px] font-semibold">Recent Estimates</p>
+              {estimates.length > 5 && (
+                <button onClick={() => onNavigate?.("estimates")} className="text-[12px] font-medium text-[var(--accent)] hover:underline">
+                  View all
+                </button>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)]">
               {loading ? (
@@ -160,13 +151,15 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
           </div>
 
           {/* Quick Actions + Pipeline Breakdown */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="mb-2 text-[13px] font-semibold">Quick Actions</p>
               <div className="space-y-2">
                 <ActionButton label="New Estimate" desc="Start from scratch" onClick={() => onModal?.("new-estimate")} />
+                <ActionButton label="Add Client" desc="Add a new client" onClick={() => onModal?.("add-client")} />
                 <ActionButton label="Quick Ballpark" desc="Voice or manual entry" onClick={() => onCallAlex?.()} />
                 <ActionButton label="Upload Invoice" desc="Add supplier pricing" onClick={() => onModal?.("upload-invoice")} />
+                <ActionButton label="View Analytics" desc="Reports & insights" onClick={() => onNavigate?.("analytics")} />
               </div>
             </div>
             <div>
@@ -187,7 +180,7 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
         </div>
 
         {/* Right column: Activity Feed */}
-        <div className="col-span-2 flex flex-col">
+        <div className="col-span-1 lg:col-span-2 flex flex-col">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-[13px] font-semibold">Activity Feed</p>
           </div>
@@ -210,10 +203,11 @@ function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
   }
 
   return (
-    <div>
+    <div role="list" aria-label="Activity feed">
       {entries.map((entry, i) => (
         <div
           key={entry.id}
+          role="listitem"
           className={`flex items-start gap-3 px-4 py-3 ${i < entries.length - 1 ? "border-b border-[var(--sep)]" : ""}`}
         >
           <div className="mt-1.5 flex-shrink-0">
@@ -235,7 +229,7 @@ function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
 
 function Metric({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
+    <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4" aria-label={`${label}: ${value}, ${sub}`}>
       <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{label}</p>
       <p className="mt-1 text-[22px] font-bold tracking-tight">{value}</p>
       <p className="text-[11px] text-[var(--secondary)]">{sub}</p>
@@ -252,9 +246,7 @@ function EstimateRow({ estimate, last, onNavigate }: { estimate: Estimate; last:
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-[13px] font-medium truncate">{estimate.estimate_number}</p>
-          <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[estimate.status] ?? STATUS_STYLE.draft}`}>
-            {STATUS_LABEL[estimate.status] ?? estimate.status}
-          </span>
+          <StatusBadge status={estimate.status} />
         </div>
         <p className="text-[12px] text-[var(--secondary)] truncate">{estimate.project_type}</p>
       </div>

@@ -1,10 +1,13 @@
 import { useConversation } from "@elevenlabs/react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 
-const AGENT_ID = "agent_6801kj5q6ztmf0vsdeh45q4v4gnm";
+const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID ?? "";
+const AGENT_CONFIGURED = AGENT_ID.length > 0;
 
 export function CallAlexFAB({ onCall }: { onCall: () => void }) {
   const [showConfirm, setShowConfirm] = useState(false);
+
+  if (!AGENT_CONFIGURED) return null;
 
   return (
     <>
@@ -30,7 +33,11 @@ export function CallAlexFAB({ onCall }: { onCall: () => void }) {
               <div>
                 <p className="text-[15px] font-semibold">Ready to Call Alex?</p>
                 <p className="mt-1 text-[13px] text-[var(--secondary)]">
-                  Alex will help you build an estimate through a voice conversation. Make sure you have your project details ready and your microphone is available.
+                  Alex will help you build an estimate through a voice conversation. Make sure you have your project details ready.
+                </p>
+                <p className="mt-1.5 flex items-center gap-1 text-[11px] text-[var(--secondary)]">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg>
+                  Microphone access required
                 </p>
               </div>
               <div className="mt-2 flex w-full gap-2">
@@ -56,24 +63,53 @@ export function CallAlexFAB({ onCall }: { onCall: () => void }) {
 }
 
 export function CallAlexPanel({ onClose }: { onClose: () => void }) {
+  const [error, setError] = useState<string | null>(null);
+  const endingRef = useRef(false);
+
   const conversation = useConversation({
-    onError: (error) => console.error("ElevenLabs error:", error),
+    onError: (err) => {
+      console.error("ElevenLabs error:", err);
+      setError(typeof err === "string" ? err : "Connection lost. Please try again.");
+    },
+    volume: 1,
   });
+  const started = useRef(false);
 
   const start = useCallback(async () => {
+    setError(null);
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      setError("Microphone access is required. Please allow microphone access and try again.");
+      return;
+    }
+    try {
       await conversation.startSession({
         agentId: AGENT_ID,
-        connectionType: "webrtc",
+        connectionType: "websocket",
       });
     } catch (err) {
       console.error("Failed to start session:", err);
+      setError("Could not connect to Alex. Please check your connection and try again.");
     }
   }, [conversation]);
 
+  // Auto-start on mount — user already confirmed via the dialog
+  useEffect(() => {
+    if (!started.current) {
+      started.current = true;
+      start();
+    }
+  }, [start]);
+
   const end = useCallback(async () => {
-    await conversation.endSession();
+    if (endingRef.current) return;
+    endingRef.current = true;
+    try {
+      await conversation.endSession();
+    } catch {
+      // Session may already be ended
+    }
     onClose();
   }, [conversation, onClose]);
 
@@ -86,13 +122,11 @@ export function CallAlexPanel({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--sep)] px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full text-[14px] font-semibold text-white ${status === "connected" ? "bg-[var(--green)]" : "bg-[var(--gray5)] text-[var(--gray1)]"}`}>A</div>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full text-[14px] font-semibold text-white ${error ? "bg-[var(--red)]" : status === "connected" ? "bg-[var(--green)]" : "bg-[var(--gray5)] text-[var(--gray1)]"}`}>A</div>
             <div>
               <p className="text-[15px] font-semibold">Alex</p>
               <p className="text-[11px] text-[var(--secondary)]">
-                {status === "disconnected" && "Estimation Assistant"}
-                {status === "connecting" && "Connecting…"}
-                {status === "connected" && (isSpeaking ? "Speaking…" : "Listening…")}
+                {error ? "Connection Error" : status === "disconnected" ? "Estimation Assistant" : status === "connecting" ? "Connecting…" : isSpeaking ? "Speaking…" : "Listening…"}
               </p>
             </div>
           </div>
@@ -104,16 +138,27 @@ export function CallAlexPanel({ onClose }: { onClose: () => void }) {
         {/* Status area */}
         <div className="h-[240px] overflow-y-auto border-b border-[var(--sep)] px-5 py-4">
           <div className="flex h-full flex-col items-center justify-center gap-4">
-            {status === "disconnected" && (
-              <p className="text-[13px] text-[var(--secondary)]">Start a call to begin your session with Alex</p>
-            )}
-            {status === "connecting" && (
+            {error ? (
+              <>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--red)]/10">
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="var(--red)" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg>
+                </div>
+                <p className="max-w-[280px] text-center text-[13px] text-[var(--secondary)]">{error}</p>
+                <button onClick={() => { started.current = false; start(); }} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-95">
+                  Retry
+                </button>
+              </>
+            ) : status === "disconnected" ? (
+              <>
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--gray4)] border-t-[var(--accent)]" />
+                <p className="text-[13px] text-[var(--secondary)]">Initializing…</p>
+              </>
+            ) : status === "connecting" ? (
               <>
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--gray4)] border-t-[var(--accent)]" />
                 <p className="text-[13px] text-[var(--secondary)]">Establishing connection…</p>
               </>
-            )}
-            {status === "connected" && (
+            ) : status === "connected" ? (
               <>
                 <div className={`flex h-20 w-20 items-center justify-center rounded-full transition-all ${isSpeaking ? "bg-[var(--accent)]/10 animate-pulse" : "bg-[var(--green)]/10"}`}>
                   <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={isSpeaking ? "var(--accent)" : "var(--green)"} strokeWidth="1.5" strokeLinecap="round">
@@ -124,25 +169,17 @@ export function CallAlexPanel({ onClose }: { onClose: () => void }) {
                   {isSpeaking ? "Alex is speaking…" : "Listening — speak to Alex"}
                 </p>
               </>
-            )}
+            ) : null}
           </div>
         </div>
 
         {/* Controls */}
         <div className="flex items-center justify-center gap-4 py-5">
-          {status === "disconnected" ? (
-            <button onClick={start} className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--green)] transition-all active:scale-90">
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-              </svg>
-            </button>
-          ) : (
-            <button onClick={end} className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--red)] transition-all active:scale-90">
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-              </svg>
-            </button>
-          )}
+          <button onClick={end} className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--red)] transition-all active:scale-90">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

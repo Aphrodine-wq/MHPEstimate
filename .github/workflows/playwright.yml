@@ -9,16 +9,19 @@ jobs:
   test-web:
     name: Web E2E Tests
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # reads version from packageManager in package.json
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo build --filter=web
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test --project=web
       - uses: actions/upload-artifact@v4
@@ -31,11 +34,13 @@ jobs:
   test-desktop:
     name: Desktop E2E Tests
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # reads version from packageManager in package.json
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

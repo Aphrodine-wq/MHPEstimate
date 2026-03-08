@@ -1,32 +1,17 @@
 import { useState } from "react";
-import { useEstimates } from "../lib/store";
+import { useEstimates, createEstimate } from "../lib/store";
+import { supabase } from "../lib/supabase";
 import { EmptyState } from "./EmptyState";
+import { StatusBadge } from "@proestimate/ui/components";
 import type { Estimate } from "@proestimate/shared/types";
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Draft", in_review: "In Review", approved: "Approved",
-  sent: "Sent", accepted: "Accepted", declined: "Declined",
-  revision_requested: "Revision", expired: "Expired",
-};
-
-const STATUS_STYLE: Record<string, string> = {
-  draft: "bg-[var(--gray5)] text-[var(--gray1)]",
-  in_review: "bg-[#fff3e0] text-[#e65100]",
-  approved: "bg-[#e3f2fd] text-[#1565c0]",
-  sent: "bg-[#f3e5f5] text-[#7b1fa2]",
-  accepted: "bg-[#e8f5e9] text-[#2e7d32]",
-  declined: "bg-[#ffebee] text-[#c62828]",
-  revision_requested: "bg-[#fff8e1] text-[#f57f17]",
-  expired: "bg-[var(--gray5)] text-[var(--gray1)]",
-};
-
-const PAGE_SIZE = 25;
 
 const FILTERS = ["All", "Draft", "In Review", "Sent", "Approved", "Accepted", "Declined"];
 const FILTER_MAP: Record<string, string> = {
   All: "", Draft: "draft", "In Review": "in_review", Sent: "sent",
   Approved: "approved", Accepted: "accepted", Declined: "declined",
 };
+
+const PAGE_SIZE = 25;
 
 export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }) {
   const { data: estimates, loading } = useEstimates();
@@ -119,9 +104,7 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-medium truncate">{est.estimate_number}</p>
-                      <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[est.status] ?? ""}`}>
-                        {STATUS_LABEL[est.status] ?? est.status}
-                      </span>
+                      <StatusBadge status={est.status} />
                     </div>
                     <p className="text-[12px] text-[var(--secondary)] truncate">{est.project_type}</p>
                     <p className="text-[11px] text-[var(--tertiary)] truncate">{est.project_address}</p>
@@ -183,15 +166,54 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
 }
 
 function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate; onClose: () => void; onEditEstimate?: (estimate: any) => void }) {
+  const [duplicating, setDuplicating] = useState(false);
+
+  const handleDuplicate = async () => {
+    if (!supabase || duplicating) return;
+    setDuplicating(true);
+    try {
+      // Create a new estimate (gets next estimate number)
+      const newEst = await createEstimate();
+      if (!newEst) { setDuplicating(false); return; }
+
+      // Copy fields from the original estimate (excluding id, estimate_number, status, created_at, updated_at)
+      const {
+        id: _id, estimate_number: _num, status: _status,
+        created_at: _ca, updated_at: _ua,
+        ...copyFields
+      } = estimate;
+
+      await supabase.from("estimates").update({
+        ...copyFields,
+        status: "draft",
+      }).eq("id", newEst.id);
+
+      // Copy line items from the original estimate
+      const { data: lineItems } = await supabase
+        .from("estimate_line_items")
+        .select("*")
+        .eq("estimate_id", estimate.id)
+        .order("line_number");
+
+      if (lineItems && lineItems.length > 0) {
+        const copiedItems = lineItems.map((item: any) => {
+          const { id: _itemId, estimate_id: _estId, created_at: _itemCa, updated_at: _itemUa, ...rest } = item;
+          return { ...rest, estimate_id: newEst.id };
+        });
+        await supabase.from("estimate_line_items").insert(copiedItems);
+      }
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-[11px] text-[var(--secondary)]">{estimate.estimate_number}</p>
           <h2 className="text-[18px] font-bold">{estimate.project_type}</h2>
-          <span className={`mt-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold ${STATUS_STYLE[estimate.status] ?? ""}`}>
-            {STATUS_LABEL[estimate.status] ?? estimate.status}
-          </span>
+          <StatusBadge status={estimate.status} className="mt-1 inline-block" />
         </div>
         <button onClick={onClose} className="rounded-md p-1 hover:bg-[var(--bg)]">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gray1)" strokeWidth="2" strokeLinecap="round">
@@ -232,7 +254,13 @@ function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate
           Open Estimate
         </button>
         <div className="flex gap-2">
-          <button className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)]">Duplicate</button>
+          <button
+            onClick={handleDuplicate}
+            disabled={duplicating}
+            className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
+          >
+            {duplicating ? "Duplicating..." : "Duplicate"}
+          </button>
           <button className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)]">PDF</button>
         </div>
       </div>
