@@ -3,7 +3,19 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "out/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "out/**"],
+      "env": [
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_ELEVENLABS_AGENT_ID",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "SUPABASE_SERVICE_KEY",
+        "ANTHROPIC_API_KEY",
+        "ELEVENLABS_API_KEY",
+        "TWILIO_ACCOUNT_SID",
+        "TWILIO_AUTH_TOKEN"
+      ]
     },
     "dev": {
       "cache": false,

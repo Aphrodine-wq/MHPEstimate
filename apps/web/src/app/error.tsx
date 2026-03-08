@@ -1,5 +1,6 @@
 "use client";
 
+import type { JSX } from "react";
 import { useEffect } from "react";
 
 export default function Error({
@@ -8,7 +9,7 @@ export default function Error({
 }: {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}): JSX.Element {
   useEffect(() => {
     // Log to Sentry or console in production
     console.error("[App Error]", error);
