@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
  * Next.js middleware for route protection.
  * Runs on the edge before every request.
  *
- * - Public routes: /, /auth, /auth/callback, /_next, /api/health
+ * - Public routes: /, /auth, /auth/callback, /_next, /api/health, /portal, /api/portal
  * - Protected routes: everything else requires a valid session
  */
 
@@ -13,6 +13,11 @@ const PUBLIC_PATHS = [
   "/auth",
   "/auth/callback",
   "/api/health",
+  // Customer portal — token-validated, no Supabase auth required
+  "/portal",
+  "/api/portal",
+  // Stripe webhooks — signature-validated, no Supabase auth
+  "/api/webhooks",
 ];
 
 export function middleware(request: NextRequest) {

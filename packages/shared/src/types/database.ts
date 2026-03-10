@@ -224,3 +224,94 @@ export interface CompanySetting {
   value: Record<string, unknown>;
   updated_at: string;
 }
+
+// ── Audit Log ──
+
+export type AuditActionType =
+  | "estimate_created"
+  | "estimate_updated"
+  | "estimate_status_changed"
+  | "estimate_sent"
+  | "estimate_accepted"
+  | "estimate_declined"
+  | "line_item_added"
+  | "line_item_updated"
+  | "line_item_removed"
+  | "change_order_created"
+  | "change_order_approved"
+  | "change_order_rejected"
+  | "client_created"
+  | "client_updated"
+  | "client_deleted"
+  | "team_member_invited"
+  | "team_member_updated"
+  | "team_member_deactivated"
+  | "invoice_uploaded"
+  | "invoice_confirmed"
+  | "voice_call_started"
+  | "voice_call_ended"
+  | "job_actual_recorded"
+  | "version_snapshot_created"
+  | "reminder_scheduled"
+  | "reminder_cancelled"
+  | "settings_updated"
+  | "estimate_pdf_generated"
+  | "estimate_shared"
+  | "estimate_signed"
+  | "payment_link_created"
+  | "estimate_exported"
+  | "estimate_reminder_deleted";
+
+export type AuditEntityType =
+  | "estimate"
+  | "estimate_line_item"
+  | "estimate_change_order"
+  | "client"
+  | "team_member"
+  | "invoice"
+  | "voice_call"
+  | "job_actual"
+  | "estimate_version"
+  | "estimate_reminder"
+  | "company_settings"
+  | "product";
+
+export interface AuditLog {
+  id: string;
+  user_id: string;
+  action_type: AuditActionType;
+  entity_type: AuditEntityType;
+  entity_id: string | null;
+  metadata: Record<string, unknown>;
+  ip_address: string | null;
+  created_at: string;
+}
+
+// ── Estimate Versions ──
+
+export interface EstimateVersion {
+  id: string;
+  estimate_id: string;
+  version_number: number;
+  snapshot: Record<string, unknown>;
+  change_summary: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+// ── Estimate Reminders ──
+
+export type ReminderType = "follow_up" | "expiry_warning" | "custom";
+export type ReminderStatus = "scheduled" | "sent" | "cancelled" | "failed";
+
+export interface EstimateReminder {
+  id: string;
+  estimate_id: string;
+  reminder_type: ReminderType;
+  scheduled_for: string;
+  sent_at: string | null;
+  status: ReminderStatus;
+  message: string | null;
+  created_by: string;
+  created_at: string;
+}

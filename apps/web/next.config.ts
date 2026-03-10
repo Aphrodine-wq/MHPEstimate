@@ -3,6 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   outputFileTracingRoot: path.join(__dirname, "../../"),
   transpilePackages: ["@proestimate/ui", "@proestimate/shared"],
   experimental: {
@@ -37,7 +38,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.elevenlabs.io",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.elevenlabs.io https://api.stripe.com",
               "frame-src 'none'",
               "object-src 'none'",
               "base-uri 'self'",
