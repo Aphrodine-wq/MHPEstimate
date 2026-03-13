@@ -99,8 +99,8 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-[13px] font-medium leading-tight truncate">{user?.full_name ?? "Not signed in"}</p>
-              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Connect Supabase"}</p>
+              <p className="text-[13px] font-medium leading-tight truncate">{user?.full_name ?? "My Account"}</p>
+              <p className="text-[11px] text-[var(--secondary)] truncate capitalize">{user?.role ?? "Team Member"}</p>
             </div>
           )}
         </button>

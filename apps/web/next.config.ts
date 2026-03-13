@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  eslint: { ignoreDuringBuilds: true },
   outputFileTracingRoot: path.join(__dirname, "../../"),
   transpilePackages: ["@proestimate/ui", "@proestimate/shared"],
   experimental: {

@@ -208,9 +208,51 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
   );
 }
 
+const STATUS_TRANSITIONS: Record<string, { label: string; next: string; color: string }[]> = {
+  draft:      [{ label: "Send for Review", next: "in_review", color: "accent" }, { label: "Mark Sent", next: "sent", color: "accent" }],
+  in_review:  [{ label: "Mark Sent", next: "sent", color: "accent" }, { label: "Back to Draft", next: "draft", color: "gray" }],
+  sent:       [{ label: "Mark Approved", next: "approved", color: "green" }, { label: "Mark Accepted", next: "accepted", color: "green" }, { label: "Mark Declined", next: "declined", color: "red" }],
+  approved:   [{ label: "Mark Accepted", next: "accepted", color: "green" }, { label: "Mark Declined", next: "declined", color: "red" }],
+  accepted:   [],
+  declined:   [{ label: "Reopen as Draft", next: "draft", color: "gray" }],
+};
+
 function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate; onClose: () => void; onEditEstimate?: (estimate: any) => void }) {
   const [duplicating, setDuplicating] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleStatusChange = async (nextStatus: string) => {
+    if (!supabase || updatingStatus) return;
+    setUpdatingStatus(true);
+    try {
+      const update: Record<string, unknown> = { status: nextStatus };
+      if (nextStatus === "sent") update.sent_at = new Date().toISOString();
+      if (nextStatus === "accepted") update.accepted_at = new Date().toISOString();
+      await supabase.from("estimates").update(update).eq("id", estimate.id);
+      toast.success(`Status updated to ${nextStatus.replace("_", " ")}`);
+    } catch {
+      toast.error("Failed to update status");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!supabase || deleting) return;
+    setDeleting(true);
+    try {
+      await supabase.from("estimate_line_items").delete().eq("estimate_id", estimate.id);
+      await supabase.from("estimates").delete().eq("id", estimate.id);
+      toast.success("Estimate deleted");
+      onClose();
+    } catch {
+      toast.error("Failed to delete estimate");
+      setDeleting(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     if (!supabase || generatingPdf) return;
@@ -318,8 +360,39 @@ function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate
         <Row label="Grand Total" value={`$${Number(estimate.grand_total).toLocaleString()}`} bold />
       </Section>
 
+      {(STATUS_TRANSITIONS[estimate.status] ?? []).length > 0 && (
+        <div className="mb-4">
+          <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Update Status</p>
+          <div className="flex flex-wrap gap-1.5">
+            {(STATUS_TRANSITIONS[estimate.status] ?? []).map((t) => (
+              <button
+                key={t.next}
+                onClick={() => handleStatusChange(t.next)}
+                disabled={updatingStatus}
+                className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all disabled:opacity-50 active:scale-[0.98] ${
+                  t.color === "green" ? "bg-[var(--green)]/10 text-[var(--green)] hover:bg-[var(--green)]/20" :
+                  t.color === "red"   ? "bg-[var(--red)]/10 text-[var(--red)] hover:bg-[var(--red)]/20" :
+                  t.color === "gray"  ? "border border-[var(--sep)] text-[var(--secondary)] hover:bg-[var(--bg)]" :
+                                        "bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20"
+                }`}
+              >
+                {updatingStatus ? "Saving…" : t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Section title="Validation">
-        <Row label="Passed" value={estimate.validation_passed ? "Yes" : "No"} />
+        <div className="flex items-center gap-2 px-3 py-2">
+          {estimate.validation_passed ? (
+            <><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6 9 17l-5-5" /></svg>
+            <p className="text-[12px] font-medium text-[var(--green)]">Validation passed</p></>
+          ) : (
+            <><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--secondary)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <p className="text-[12px] text-[var(--secondary)]">Validation pending — open estimate to run</p></>
+          )}
+        </div>
       </Section>
 
       <Section title="Timeline">
@@ -329,25 +402,45 @@ function DetailPanel({ estimate, onClose, onEditEstimate }: { estimate: Estimate
       </Section>
 
       <div className="mt-4 space-y-2">
-        <button onClick={() => onEditEstimate?.(estimate)} className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-[13px] font-medium text-white transition-all active:scale-[0.99]">
+        <button onClick={() => onEditEstimate?.(estimate)} className="w-full rounded-lg bg-[var(--accent)] py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.99]">
           Open Estimate
         </button>
         <div className="flex gap-2">
           <button
             onClick={handleDuplicate}
             disabled={duplicating}
-            className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
+            className="flex-1 rounded-lg border border-[var(--sep)] py-2 text-[12px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
           >
-            {duplicating ? "Duplicating..." : "Duplicate"}
+            {duplicating ? "Copying…" : "Duplicate"}
           </button>
           <button
             onClick={handleDownloadPDF}
             disabled={generatingPdf}
-            className="flex-1 rounded-lg border border-[var(--sep)] py-2.5 text-[13px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
+            className="flex-1 rounded-lg border border-[var(--sep)] py-2 text-[12px] font-medium transition-all hover:bg-[var(--bg)] disabled:opacity-50"
           >
-            {generatingPdf ? "Generating..." : "PDF"}
+            {generatingPdf ? "Generating…" : "Download PDF"}
           </button>
         </div>
+        {!confirmDelete ? (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="w-full rounded-lg py-2 text-[12px] font-medium text-[var(--red)]/70 transition-colors hover:text-[var(--red)]"
+          >
+            Delete Estimate
+          </button>
+        ) : (
+          <div className="rounded-lg border border-[var(--red)]/20 bg-[var(--red)]/5 p-3">
+            <p className="mb-2 text-[12px] text-[var(--label)]">Delete <span className="font-semibold">{estimate.estimate_number}</span>? This cannot be undone.</p>
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmDelete(false)} className="flex-1 rounded-lg border border-[var(--sep)] py-1.5 text-[12px] font-medium transition-colors hover:bg-[var(--bg)]">
+                Cancel
+              </button>
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 rounded-lg bg-[var(--red)] py-1.5 text-[12px] font-semibold text-white transition-all disabled:opacity-50">
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -139,8 +139,11 @@ export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
               {loading ? (
                 <LoadingRows count={4} />
               ) : estimates.length === 0 ? (
-                <div className="flex h-full items-center justify-center py-16">
+                <div className="flex h-full flex-col items-center justify-center gap-3 py-16">
                   <p className="text-[13px] text-[var(--secondary)]">No estimates yet</p>
+                  <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110">
+                    Create First Estimate
+                  </button>
                 </div>
               ) : (
                 estimates.slice(0, 8).map((est, i, arr) => (

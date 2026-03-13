@@ -11,6 +11,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ title, onModal, onNavigate, user, onSignOut, onToggleMobileMenu }: TopBarProps) {
+  const [helpOpen, setHelpOpen] = useState(false);
   return (
     <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-[var(--sep)] bg-[var(--card)] px-3 md:px-6">
       {/* Left: Hamburger + Breadcrumb */}
@@ -48,13 +49,36 @@ export function TopBar({ title, onModal, onNavigate, user, onSignOut, onToggleMo
         <NotificationsButton />
 
         {/* Help */}
-        <button aria-label="Help" className="hidden sm:flex rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]">
+        <button onClick={() => setHelpOpen(true)} aria-label="Help" className="hidden sm:flex rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]">
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <path d="M12 17h.01" />
           </svg>
         </button>
+
+        {/* Help modal */}
+        {helpOpen && (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setHelpOpen(false)} />
+            <div className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--sep)] bg-[var(--card)] p-5 shadow-xl animate-modal-content">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-semibold">Keyboard Shortcuts</p>
+                <button onClick={() => setHelpOpen(false)} className="rounded-md p-1 hover:bg-[var(--bg)]">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div className="space-y-2 text-[13px]">
+                {[["N", "New estimate"],["C", "Add client"],["↑ / ↓", "Navigate lists"],["Esc", "Close panels"]].map(([key, desc]) => (
+                  <div key={key} className="flex items-center justify-between">
+                    <span className="text-[var(--secondary)]">{desc}</span>
+                    <kbd className="rounded-md border border-[var(--sep)] bg-[var(--bg)] px-2 py-0.5 text-[11px] font-medium">{key}</kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Divider */}
         <div className="hidden sm:block mx-1.5 h-6 w-px bg-[var(--sep)]" />
@@ -123,11 +147,13 @@ function NotificationsButton() {
                 ))
               )}
             </div>
-            <div className="border-t border-[var(--sep)] px-4 py-2">
-              <button className="w-full text-center text-[12px] font-medium text-[var(--accent)] hover:underline">
-                View All Notifications
-              </button>
-            </div>
+            {notifications.length > 0 && (
+              <div className="border-t border-[var(--sep)] px-4 py-2">
+                <button onClick={markAllRead} className="w-full text-center text-[12px] font-medium text-[var(--secondary)] hover:text-[var(--label)] transition-colors">
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
