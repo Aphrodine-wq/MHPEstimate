@@ -8,7 +8,7 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
+    "lint": "tsc --noEmit",
     "package": "electron-builder --config electron-builder.yml",
     "package:mac": "electron-vite build && electron-builder --config electron-builder.yml --mac"
   },

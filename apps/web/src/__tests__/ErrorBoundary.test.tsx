@@ -43,13 +43,14 @@ describe("ErrorBoundary", () => {
     );
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Try Again"));
-
+    // Update children to not throw before resetting the boundary
     rerender(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>
     );
+
+    fireEvent.click(screen.getByText("Try Again"));
     expect(screen.getByText("No error")).toBeInTheDocument();
   });
 });

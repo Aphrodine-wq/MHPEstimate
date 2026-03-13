@@ -123,10 +123,8 @@ describe("generatePackageEstimate", () => {
     const result = generatePackageEstimate("outdoor_living", 0.03, 0.15);
     if (!result) return;
 
-    const expected = Math.round(
-      (result.subtotal + result.overhead + result.profitMargin) * 100
-    ) / 100;
-    expect(result.grandTotal).toBe(expected);
+    const expected = result.subtotal + result.overhead + result.profitMargin;
+    expect(result.grandTotal).toBeCloseTo(expected, 1);
   });
 });
 

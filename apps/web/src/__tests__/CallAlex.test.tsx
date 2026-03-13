@@ -11,6 +11,12 @@ vi.mock("@elevenlabs/react", () => ({
   }),
 }));
 
+// Mock mediaDevices (not available in jsdom)
+Object.defineProperty(navigator, "mediaDevices", {
+  writable: true,
+  value: { getUserMedia: vi.fn().mockResolvedValue({}) },
+});
+
 // Set agent ID for tests
 const originalEnv = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
 

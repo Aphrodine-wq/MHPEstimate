@@ -120,7 +120,7 @@ describe("ConfirmDialog", () => {
         message="Sure?"
       />
     );
-    fireEvent.click(screen.getByText("Confirm"));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
     expect(onConfirm).toHaveBeenCalledOnce();
     expect(onClose).toHaveBeenCalledOnce();
   });

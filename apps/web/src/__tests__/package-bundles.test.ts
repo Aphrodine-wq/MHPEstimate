@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   MHP_PACKAGE_BUNDLES,
+  MHP_PROJECT_TEMPLATES,
   getPackageBundle,
   getAvailableBundles,
   findBundlesForProjectType,
@@ -25,7 +26,6 @@ describe("MHP_PACKAGE_BUNDLES", () => {
   });
 
   it("all projectTypes reference valid template keys", () => {
-    const { MHP_PROJECT_TEMPLATES } = require("@proestimate/shared/constants");
     const validTypes = Object.keys(MHP_PROJECT_TEMPLATES);
     for (const bundle of Object.values(MHP_PACKAGE_BUNDLES)) {
       for (const pt of bundle.projectTypes) {
