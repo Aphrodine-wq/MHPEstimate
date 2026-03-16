@@ -20,6 +20,13 @@ export type {
   VoiceCallSource,
   JobActual,
   CompanySetting,
+  AuditLog,
+  AuditActionType,
+  AuditEntityType,
+  EstimateVersion,
+  EstimateReminder,
+  ReminderType,
+  ReminderStatus,
 } from "./database";
 
 export type { ValidationCheck, ValidationResult, ValidationSeverity } from "./validation";

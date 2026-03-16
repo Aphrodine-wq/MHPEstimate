@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import dynamic from "next/dynamic";
@@ -23,21 +23,29 @@ const CallHistoryPage = dynamic(() => import("./CallHistoryPage").then(m => ({ d
 const AnalyticsPage = dynamic(() => import("./AnalyticsPage").then(m => ({ default: m.AnalyticsPage })), { ssr: false, loading: () => <PageSkeleton /> });
 const SettingsPage = dynamic(() => import("./SettingsPage").then(m => ({ default: m.SettingsPage })), { ssr: false, loading: () => <PageSkeleton /> });
 const Profile = dynamic(() => import("./Profile").then(m => ({ default: m.Profile })), { ssr: false, loading: () => <PageSkeleton /> });
+const TeamMembersPage = dynamic(() => import("./TeamMembersPage").then(m => ({ default: m.TeamMembersPage })), { ssr: false, loading: () => <PageSkeleton /> });
 const CallAlexFAB = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexFAB })), { ssr: false });
 const CallAlexPanel = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexPanel })), { ssr: false });
 import { SplashScreen } from "./SplashScreen";
 import { AuthScreen } from "./AuthScreen";
 import { OnboardingWizard } from "./OnboardingWizard";
-import { NewEstimateModal, AddClientModal, LogExpenseModal, UploadInvoiceModal, EditProfileModal } from "./FormModals";
+import { NewEstimateModal } from "./NewEstimateModal";
+import { AddClientModal } from "./AddClientModal";
+import { LogExpenseModal } from "./LogExpenseModal";
+import { UploadInvoiceModal } from "./UploadInvoiceModal";
+import { EditProfileModal } from "./EditProfileModal";
 import { EstimateEditorModal } from "./EstimateEditorModal";
+import { AppProvider, type AppContextValue } from "./AppContext";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { useCurrentUser, useEstimates } from "../lib/store";
 import { supabase, getSession, signOut } from "../lib/supabase";
+import { setUserContext, clearUserContext } from "../lib/sentry";
 import { Toaster } from "react-hot-toast";
 
 type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
 type AppPhase = "splash" | "auth" | "reset-password" | "ready";
 
+// Pages no longer receive props — they use useAppContext() instead
 const PAGE_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   estimates: "Estimates",
@@ -48,9 +56,10 @@ const PAGE_TITLES: Record<string, string> = {
   analytics: "Analytics",
   settings: "Settings",
   profile: "Profile",
+  team: "Team Members",
 };
 
-const pages: Record<string, React.ComponentType<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void; onSignOut?: () => void }>> = {
+const pages: Record<string, React.ComponentType> = {
   dashboard: Dashboard,
   estimates: EstimatesList,
   materials: MaterialsPage,
@@ -60,6 +69,7 @@ const pages: Record<string, React.ComponentType<{ onNavigate?: (page: string) =>
   analytics: AnalyticsPage,
   settings: SettingsPage,
   profile: Profile,
+  team: TeamMembersPage,
 };
 
 export function App() {
@@ -79,6 +89,11 @@ export function App() {
     setEditingEstimate(estimate);
     setModal("edit-estimate");
   }, []);
+
+  const handleEstimateCreated = useCallback((estimate: Estimate) => {
+    setCallOpen(false);
+    openEstimateEditor(estimate);
+  }, [openEstimateEditor]);
 
   // After splash completes, check auth
   const handleSplashReady = useCallback(async () => {
@@ -126,10 +141,28 @@ export function App() {
     return () => { subscription.unsubscribe(); };
   }, []);
 
+  // Sync authenticated user identity to Sentry so errors include who was affected
+  useEffect(() => {
+    if (phase === "ready" && user) {
+      setUserContext(user.id, user.email ?? undefined, user.role);
+    } else if (phase === "auth") {
+      clearUserContext();
+    }
+  }, [phase, user]);
+
   const Page = pages[active] ?? Dashboard;
+
+  const appCtx = useMemo<AppContextValue>(() => ({
+    onNavigate: setActive,
+    onCallAlex: openCall,
+    onModal: handleModal,
+    onEditEstimate: openEstimateEditor,
+    onSignOut: handleSignOut,
+  }), [openCall, handleModal, openEstimateEditor, handleSignOut]);
 
   return (
     <ErrorBoundary>
+      <AppProvider value={appCtx}>
       {phase === "splash" && <SplashScreen onReady={handleSplashReady} />}
       {phase === "auth" && <AuthScreen onAuthenticated={handleAuthenticated} onDevBypass={handleDevBypass} />}
       {phase === "reset-password" && <AuthScreen onAuthenticated={handleAuthenticated} initialView="reset-password" />}
@@ -155,12 +188,12 @@ export function App() {
           />
           <main id="main-content" className="flex-1 overflow-hidden" tabIndex={-1}>
             <ErrorBoundary key={active}>
-              <Page onNavigate={setActive} onCallAlex={openCall} onModal={handleModal} onEditEstimate={openEstimateEditor} onSignOut={handleSignOut} />
+              <Page />
             </ErrorBoundary>
           </main>
         </div>
         {!callOpen && <CallAlexFAB onCall={openCall} />}
-        {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} />}
+        {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} onEstimateCreated={handleEstimateCreated} />}
       </div>
       <NewEstimateModal open={modal === "new-estimate"} onClose={() => setModal(null)} onCreated={(est) => { openEstimateEditor(est); }} />
       <AddClientModal open={modal === "add-client"} onClose={() => setModal(null)} />
@@ -182,6 +215,7 @@ export function App() {
         }}
       />
       <div aria-live="polite" aria-atomic="true" className="sr-only" id="live-region" />
+      </AppProvider>
     </ErrorBoundary>
   );
 }

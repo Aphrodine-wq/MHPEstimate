@@ -2,13 +2,8 @@ import { useEstimates, useClients, useInvoices, useActivityFeed } from "../lib/s
 import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";
 import { StatusBadge } from "@proestimate/ui/components";
+import { useAppContext } from "./AppContext";
 import type { Estimate } from "@proestimate/shared/types";
-
-interface DashboardProps {
-  onNavigate?: (page: string) => void;
-  onCallAlex?: () => void;
-  onModal?: (m: string) => void;
-}
 
 const QUOTES = [
   { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin" },
@@ -68,7 +63,8 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
-export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
+export function Dashboard() {
+  const { onNavigate, onCallAlex, onModal } = useAppContext();
   const { data: estimates, loading } = useEstimates();
   const { data: clients } = useClients();
   const { data: invoices } = useInvoices();

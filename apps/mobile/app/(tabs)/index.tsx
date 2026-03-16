@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { useState, useCallback } from "react";
 import { useEstimates, useActivityFeed, createEstimate } from "@/lib/store";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -145,7 +146,11 @@ function MetricCard({ label, value, sub }: { label: string; value: string; sub: 
 
 function EstimateRow({ estimate, last }: { estimate: Estimate; last: boolean }) {
   return (
-    <View style={[styles.estimateRow, !last && styles.borderBottom]}>
+    <TouchableOpacity
+      style={[styles.estimateRow, !last && styles.borderBottom]}
+      onPress={() => router.push(`/estimate/${estimate.id}`)}
+      activeOpacity={0.7}
+    >
       <View style={styles.estimateLeft}>
         <View style={styles.estimateHeader}>
           <Text style={styles.estimateNumber}>{estimate.estimate_number}</Text>
@@ -159,7 +164,7 @@ function EstimateRow({ estimate, last }: { estimate: Estimate; last: boolean }) 
           <Text style={styles.estimateMargin}>{Number(estimate.gross_margin_pct).toFixed(1)}%</Text>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

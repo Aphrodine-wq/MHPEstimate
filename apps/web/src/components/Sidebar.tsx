@@ -23,9 +23,14 @@ const toolsNav = [
   { id: "settings", label: "Settings", icon: IconGear },
 ];
 
+const adminNav = [
+  { id: "team", label: "Team", icon: IconTeam },
+];
+
 export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
   const initials = user?.full_name
     ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--"
     : "--";
@@ -66,6 +71,14 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
           {collapsed ? "" : "Tools"}
         </p>
         <NavGroup items={toolsNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
+        {isAdmin && (
+          <>
+            <p className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
+              {collapsed ? "" : "Admin"}
+            </p>
+            <NavGroup items={adminNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
+          </>
+        )}
       </nav>
 
       {/* Collapse toggle */}
@@ -212,6 +225,16 @@ function IconChart({ active }: { active: boolean }) {
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
+    </svg>
+  );
+}
+
+function IconTeam({ active }: { active: boolean }) {
+  const c = active ? "#fff" : "#636366";
+  return (
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   );
 }

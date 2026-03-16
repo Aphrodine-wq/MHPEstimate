@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type JSX } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { DigitalSignature } from "@/components/DigitalSignature";
 import type { Estimate, EstimateLineItem, Client, EstimateChangeOrder } from "@proestimate/shared/types";
@@ -287,6 +287,12 @@ export default function PortalPage(): JSX.Element {
   const [declining, setDeclining] = useState(false);
   const [declineError, setDeclineError] = useState<string | null>(null);
   const [declineSuccess, setDeclineSuccess] = useState(false);
+  const [approvingCoId, setApprovingCoId] = useState<string | null>(null);
+  const [rejectingCoId, setRejectingCoId] = useState<string | null>(null);
+  const [coRejectReason, setCoRejectReason] = useState("");
+  const [showCoSignature, setShowCoSignature] = useState<string | null>(null); // changeOrderId being signed
+  const [coSignError, setCoSignError] = useState<string | null>(null);
+  const [coProcessing, setCoProcessing] = useState(false);
 
   /* Fetch portal data */
   useEffect(() => {
@@ -324,6 +330,27 @@ export default function PortalPage(): JSX.Element {
     };
 
     void fetchData();
+  }, [id, token]);
+
+  /* Track portal view */
+  useEffect(() => {
+    if (!id || !token) return;
+    let mounted = true;
+    const trackView = async () => {
+      try {
+        await fetch("/api/portal-viewed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estimateId: id }),
+        });
+      } catch {
+        // Silently fail on tracking
+      }
+    };
+    trackView();
+    return () => {
+      mounted = false;
+    };
   }, [id, token]);
 
   /* Handle signature submission */
@@ -405,6 +432,158 @@ export default function PortalPage(): JSX.Element {
     }
   }, [id, token, declineReason, signerName]);
 
+  /* Handle change order: show signature pad for approval */
+  const handleStartCoApproval = useCallback((changeOrderId: string) => {
+    setShowCoSignature(changeOrderId);
+    setCoSignError(null);
+    setRejectingCoId(null);
+    setCoRejectReason("");
+  }, []);
+
+  /* Handle change order: sign and approve */
+  const handleCoSign = useCallback(
+    async (signatureDataUrl: string) => {
+      if (!id || !token || !showCoSignature) return;
+      setCoProcessing(true);
+      setCoSignError(null);
+      try {
+        const res = await fetch("/api/portal-change-order-respond", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            estimateId: id,
+            token,
+            changeOrderId: showCoSignature,
+            action: "approve",
+            signerName: signerName || "Client",
+            signatureDataUrl,
+          }),
+        });
+        const json = (await res.json()) as { success?: boolean; error?: string; signedAt?: string };
+        if (!res.ok || !json.success) {
+          setCoSignError(json.error ?? "Failed to approve change order. Please try again.");
+          return;
+        }
+        // Update local data: mark as approved + signed
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                changeOrders: prev.changeOrders.map((co) =>
+                  co.id === showCoSignature
+                    ? { ...co, status: "approved" as const, client_signed: true, signed_at: json.signedAt ?? new Date().toISOString() }
+                    : co,
+                ),
+              }
+            : prev,
+        );
+        setShowCoSignature(null);
+      } catch {
+        setCoSignError("A network error occurred. Please try again.");
+      } finally {
+        setCoProcessing(false);
+      }
+    },
+    [id, token, showCoSignature, signerName],
+  );
+
+  /* Handle change order: show rejection form */
+  const handleStartCoRejection = useCallback((changeOrderId: string) => {
+    setRejectingCoId(changeOrderId);
+    setCoRejectReason("");
+    setCoSignError(null);
+    setShowCoSignature(null);
+  }, []);
+
+  /* Handle change order: confirm rejection */
+  const handleConfirmCoRejection = useCallback(
+    async (changeOrderId: string) => {
+      if (!id || !token) return;
+      setCoProcessing(true);
+      setCoSignError(null);
+      try {
+        const res = await fetch("/api/portal-change-order-respond", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            estimateId: id,
+            token,
+            changeOrderId,
+            action: "reject",
+            signerName: signerName || "Client",
+            reason: coRejectReason || undefined,
+          }),
+        });
+        const json = (await res.json()) as { success?: boolean; error?: string };
+        if (!res.ok || !json.success) {
+          setCoSignError(json.error ?? "Failed to reject change order. Please try again.");
+          return;
+        }
+        // Update local data: mark as rejected
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                changeOrders: prev.changeOrders.map((co) =>
+                  co.id === changeOrderId
+                    ? { ...co, status: "rejected" as const }
+                    : co,
+                ),
+              }
+            : prev,
+        );
+        setRejectingCoId(null);
+        setCoRejectReason("");
+      } catch {
+        setCoSignError("A network error occurred. Please try again.");
+      } finally {
+        setCoProcessing(false);
+      }
+    },
+    [id, token, signerName, coRejectReason],
+  );
+
+  /* Handle existing approved change order signing (legacy flow) */
+  const handleApproveChangeOrder = useCallback(
+    async (changeOrderId: string) => {
+      if (!id || !token) return;
+      setApprovingCoId(changeOrderId);
+      try {
+        const res = await fetch("/api/portal-change-order-sign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            estimateId: id,
+            token,
+            changeOrderId,
+            signerName: signerName || "Client",
+          }),
+        });
+        const json = (await res.json()) as { success?: boolean; error?: string };
+        if (!res.ok || !json.success) {
+          alert(json.error ?? "Failed to sign change order. Please try again.");
+          return;
+        }
+        // Update local data
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                changeOrders: prev.changeOrders.map((co) =>
+                  co.id === changeOrderId ? { ...co, client_signed: true, signed_at: new Date().toISOString() } : co,
+                ),
+              }
+            : prev,
+        );
+      } catch {
+        alert("A network error occurred. Please try again.");
+      } finally {
+        setApprovingCoId(null);
+      }
+    },
+    [id, token, signerName],
+  );
+
   /* ── Render states ── */
 
   if (loading) return <LoadingSkeleton />;
@@ -436,8 +615,20 @@ export default function PortalPage(): JSX.Element {
         @media print {
           .no-print { display: none !important; }
           body { background: #ffffff !important; overflow: auto !important; }
-          .portal-root { background: #ffffff !important; }
-          .portal-card { box-shadow: none !important; }
+          .portal-root { background: #ffffff !important; padding: 0 !important; }
+          .portal-card { box-shadow: none !important; margin-bottom: 0 !important; }
+        }
+        @media (max-width: 640px) {
+          .portal-root {
+            padding: 16px 12px 32px !important;
+          }
+          .portal-card {
+            border-radius: 8px !important;
+            margin-bottom: 12px !important;
+          }
+          h1 { font-size: 18px !important; }
+          h2 { font-size: 14px !important; }
+          p { font-size: 13px !important; }
         }
       `}</style>
 
@@ -528,6 +719,30 @@ export default function PortalPage(): JSX.Element {
                   {estimate.estimate_number}
                 </p>
                 <StatusBadge status={estimate.status} />
+                {/* Print button */}
+                <button
+                  onClick={() => window.print()}
+                  className="no-print"
+                  style={{
+                    padding: "8px 16px",
+                    background: "rgba(255,255,255,0.15)",
+                    border: "1px solid rgba(255,255,255,0.3)",
+                    borderRadius: 6,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "#ffffff",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.25)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  }}
+                >
+                  Print / Save as PDF
+                </button>
               </div>
             </div>
 
@@ -887,149 +1102,460 @@ export default function PortalPage(): JSX.Element {
             </div>
           </div>
 
-          {/* ── Approved Change Orders ── */}
-          {changeOrders.length > 0 && (
-            <div
-              className="portal-card"
-              style={{
-                background: "#ffffff",
-                borderRadius: 12,
-                marginBottom: 16,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                overflow: "hidden",
-              }}
-            >
-              <div style={{ padding: "18px 24px 0" }}>
-                <h2
-                  style={{
-                    margin: "0 0 4px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: NAVY,
-                  }}
-                >
-                  Approved Change Orders
-                </h2>
-                <p style={{ margin: "0 0 16px", fontSize: 13, color: "#6b7280" }}>
-                  The following change orders have been approved and are included in the total.
-                </p>
-              </div>
+          {/* ── Change Orders ── */}
+          {changeOrders.length > 0 && (() => {
+            const pendingCOs = changeOrders.filter((co) => co.status === "pending");
+            const approvedCOs = changeOrders.filter((co) => co.status === "approved");
+            const approvedTotal = approvedCOs.reduce((s, co) => s + Number(co.cost_impact), 0);
 
-              {/* Column headers */}
-              <div
-                style={{
-                  background: NAVY_LIGHT,
-                  display: "grid",
-                  gridTemplateColumns: "50px 1fr 120px 120px",
-                  padding: "6px 24px",
-                  gap: 8,
-                }}
-              >
-                {["#", "Description", "Timeline", "Cost Impact"].map((h, i) => (
-                  <span
-                    key={h}
+            return (
+              <>
+                {/* ── Pending Change Orders (require client response) ── */}
+                {pendingCOs.length > 0 && (
+                  <div
+                    className="portal-card no-print"
                     style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                      color: "rgba(255,255,255,0.85)",
-                      textAlign: i >= 2 ? "right" : "left",
+                      background: "#ffffff",
+                      borderRadius: 12,
+                      marginBottom: 16,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                      border: "2px solid #f59e0b",
+                      overflow: "hidden",
                     }}
                   >
-                    {h}
-                  </span>
-                ))}
-              </div>
+                    <div style={{ padding: "18px 24px 0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <h2
+                          style={{
+                            margin: 0,
+                            fontSize: 13,
+                            fontWeight: 700,
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                            color: "#92400e",
+                          }}
+                        >
+                          Pending Change Orders — Your Response Needed
+                        </h2>
+                      </div>
+                      <p style={{ margin: "0 0 16px", fontSize: 13, color: "#6b7280" }}>
+                        The following change orders are awaiting your approval or rejection. Please review each one carefully.
+                      </p>
+                    </div>
 
-              {changeOrders.map((co, idx) => (
-                <div
-                  key={co.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "50px 1fr 120px 120px",
-                    padding: "10px 24px",
-                    gap: 8,
-                    background: idx % 2 === 1 ? "#f9fafb" : "#ffffff",
-                    borderBottom: idx < changeOrders.length - 1 ? "1px solid #f3f4f6" : "none",
-                    alignItems: "start",
-                  }}
-                >
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#9ca3af" }}>
-                    CO #{co.change_number}
-                  </span>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 13, color: "#111827" }}>{co.description}</p>
-                    {co.client_signed && (
-                      <span
+                    {pendingCOs.map((co, idx) => (
+                      <div key={co.id}>
+                        <div
+                          style={{
+                            padding: "16px 24px",
+                            background: idx % 2 === 1 ? "#fffbeb" : "#ffffff",
+                            borderTop: "1px solid #fde68a",
+                          }}
+                        >
+                          {/* CO header row */}
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                            <div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>
+                                  CO #{co.change_number}
+                                </span>
+                                <span
+                                  style={{
+                                    display: "inline-block",
+                                    padding: "2px 8px",
+                                    borderRadius: 9999,
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    background: "#fef3c7",
+                                    color: "#92400e",
+                                  }}
+                                >
+                                  Pending
+                                </span>
+                              </div>
+                              <p style={{ margin: 0, fontSize: 14, color: "#111827", lineHeight: 1.6 }}>
+                                {co.description}
+                              </p>
+                            </div>
+                            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 16 }}>
+                              <p
+                                style={{
+                                  margin: 0,
+                                  fontSize: 16,
+                                  fontWeight: 700,
+                                  color: co.cost_impact >= 0 ? "#15803d" : "#b91c1c",
+                                }}
+                              >
+                                {co.cost_impact >= 0 ? "+" : ""}${fmt(co.cost_impact)}
+                              </p>
+                              {co.timeline_impact && (
+                                <p style={{ margin: "4px 0 0", fontSize: 12, color: "#6b7280" }}>
+                                  Timeline: {co.timeline_impact}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Signature pad for approval */}
+                          {showCoSignature === co.id && (
+                            <div style={{ marginTop: 16, marginBottom: 8 }}>
+                              <p style={{ margin: "0 0 8px", fontSize: 13, fontWeight: 600, color: "#111827" }}>
+                                Sign to approve Change Order #{co.change_number}
+                              </p>
+                              <p style={{ margin: "0 0 12px", fontSize: 12, color: "#6b7280" }}>
+                                By signing below, you authorize this scope change at a cost of{" "}
+                                <strong style={{ color: "#111827" }}>
+                                  {co.cost_impact >= 0 ? "+" : ""}${fmt(co.cost_impact)}
+                                </strong>.
+                              </p>
+                              <DigitalSignature
+                                onSign={handleCoSign}
+                                signerName={signerName || "Client"}
+                                disabled={coProcessing || !signerName.trim()}
+                              />
+                              {!signerName.trim() && (
+                                <p style={{ margin: "8px 0 0", fontSize: 12, color: "#f59e0b" }}>
+                                  Please enter your full name in the signature section below before signing.
+                                </p>
+                              )}
+                              {coSignError && (
+                                <div
+                                  style={{
+                                    marginTop: 8,
+                                    padding: "8px 12px",
+                                    background: "#fef2f2",
+                                    border: "1px solid #fecaca",
+                                    borderRadius: 8,
+                                    fontSize: 13,
+                                    color: "#b91c1c",
+                                  }}
+                                >
+                                  {coSignError}
+                                </div>
+                              )}
+                              <button
+                                onClick={() => { setShowCoSignature(null); setCoSignError(null); }}
+                                style={{
+                                  marginTop: 8,
+                                  padding: "6px 14px",
+                                  background: "transparent",
+                                  border: "1px solid #d1d5db",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  color: "#6b7280",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Rejection form */}
+                          {rejectingCoId === co.id && (
+                            <div style={{ marginTop: 16, marginBottom: 8 }}>
+                              <p style={{ margin: "0 0 8px", fontSize: 13, fontWeight: 600, color: "#111827" }}>
+                                Reject Change Order #{co.change_number}
+                              </p>
+                              <p style={{ margin: "0 0 8px", fontSize: 12, color: "#6b7280" }}>
+                                Optionally, let us know why you are declining this change order.
+                              </p>
+                              <textarea
+                                value={coRejectReason}
+                                onChange={(e) => setCoRejectReason(e.target.value)}
+                                placeholder="Reason for rejection (optional)"
+                                rows={2}
+                                style={{
+                                  width: "100%",
+                                  padding: "9px 12px",
+                                  border: "1px solid #d1d5db",
+                                  borderRadius: 8,
+                                  fontSize: 13,
+                                  color: "#111827",
+                                  background: "#ffffff",
+                                  outline: "none",
+                                  boxSizing: "border-box",
+                                  resize: "vertical",
+                                  fontFamily: "inherit",
+                                }}
+                              />
+                              {coSignError && (
+                                <div
+                                  style={{
+                                    marginTop: 8,
+                                    padding: "8px 12px",
+                                    background: "#fef2f2",
+                                    border: "1px solid #fecaca",
+                                    borderRadius: 8,
+                                    fontSize: 13,
+                                    color: "#b91c1c",
+                                  }}
+                                >
+                                  {coSignError}
+                                </div>
+                              )}
+                              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                                <button
+                                  onClick={() => { setRejectingCoId(null); setCoRejectReason(""); setCoSignError(null); }}
+                                  disabled={coProcessing}
+                                  style={{
+                                    padding: "8px 16px",
+                                    background: "#ffffff",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: 6,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    color: "#374151",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={() => handleConfirmCoRejection(co.id)}
+                                  disabled={coProcessing}
+                                  style={{
+                                    padding: "8px 16px",
+                                    background: "#dc2626",
+                                    border: "none",
+                                    borderRadius: 6,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    color: "#ffffff",
+                                    cursor: "pointer",
+                                    opacity: coProcessing ? 0.6 : 1,
+                                  }}
+                                >
+                                  {coProcessing ? "Rejecting..." : "Confirm Rejection"}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action buttons (only show if not currently in a sub-flow) */}
+                          {showCoSignature !== co.id && rejectingCoId !== co.id && (
+                            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                              <button
+                                onClick={() => handleStartCoApproval(co.id)}
+                                style={{
+                                  padding: "10px 20px",
+                                  background: "#16a34a",
+                                  border: "none",
+                                  borderRadius: 6,
+                                  fontSize: 13,
+                                  fontWeight: 600,
+                                  color: "#ffffff",
+                                  cursor: "pointer",
+                                  transition: "all 0.2s",
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#15803d"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#16a34a"; }}
+                              >
+                                Approve & Sign
+                              </button>
+                              <button
+                                onClick={() => handleStartCoRejection(co.id)}
+                                style={{
+                                  padding: "10px 20px",
+                                  background: "transparent",
+                                  border: "1px solid #dc2626",
+                                  borderRadius: 6,
+                                  fontSize: 13,
+                                  fontWeight: 600,
+                                  color: "#dc2626",
+                                  cursor: "pointer",
+                                  transition: "all 0.2s",
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#fef2f2"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ── Approved Change Orders ── */}
+                {approvedCOs.length > 0 && (
+                  <div
+                    className="portal-card"
+                    style={{
+                      background: "#ffffff",
+                      borderRadius: 12,
+                      marginBottom: 16,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div style={{ padding: "18px 24px 0" }}>
+                      <h2
                         style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 4,
-                          marginTop: 4,
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: "#16a34a",
+                          margin: "0 0 4px",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: NAVY,
                         }}
                       >
-                        <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                        Client Signed
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ margin: 0, fontSize: 13, color: "#6b7280", textAlign: "right" }}>
-                    {co.timeline_impact ?? "—"}
-                  </p>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      textAlign: "right",
-                      color: co.cost_impact >= 0 ? "#15803d" : "#b91c1c",
-                    }}
-                  >
-                    {co.cost_impact >= 0 ? "+" : ""}${fmt(co.cost_impact)}
-                  </p>
-                </div>
-              ))}
+                        Approved Change Orders
+                      </h2>
+                      <p style={{ margin: "0 0 16px", fontSize: 13, color: "#6b7280" }}>
+                        The following change orders have been approved and are included in the total.
+                      </p>
+                    </div>
 
-              {/* Change orders total */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "50px 1fr 120px 120px",
-                  padding: "10px 24px",
-                  gap: 8,
-                  background: "#edf2f7",
-                  borderTop: "2px solid #e2e8f0",
-                }}
-              >
-                <span />
-                <span style={{ fontSize: 12, fontWeight: 700, color: NAVY }}>
-                  Total Change Order Impact
-                </span>
-                <span />
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    textAlign: "right",
-                    color: changeOrders.reduce((s, co) => s + Number(co.cost_impact), 0) >= 0
-                      ? "#15803d"
-                      : "#b91c1c",
-                  }}
-                >
-                  {changeOrders.reduce((s, co) => s + Number(co.cost_impact), 0) >= 0 ? "+" : ""}
-                  ${fmt(changeOrders.reduce((s, co) => s + Number(co.cost_impact), 0))}
-                </span>
-              </div>
-            </div>
-          )}
+                    {/* Column headers */}
+                    <div
+                      style={{
+                        background: NAVY_LIGHT,
+                        display: "grid",
+                        gridTemplateColumns: "50px 1fr 120px 120px 140px",
+                        padding: "6px 24px",
+                        gap: 8,
+                      }}
+                    >
+                      {["#", "Description", "Timeline", "Cost Impact", "Status"].map((h, i) => (
+                        <span
+                          key={h}
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            color: "rgba(255,255,255,0.85)",
+                            textAlign: i >= 2 ? "right" : "left",
+                          }}
+                        >
+                          {h}
+                        </span>
+                      ))}
+                    </div>
+
+                    {approvedCOs.map((co, idx) => (
+                      <div
+                        key={co.id}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "50px 1fr 120px 120px 140px",
+                          padding: "10px 24px",
+                          gap: 8,
+                          background: idx % 2 === 1 ? "#f9fafb" : "#ffffff",
+                          borderBottom: idx < approvedCOs.length - 1 ? "1px solid #f3f4f6" : "none",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "#9ca3af" }}>
+                          CO #{co.change_number}
+                        </span>
+                        <div>
+                          <p style={{ margin: 0, fontSize: 13, color: "#111827" }}>{co.description}</p>
+                        </div>
+                        <p style={{ margin: 0, fontSize: 13, color: "#6b7280", textAlign: "right" }}>
+                          {co.timeline_impact ?? "\u2014"}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 13,
+                            fontWeight: 600,
+                            textAlign: "right",
+                            color: co.cost_impact >= 0 ? "#15803d" : "#b91c1c",
+                          }}
+                        >
+                          {co.cost_impact >= 0 ? "+" : ""}${fmt(co.cost_impact)}
+                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                          {co.client_signed ? (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: "#16a34a",
+                              }}
+                            >
+                              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                              Signed
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleApproveChangeOrder(co.id)}
+                              className="no-print"
+                              style={{
+                                padding: "6px 12px",
+                                background: "#16a34a",
+                                border: "none",
+                                borderRadius: 6,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: "#ffffff",
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                                transition: "all 0.2s",
+                              }}
+                              disabled={approvingCoId === co.id}
+                              onMouseEnter={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#15803d"; }}
+                              onMouseLeave={(e) => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#16a34a"; }}
+                            >
+                              {approvingCoId === co.id ? "Signing..." : "Sign"}
+                            </button>
+                          )}
+                          {co.signed_at && (
+                            <span style={{ fontSize: 10, color: "#9ca3af" }}>
+                              {new Date(co.signed_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Change orders total */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "50px 1fr 120px 120px 140px",
+                        padding: "10px 24px",
+                        gap: 8,
+                        background: "#edf2f7",
+                        borderTop: "2px solid #e2e8f0",
+                      }}
+                    >
+                      <span />
+                      <span style={{ fontSize: 12, fontWeight: 700, color: NAVY }}>
+                        Total Change Order Impact
+                      </span>
+                      <span />
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          textAlign: "right",
+                          color: approvedTotal >= 0 ? "#15803d" : "#b91c1c",
+                        }}
+                      >
+                        {approvedTotal >= 0 ? "+" : ""}${fmt(approvedTotal)}
+                      </span>
+                      <span />
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {/* ── Scope inclusions / exclusions ── */}
           {(estimate.scope_inclusions.length > 0 || estimate.scope_exclusions.length > 0) && (

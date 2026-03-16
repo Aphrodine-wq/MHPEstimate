@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useCurrentUser } from "../lib/store";
+import { useAppContext } from "./AppContext";
 import { signOut } from "../lib/supabase";
 
-export function Profile({ onModal, onSignOut }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onSignOut?: () => void }) {
+export function Profile() {
+  const { onModal, onSignOut } = useAppContext();
   const { user, loading } = useCurrentUser();
   const [pushNotif, setPushNotif] = useState(true);
   const [emailNotif, setEmailNotif] = useState(true);

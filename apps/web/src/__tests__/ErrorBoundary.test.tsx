@@ -36,9 +36,15 @@ describe("ErrorBoundary", () => {
   });
 
   it("recovers when Try Again is clicked", () => {
-    const { rerender } = render(
+    let shouldThrow = true;
+    function Thrower() {
+      if (shouldThrow) throw new Error("Test error");
+      return <div>No error</div>;
+    }
+
+    render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
+        <Thrower />
       </ErrorBoundary>
     );
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();

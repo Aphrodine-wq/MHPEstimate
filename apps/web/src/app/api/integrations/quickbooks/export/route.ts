@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { getAuthUser } from "@/lib/auth-helpers";
 import { estimateApiLimiter } from "@/lib/rate-limit";
 import { logAudit, getClientIp } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 interface LineItem {
   category: string;
@@ -170,14 +171,16 @@ export async function POST(req: NextRequest) {
   // --- Rate limiting: 10 requests/minute per user ---
   try {
     await estimateApiLimiter.check(10, user.id);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "integrations-quickbooks-export" });
     return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
   }
 
   let body: { estimateId?: string };
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "integrations-quickbooks-export" });
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
@@ -232,6 +235,16 @@ export async function POST(req: NextRequest) {
   const items = (lineItems as LineItem[]) ?? [];
   const estNumber = estimate.estimate_number as string;
 
+  // Log audit BEFORE format-specific returns so all exports are tracked
+  await logAudit(
+    user.id,
+    "estimate_exported",
+    "estimate",
+    estimateId,
+    { format, estimate_number: estNumber },
+    getClientIp(req)
+  );
+
   if (format === "csv") {
     const csv = generateCSV(estimate, items, client);
     return new NextResponse(csv, {
@@ -241,15 +254,6 @@ export async function POST(req: NextRequest) {
       },
     });
   }
-
-  await logAudit(
-    user.id,
-    "estimate_exported",
-    "estimate",
-    estimateId,
-    { format, estimate_number: estNumber },
-    getClientIp(req)
-  );
 
   // Default: IIF
   const iif = generateIIF(estimate, items, client);

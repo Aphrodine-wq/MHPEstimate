@@ -77,6 +77,12 @@ describe("CallAlexFAB", () => {
 describe("CallAlexPanel", () => {
   it("renders the panel with Alex header", async () => {
     process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID = "agent_test123";
+    // Mock getUserMedia so auto-start doesn't set error state
+    Object.defineProperty(globalThis.navigator, "mediaDevices", {
+      value: { getUserMedia: vi.fn().mockResolvedValue({}) },
+      writable: true,
+      configurable: true,
+    });
     const { CallAlexPanel } = await import("../components/CallAlex");
     render(<CallAlexPanel onClose={() => {}} />);
     expect(screen.getByText("Alex")).toBeInTheDocument();

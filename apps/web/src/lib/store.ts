@@ -10,6 +10,8 @@ import type {
   VoiceCall,
   TeamMember,
   EstimateLineItem,
+  JobActual,
+  EstimateChangeOrder,
 } from "@proestimate/shared/types";
 
 // ── Realtime-enabled hooks ──
@@ -228,7 +230,7 @@ export async function createEstimate(): Promise<Estimate | null> {
 }
 
 export function useCompanySettings() {
-  const [data, setData] = useState<Record<string, any>>({});
+  const [data, setData] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -237,8 +239,8 @@ export function useCompanySettings() {
     const { data: rows } = await supabase
       .from("company_settings")
       .select("*");
-    const map: Record<string, any> = {};
-    (rows ?? []).forEach((r: any) => { map[r.key] = r.value; });
+    const map: Record<string, unknown> = {};
+    (rows ?? []).forEach((r: { key: string; value: unknown }) => { map[r.key] = r.value; });
     setData(map);
     setLoading(false);
   }, []);
@@ -261,7 +263,7 @@ export function useCompanySettings() {
   return { data, loading, refresh };
 }
 
-export async function upsertSetting(key: string, value: any) {
+export async function upsertSetting(key: string, value: unknown) {
   if (!supabase) return;
   const { error } = await supabase.from("company_settings").upsert(
     { key, value, updated_at: new Date().toISOString() },
@@ -480,6 +482,71 @@ export function useNotifications() {
   }, [notifications]);
 
   return { notifications, markRead, markAllRead };
+}
+
+// ── Team Members hook ──
+
+const EMPTY_TEAM_MEMBERS: TeamMember[] = [];
+
+export function useTeamMembers() {
+  const { rows: members, status, refetch } = useTableSync<TeamMember>({
+    supabase: supabase!,
+    table: "team_members",
+    orderBy: { column: "full_name", ascending: true },
+    enabled: !!supabase,
+  });
+
+  if (!supabase) return { members: EMPTY_TEAM_MEMBERS, loading: false, refresh: NOOP_REFRESH };
+
+  return {
+    members,
+    loading: status === "CONNECTING",
+    refresh: refetch,
+  };
+}
+
+// ── Job Actuals hook ──
+
+export function useJobActuals(estimateId: string) {
+  const [actuals, setActuals] = useState<JobActual | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase || !estimateId) { setLoading(false); return; }
+    supabase
+      .from("job_actuals")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .maybeSingle()
+      .then(({ data }) => {
+        setActuals(data as JobActual | null);
+        setLoading(false);
+      });
+  }, [estimateId]);
+
+  return { actuals, loading };
+}
+
+// ── Change Orders hook ──
+
+export function useChangeOrders(estimateId: string) {
+  const [changeOrders, setChangeOrders] = useState<EstimateChangeOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase || !estimateId) { setChangeOrders([]); setLoading(false); return; }
+    supabase
+      .from("estimate_change_orders")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .order("change_number", { ascending: true })
+      .then(({ data }) => {
+        setChangeOrders((data as EstimateChangeOrder[]) ?? []);
+        setLoading(false);
+      });
+  }, [estimateId]);
+
+  return { changeOrders, loading };
 }
 
 export function useCurrentUser() {

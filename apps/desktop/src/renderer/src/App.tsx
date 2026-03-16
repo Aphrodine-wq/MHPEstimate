@@ -15,8 +15,11 @@ import { SplashScreen } from "./components/SplashScreen";
 import { AuthScreen } from "./components/AuthScreen";
 import { NewEstimateModal, AddClientModal, LogExpenseModal, UploadInvoiceModal, EditProfileModal } from "./components/FormModals";
 import { EstimateEditorModal } from "./components/EstimateEditorModal";
+import { UpdateBanner } from "./components/UpdateBanner";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { useCurrentUser } from "./lib/store";
 import { supabase, getSession, signOut } from "./lib/supabase";
+import { initSyncHandler } from "./lib/sync-handler";
 
 type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
 type AppPhase = "splash" | "auth" | "reset-password" | "ready";
@@ -95,11 +98,17 @@ export function App() {
     return () => { subscription.unsubscribe(); };
   }, []);
 
+  // Initialize background sync handler when authenticated
+  useEffect(() => {
+    if (phase !== "ready") return;
+    const cleanup = initSyncHandler();
+    return cleanup;
+  }, [phase]);
+
   // Handle deep link auth callbacks (proestimate://auth/callback#access_token=...)
   useEffect(() => {
     if (!supabase) return;
     const cleanup = window.electronAPI?.onDeepLink(async (url: string) => {
-      // Supabase appends tokens as hash fragment: proestimate://auth/callback#access_token=...&refresh_token=...
       const hashIndex = url.indexOf("#");
       if (hashIndex === -1) return;
       const params = new URLSearchParams(url.substring(hashIndex + 1));
@@ -110,6 +119,79 @@ export function App() {
       }
     });
     return () => { cleanup?.(); };
+  }, []);
+
+  // Handle native menu actions
+  useEffect(() => {
+    const cleanup = window.electronAPI?.onMenuAction((action: string) => {
+      // Navigation actions: "navigate:dashboard", "navigate:estimates", etc.
+      if (action.startsWith("navigate:")) {
+        const page = action.split(":")[1]!;
+        setActive(page);
+        return;
+      }
+
+      switch (action) {
+        case "new-estimate":
+          setModal("new-estimate");
+          break;
+        case "export-pdf":
+        case "save-pdf":
+          // Trigger PDF export — the EstimateEditorModal handles this internally
+          // If on estimates page, this is a no-op (user needs to open an estimate first)
+          break;
+        case "import-moasure":
+          setActive("estimates");
+          break;
+        case "import-plan":
+          setActive("estimates");
+          break;
+        case "call-alex":
+          setCallOpen(true);
+          break;
+        case "check-updates":
+          window.electronAPI?.checkForUpdates();
+          break;
+        case "report-problem":
+          // Navigate to settings page for support
+          setActive("settings");
+          break;
+      }
+    });
+    return () => { cleanup?.(); };
+  }, []);
+
+  // Handle file open events (Finder "Open With" / drag to dock icon)
+  useEffect(() => {
+    const cleanup = window.electronAPI?.onFileOpened((filePath: string) => {
+      // Auto-navigate to estimates page when a file is opened
+      setActive("estimates");
+      // Could trigger import modal based on file extension
+    });
+    return () => { cleanup?.(); };
+  }, []);
+
+  // Global error handler — report renderer errors to main process
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      window.electronAPI?.reportError({
+        message: event.message,
+        stack: event.error?.stack,
+      });
+    };
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      const error = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
+      window.electronAPI?.reportError({
+        message: error.message,
+        stack: error.stack,
+      });
+    };
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleRejection);
+    return () => {
+      window.removeEventListener("error", handleError);
+      window.removeEventListener("unhandledrejection", handleRejection);
+    };
   }, []);
 
   const Page = pages[active] ?? Dashboard;
@@ -130,12 +212,18 @@ export function App() {
             user={user}
             onSignOut={handleSignOut}
           />
+          <UpdateBanner />
           <main className="flex-1 overflow-hidden">
             <Page onNavigate={setActive} onCallAlex={openCall} onModal={handleModal} onEditEstimate={openEstimateEditor} onSignOut={handleSignOut} />
           </main>
         </div>
         {!callOpen && <CallAlexFAB onCall={openCall} />}
         {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} />}
+
+        {/* Offline indicator — positioned at bottom-left */}
+        <div className="fixed bottom-4 left-4 z-50">
+          <OfflineIndicator />
+        </div>
       </div>
 
       {/* Modals */}

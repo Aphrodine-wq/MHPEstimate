@@ -116,7 +116,7 @@ describe("ConfirmDialog", () => {
         open={true}
         onClose={onClose}
         onConfirm={onConfirm}
-        title="Confirm"
+        title="Delete?"
         message="Sure?"
       />
     );

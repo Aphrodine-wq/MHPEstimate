@@ -8,6 +8,11 @@ interface SplashScreenProps {
 export function SplashScreen({ onReady }: SplashScreenProps) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<"loading" | "done">("loading");
+  const [version, setVersion] = useState("1.0.0");
+
+  useEffect(() => {
+    window.electronAPI?.getVersion().then((v) => setVersion(v));
+  }, []);
 
   useEffect(() => {
     let frame: number;
@@ -100,7 +105,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
       </div>
 
       {/* Version */}
-      <p className="absolute bottom-6 text-[10px] text-[#c7c7cc]">v1.0.0</p>
+      <p className="absolute bottom-6 text-[10px] text-[#c7c7cc]">v{version}</p>
     </div>
   );
 }

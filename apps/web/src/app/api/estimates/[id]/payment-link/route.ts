@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { getAuthUser } from "@/lib/auth-helpers";
 import { estimateApiLimiter } from "@/lib/rate-limit";
 import { logAudit, getClientIp } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 export async function POST(
   req: NextRequest,
@@ -18,7 +19,8 @@ export async function POST(
   // --- Rate limiting: 10 requests/minute per user ---
   try {
     await estimateApiLimiter.check(10, user.id);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-payment-link" });
     return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
   }
 
@@ -85,7 +87,8 @@ export async function POST(
   try {
     const Stripe = (await import("stripe")).default;
     stripe = new Stripe(stripeKey);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-payment-link" });
     return NextResponse.json(
       { error: "Stripe package not installed. Run: pnpm add stripe" },
       { status: 503 }
@@ -134,6 +137,7 @@ export async function POST(
       configured: true,
     });
   } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-payment-link" });
     console.error("Stripe session creation failed:", err);
     return NextResponse.json(
       { error: "Failed to create payment session" },
@@ -162,7 +166,8 @@ export async function GET(
   try {
     const Stripe = (await import("stripe")).default;
     stripe = new Stripe(stripeKey);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-payment-link" });
     return NextResponse.json({ configured: false, status: "not_installed" });
   }
 
@@ -196,6 +201,7 @@ export async function GET(
       lastSessionUrl: matching[0]?.url,
     });
   } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-payment-link" });
     console.error("Stripe status check failed:", err);
     return NextResponse.json({ configured: true, status: "error" }, { status: 500 });
   }

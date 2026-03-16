@@ -1,5 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { useState, useCallback } from "react";
 import { useClients } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
@@ -53,7 +54,11 @@ export default function ClientsScreen() {
     : clients;
 
   const renderItem = ({ item }: { item: Client }) => (
-    <View style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() => router.push(`/client/${item.id}`)}
+      activeOpacity={0.7}
+    >
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{getInitials(item.full_name)}</Text>
       </View>
@@ -67,7 +72,7 @@ export default function ClientsScreen() {
           </Text>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

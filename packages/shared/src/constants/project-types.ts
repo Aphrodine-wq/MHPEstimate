@@ -79,6 +79,65 @@ export const PROJECT_TYPES = {
     defaultWasteFactor: 0.10,
     defaultContingency: 0.15,
   },
+  infrastructure: {
+    label: "Infrastructure (Site/Utility)",
+    defaultWasteFactor: 0.10,
+    defaultContingency: 0.15,
+  },
 } as const;
 
 export type ProjectType = keyof typeof PROJECT_TYPES;
+
+/** Foundation types for raised slab construction (2-4 blocks typical in MS) */
+export const FOUNDATION_TYPES = {
+  raised_slab: {
+    label: "Raised Foundation Slab",
+    description: "CMU block stem wall with poured slab (2-4 blocks tall typical)",
+    defaultBlockHeight: 3,
+    minBlockHeight: 2,
+    maxBlockHeight: 6,
+  },
+  monolithic_slab: {
+    label: "Monolithic Slab",
+    description: "Single-pour slab on grade with thickened edge",
+  },
+  crawlspace: {
+    label: "Crawlspace",
+    description: "Raised foundation with accessible crawl space below",
+  },
+  pier_beam: {
+    label: "Pier & Beam",
+    description: "Concrete piers with wood or steel beams",
+  },
+} as const;
+
+export type FoundationType = keyof typeof FOUNDATION_TYPES;
+
+/** Target cost per square foot range for MHP builds */
+export const SQFT_PRICING_TARGET = {
+  min: 185,
+  max: 205,
+  sweet_spot: 195,
+  label: "$185 – $205 / sq ft",
+} as const;
+
+/** Infrastructure estimate divisions */
+export const INFRASTRUCTURE_DIVISIONS = [
+  "land_setup",
+  "utility_setup",
+  "well",
+  "septic",
+  "plumbing",
+  "electrical",
+] as const;
+
+export type InfrastructureDivision = (typeof INFRASTRUCTURE_DIVISIONS)[number];
+
+export const INFRASTRUCTURE_DIVISION_LABELS: Record<InfrastructureDivision, string> = {
+  land_setup: "Land Setup",
+  utility_setup: "Utility Setup",
+  well: "Well",
+  septic: "Septic",
+  plumbing: "Plumbing",
+  electrical: "Electrical",
+};

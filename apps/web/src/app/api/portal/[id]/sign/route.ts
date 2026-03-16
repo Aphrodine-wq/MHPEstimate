@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
 import { verifyPortalToken } from "@/lib/portal-token";
 import { portalSignLimiter } from "@/lib/rate-limit";
-import { logAudit } from "@/lib/audit";
+import { logAudit, logAuthFailure } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 export async function POST(
   req: NextRequest,
@@ -10,25 +11,28 @@ export async function POST(
 ) {
   const { id } = await params;
 
-  // --- Token validation ---
-  const token = req.nextUrl.searchParams.get("token");
-  if (!token) {
-    return NextResponse.json({ error: "Missing token" }, { status: 401 });
-  }
-
-  if (!verifyPortalToken(token, id)) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-  }
-
   // --- Rate limiting: 5 requests/minute per IP ---
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     req.headers.get("x-real-ip") ??
     "unknown";
 
+  // --- Token validation ---
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token) {
+    logAuthFailure("portal_token_missing", { route: "/api/portal/[id]/sign", estimate_id: id }, ip);
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+
+  if (!verifyPortalToken(token, id)) {
+    logAuthFailure("portal_token_invalid", { route: "/api/portal/[id]/sign", estimate_id: id }, ip);
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
+
   try {
     await portalSignLimiter.check(5, ip);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "portal-sign" });
     return NextResponse.json(
       { error: "Rate limit exceeded. Please try again later." },
       { status: 429 }
@@ -43,7 +47,8 @@ export async function POST(
   };
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "portal-sign" });
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 

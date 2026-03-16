@@ -56,11 +56,17 @@ export default function SettingsScreen() {
         {/* Sections */}
         <Text style={styles.sectionLabel}>General</Text>
         <View style={styles.sectionCard}>
-          <SettingsRow label="Analytics" sub="View performance metrics" />
+          <TouchableOpacity onPress={() => router.push("/analytics")} activeOpacity={0.6}>
+            <SettingsRow label="Analytics" sub="View performance metrics" chevron />
+          </TouchableOpacity>
           <View style={styles.rowSep} />
-          <SettingsRow label="Call History" sub="Voice call logs" />
+          <TouchableOpacity onPress={() => router.push("/calls")} activeOpacity={0.6}>
+            <SettingsRow label="Call History" sub="Voice call logs" chevron />
+          </TouchableOpacity>
           <View style={styles.rowSep} />
-          <SettingsRow label="Materials" sub="Product & pricing database" />
+          <TouchableOpacity onPress={() => router.push("/materials")} activeOpacity={0.6}>
+            <SettingsRow label="Materials" sub="Product & pricing database" chevron />
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionLabel}>About</Text>
@@ -81,7 +87,7 @@ export default function SettingsScreen() {
   );
 }
 
-function SettingsRow({ label, sub, value }: { label: string; sub?: string; value?: string }) {
+function SettingsRow({ label, sub, value, chevron }: { label: string; sub?: string; value?: string; chevron?: boolean }) {
   return (
     <View style={styles.settingsRow}>
       <View style={styles.settingsRowLeft}>
@@ -89,6 +95,7 @@ function SettingsRow({ label, sub, value }: { label: string; sub?: string; value
         {sub && <Text style={styles.settingsSub}>{sub}</Text>}
       </View>
       {value && <Text style={styles.settingsValue}>{value}</Text>}
+      {chevron && <Text style={styles.chevron}>{">"}</Text>}
     </View>
   );
 }
@@ -150,6 +157,7 @@ const styles = StyleSheet.create({
   settingsLabel: { fontSize: 15, color: colors.text },
   settingsSub: { fontSize: 12, color: colors.secondary, marginTop: 2 },
   settingsValue: { fontSize: 14, color: colors.secondary },
+  chevron: { fontSize: 16, color: colors.gray3, marginLeft: 4 },
   rowSep: { height: 1, backgroundColor: colors.sep, marginLeft: 16 },
   signOutButton: {
     backgroundColor: colors.red + "12",

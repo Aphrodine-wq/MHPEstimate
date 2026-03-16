@@ -1,13 +1,15 @@
 import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useClients, useEstimates } from "../lib/store";
+import { useAppContext } from "./AppContext";
 import { supabase } from "../lib/supabase";
 import { usePersistedState } from "../lib/usePersistedState";
 import { EmptyState } from "./EmptyState";
 import { StatusBadge } from "@proestimate/ui/components";
 import type { Client } from "@proestimate/shared/types";
 
-export function ClientsPage({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
+export function ClientsPage() {
+  const { onModal } = useAppContext();
   const { data: clients, loading } = useClients();
   const [search, setSearch] = usePersistedState("clients_search", "");
   const [selected, setSelected] = useState<string | null>(null);

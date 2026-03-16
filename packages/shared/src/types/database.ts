@@ -47,6 +47,10 @@ export type EstimateStatus =
 export type EstimateTier = "budget" | "midrange" | "high_end" | "good" | "better" | "best";
 export type EstimateSource = "manual" | "voice" | "template";
 
+export type EstimateCategory = "building" | "infrastructure";
+
+export type FoundationType = "raised_slab" | "monolithic_slab" | "crawlspace" | "pier_beam";
+
 export interface Estimate {
   id: string;
   estimate_number: string;
@@ -54,6 +58,10 @@ export interface Estimate {
   estimator_id: string | null;
   reviewer_id: string | null;
   project_type: string;
+  estimate_category: EstimateCategory;
+  foundation_type: FoundationType | null;
+  foundation_block_height: number | null;
+  square_footage: number | null;
   project_address: string | null;
   status: EstimateStatus;
   scope_inclusions: string[];
@@ -62,11 +70,14 @@ export interface Estimate {
   materials_subtotal: number;
   labor_subtotal: number;
   subcontractor_total: number;
+  retail_total: number;
+  actual_total: number;
   permits_fees: number;
   overhead_profit: number;
   contingency: number;
   tax: number;
   grand_total: number;
+  cost_per_sqft: number | null;
   gross_margin_pct: number | null;
   estimated_start: string | null;
   estimated_end: string | null;
@@ -97,6 +108,9 @@ export interface EstimateLineItem {
   unit: string | null;
   unit_price: number | null;
   extended_price: number | null;
+  material_cost: number | null;
+  labor_cost: number | null;
+  retail_price: number | null;
   notes: string | null;
   product_id: string | null;
   price_source: string | null;
@@ -260,7 +274,10 @@ export type AuditActionType =
   | "estimate_signed"
   | "payment_link_created"
   | "estimate_exported"
-  | "estimate_reminder_deleted";
+  | "estimate_reminder_deleted"
+  | "change_order_client_approved"
+  | "change_order_client_rejected"
+  | "change_order_notification_sent";
 
 export type AuditEntityType =
   | "estimate"

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(cd:*)",
-      "Bash(sips:*)"
+      "Bash(sips:*)",
+      "Bash(~/.config/walt/team-visuals.sh \"WALT TEAM\" \"BUILDER-PRICING\" \"BUILDER-VOICE\" \"BUILDER-INTEGRATIONS\")",
+      "Bash(pkill -f \"electron-vite\" 2>/dev/null; pkill -f \"electron\" 2>/dev/null; sleep 1; echo \"killed\")"
     ]
   }
 }

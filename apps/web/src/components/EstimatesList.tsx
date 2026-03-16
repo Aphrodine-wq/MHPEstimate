@@ -1,26 +1,19 @@
-import { useCallback, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { useEstimates, createEstimate } from "../lib/store";
-import { supabase } from "../lib/supabase";
+import { useEstimates } from "../lib/store";
+import { useAppContext } from "./AppContext";
 import { usePersistedState } from "../lib/usePersistedState";
-import { EmptyState } from "./EmptyState";
-import { StatusBadge } from "@proestimate/ui/components";
-import { generateEstimatePDF } from "./EstimatePDF";
-import type { Estimate, Client } from "@proestimate/shared/types";
+import { EstimatesFilters } from "./estimates/EstimatesFilters";
+import { EstimatesTable } from "./estimates/EstimatesTable";
 
-const FILTERS = ["All", "Draft", "In Review", "Sent", "Approved", "Accepted", "Declined"];
 const FILTER_MAP: Record<string, string> = {
   All: "", Draft: "draft", "In Review": "in_review", Sent: "sent",
   Approved: "approved", Accepted: "accepted", Declined: "declined",
 };
 
-const PAGE_SIZE = 25;
-
-export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void }) {
+export function EstimatesList() {
+  const { onModal, onEditEstimate } = useAppContext();
   const { data: estimates, loading } = useEstimates();
   const [filter, setFilter] = usePersistedState("estimates_filter", "All");
   const [search, setSearch] = usePersistedState("estimates_search", "");
-  const [selected, setSelected] = useState<string | null>(null);
   const [page, setPage] = usePersistedState("estimates_page", 0);
 
   const filtered = estimates.filter((e) => {
@@ -36,32 +29,6 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages - 1);
-  const paged = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
-
-  const detail = selected ? estimates.find((e) => e.id === selected) : null;
-  const listRef = useRef<HTMLDivElement>(null);
-
-  const handleListKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!listRef.current) return;
-      const items = listRef.current.querySelectorAll<HTMLElement>('[data-estimate-item]');
-      if (items.length === 0) return;
-      const currentIndex = Array.from(items).findIndex((el) => el === document.activeElement);
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
-        items[next]?.focus();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
-        items[prev]?.focus();
-      }
-    },
-    []
-  );
-
   return (
     <div className="flex h-full flex-col">
       <header className="flex items-center justify-between px-4 md:px-8 pt-4 pb-1">
@@ -71,31 +38,14 @@ export function EstimatesList({ onModal, onEditEstimate }: { onNavigate?: (page:
         </button>
       </header>
 
-      {/* Search */}
-      <div className="px-4 md:px-8 py-3">
-        <div className="relative mb-2 flex gap-2">
-          <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--gray2)" strokeWidth="2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search by number, type, or address..."
-              aria-label="Search estimates by number, type, or address"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-[var(--sep)] bg-[var(--card)] py-2 pl-9 pr-3 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20"
-            />
-          </div>
-          {(search || filter !== "All" || page !== 0) && (
-            <button
-              onClick={() => { setSearch(""); setFilter("All"); setPage(0); }}
-              className="flex-shrink-0 rounded-lg border border-[var(--sep)] px-3 py-2 text-[12px] font-medium text-[var(--secondary)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
+      <EstimatesFilters
+        search={search}
+        setSearch={setSearch}
+        filter={filter}
+        setFilter={setFilter}
+        page={page}
+        setPage={setPage}
+      />
 
         {/* Segmented control */}
         <div className="flex overflow-x-auto rounded-lg bg-[var(--gray5)] p-0.5">

@@ -3,22 +3,16 @@ import { NextResponse } from "next/server";
 /**
  * Health check endpoint for monitoring and load balancers.
  * GET /api/health
+ *
+ * Returns only the minimum information needed for health probes.
+ * No config details, environment names, uptime, or service booleans
+ * — those leak deployment info to unauthenticated callers.
  */
 export async function GET() {
-  const now = new Date().toISOString();
-
   return NextResponse.json(
     {
       status: "ok",
-      timestamp: now,
-      version: process.env.npm_package_version ?? "0.0.0",
-      environment: process.env.NODE_ENV ?? "unknown",
-      uptime: process.uptime(),
-      checks: {
-        supabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-        sentry: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
-        elevenlabs: !!process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY,
-      },
+      timestamp: new Date().toISOString(),
     },
     { status: 200 }
   );

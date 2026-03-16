@@ -1,5 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { useState, useCallback } from "react";
 import { useEstimates, createEstimate } from "@/lib/store";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -37,7 +38,11 @@ export default function EstimatesScreen() {
   };
 
   const renderItem = ({ item }: { item: Estimate }) => (
-    <View style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() => router.push(`/estimate/${item.id}`)}
+      activeOpacity={0.7}
+    >
       <View style={styles.rowLeft}>
         <View style={styles.rowHeader}>
           <Text style={styles.estNumber}>{item.estimate_number}</Text>
@@ -53,7 +58,7 @@ export default function EstimatesScreen() {
         )}
         <Text style={styles.tierBadge}>{item.tier}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

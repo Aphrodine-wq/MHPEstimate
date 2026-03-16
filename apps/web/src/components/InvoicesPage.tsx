@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import toast from "react-hot-toast";
+import * as Sentry from "@sentry/nextjs";
 import { useInvoices } from "../lib/store";
+import { useAppContext } from "./AppContext";
 import { supabase } from "../lib/supabase";
 import { EmptyState } from "./EmptyState";
 import { ConfirmDialog } from "./Modal";
@@ -17,10 +19,26 @@ const STATUS_STYLE: Record<string, string> = {
 
 const STATUS_FLOW: InvoiceStatus[] = ["pending", "processing", "review", "confirmed", "error"];
 
+type SortKey = "date_desc" | "date_asc" | "amount_desc" | "amount_asc";
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "date_desc", label: "Newest first" },
+  { value: "date_asc", label: "Oldest first" },
+  { value: "amount_desc", label: "Amount: high to low" },
+  { value: "amount_asc", label: "Amount: low to high" },
+];
+
+interface ParsedInvoiceData {
+  total?: number;
+  amount?: number;
+  grand_total?: number;
+  line_items?: Array<{ description?: string; name?: string; quantity?: number; total?: number; price?: number; amount?: number }>;
+  [key: string]: unknown;
+}
+
 function parsedTotal(inv: Invoice): number | null {
-  const pd = inv.parsed_data;
+  const pd = inv.parsed_data as ParsedInvoiceData | null;
   if (!pd) return null;
-  const total = (pd as any).total ?? (pd as any).amount ?? (pd as any).grand_total;
+  const total = pd.total ?? pd.amount ?? pd.grand_total;
   return typeof total === "number" ? total : null;
 }
 
@@ -28,18 +46,53 @@ function fmt(n: number): string {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void }) {
+export function InvoicesPage() {
+  const { onModal } = useAppContext();
   const { data: invoices, loading } = useInvoices();
   const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortKey>("date_desc");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Invoice | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const filters = ["All", "Pending", "Processing", "Review", "Confirmed", "Error"];
-  const filtered = invoices.filter((inv) => {
-    if (filter === "All") return true;
-    return inv.status === filter.toLowerCase();
-  });
+
+  const filtered = useMemo(() => {
+    let list = invoices.filter((inv) => {
+      if (filter !== "All" && inv.status !== filter.toLowerCase()) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const supplierMatch = (inv.supplier_name ?? "").toLowerCase().includes(q);
+        const numberMatch = (inv.invoice_number ?? "").toLowerCase().includes(q);
+        return supplierMatch || numberMatch;
+      }
+      return true;
+    });
+
+    list = [...list].sort((a, b) => {
+      switch (sort) {
+        case "date_asc":
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case "date_desc":
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "amount_desc": {
+          const aTotal = parsedTotal(a) ?? 0;
+          const bTotal = parsedTotal(b) ?? 0;
+          return bTotal - aTotal;
+        }
+        case "amount_asc": {
+          const aTotal = parsedTotal(a) ?? 0;
+          const bTotal = parsedTotal(b) ?? 0;
+          return aTotal - bTotal;
+        }
+        default:
+          return 0;
+      }
+    });
+
+    return list;
+  }, [invoices, filter, search, sort]);
 
   const selectedInvoice = invoices.find((inv) => inv.id === selectedId) ?? null;
 
@@ -48,10 +101,10 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
     setUpdatingStatus(true);
     try {
       const { error } = await supabase.from("invoices").update({ status: newStatus }).eq("id", inv.id);
-      if (error) { toast.error("Failed to update status"); console.error(error); }
+      if (error) { Sentry.captureException(error); toast.error("Failed to update status"); }
       else toast.success(`Status updated to ${newStatus}`);
     } catch (err) {
-      console.error(err);
+      Sentry.captureException(err);
       toast.error("Failed to update status");
     }
     setUpdatingStatus(false);
@@ -61,13 +114,13 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
     if (!supabase) return;
     try {
       const { error } = await supabase.from("invoices").delete().eq("id", inv.id);
-      if (error) { toast.error("Failed to delete invoice"); console.error(error); }
+      if (error) { Sentry.captureException(error); toast.error("Failed to delete invoice"); }
       else {
         toast.success("Invoice deleted");
         if (selectedId === inv.id) setSelectedId(null);
       }
     } catch (err) {
-      console.error(err);
+      Sentry.captureException(err);
       toast.error("Failed to delete invoice");
     }
   };
@@ -81,7 +134,33 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
         </button>
       </header>
 
-      <div className="px-4 md:px-8 py-3">
+      <div className="px-4 md:px-8 py-3 space-y-2">
+        {/* Search + Sort row */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--gray2)" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by supplier or invoice #..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-[var(--sep)] bg-[var(--card)] py-2 pl-8 pr-3 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20"
+            />
+          </div>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="rounded-lg border border-[var(--sep)] bg-[var(--card)] px-3 py-2 text-[13px] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Status filter tabs */}
         <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
           {filters.map((f) => (
             <button
@@ -110,8 +189,14 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
         ) : filtered.length === 0 ? (
           <EmptyState
             title="No invoices"
-            description={filter !== "All" ? "No invoices with this status" : "Upload supplier invoices to feed the pricing engine"}
-            action={filter === "All" ? "Upload Invoice" : undefined}
+            description={
+              search
+                ? `No invoices matching "${search}"`
+                : filter !== "All"
+                  ? "No invoices with this status"
+                  : "Upload supplier invoices to feed the pricing engine"
+            }
+            action={!search && filter === "All" ? "Upload Invoice" : undefined}
           />
         ) : (
           <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)]">
@@ -195,11 +280,11 @@ export function InvoicesPage({ onModal }: { onNavigate?: (page: string) => void;
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--secondary)] mb-2">Parsed Data</p>
                           <div className="rounded-lg border border-[var(--sep)] bg-[var(--card)] overflow-hidden">
                             {/* Line items if present */}
-                            {Array.isArray((inv.parsed_data as any).line_items) && (inv.parsed_data as any).line_items.length > 0 && (
+                            {Array.isArray((inv.parsed_data as ParsedInvoiceData).line_items) && (inv.parsed_data as ParsedInvoiceData).line_items!.length > 0 && (
                               <div className="p-3">
                                 <p className="text-[11px] font-semibold text-[var(--label)] mb-2">Line Items</p>
                                 <div className="space-y-1.5">
-                                  {(inv.parsed_data as any).line_items.map((item: any, idx: number) => (
+                                  {(inv.parsed_data as ParsedInvoiceData).line_items!.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between text-[12px]">
                                       <span className="text-[var(--label)] truncate flex-1 mr-3">
                                         {item.description ?? item.name ?? `Item ${idx + 1}`}

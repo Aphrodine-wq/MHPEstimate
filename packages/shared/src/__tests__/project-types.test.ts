@@ -18,12 +18,13 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
   "painting",
   "bonus_room",
   "commercial",
+  "infrastructure",
 ];
 
 describe("PROJECT_TYPES", () => {
-  it("contains all 16 expected project types", () => {
+  it("contains all 17 expected project types", () => {
     const keys = Object.keys(PROJECT_TYPES);
-    expect(keys).toHaveLength(16);
+    expect(keys).toHaveLength(17);
     for (const type of ALL_PROJECT_TYPES) {
       expect(PROJECT_TYPES).toHaveProperty(type);
     }

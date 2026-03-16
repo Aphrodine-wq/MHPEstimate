@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNotifications } from "../lib/store";
+import type { TeamMember } from "@proestimate/shared/types";
 
 interface TopBarProps {
   title: string;
   onModal: (m: string) => void;
   onNavigate: (page: string) => void;
-  user: any;
+  user: TeamMember | null;
   onSignOut?: () => void;
   onToggleMobileMenu?: () => void;
 }
@@ -193,7 +194,7 @@ function QuickAddButton({ onModal }: { onModal: (m: string) => void }) {
   );
 }
 
-function UserMenu({ user, onNavigate, onSignOut }: { user: any; onNavigate: (page: string) => void; onSignOut?: () => void }) {
+function UserMenu({ user, onNavigate, onSignOut }: { user: TeamMember | null; onNavigate: (page: string) => void; onSignOut?: () => void }) {
   const [open, setOpen] = useState(false);
   const initials = user?.full_name ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--" : "--";
 

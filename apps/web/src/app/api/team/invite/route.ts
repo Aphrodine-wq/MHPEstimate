@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { getAuthUser } from "@/lib/auth-helpers";
 import { inviteLimiter } from "@/lib/rate-limit";
 import { logAudit, getClientIp } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 const INVITE_LIMIT = 10; // max 10 invites per hour per user
 
@@ -33,7 +34,8 @@ export async function POST(req: NextRequest) {
   // --- Rate limiting: 10 invites per hour per user ---
   try {
     await inviteLimiter.check(INVITE_LIMIT, user.id);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "team-invite" });
     return NextResponse.json(
       { error: "Too many invites. Please wait an hour and try again." },
       { status: 429 }
@@ -44,7 +46,8 @@ export async function POST(req: NextRequest) {
   let body: InviteBody;
   try {
     body = await req.json() as InviteBody;
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "team-invite" });
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 

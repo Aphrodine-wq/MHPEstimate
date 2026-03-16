@@ -5,8 +5,11 @@ import { getAuthUser } from "@/lib/auth-helpers";
 import { sendEstimateLimiter } from "@/lib/rate-limit";
 import { getPortalUrl } from "@/lib/portal-token";
 import { logAudit, getClientIp } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@northmshomepros.com";
 
 export async function POST(
@@ -29,7 +32,8 @@ export async function POST(
   // --- Rate limiting: 5 sends/minute per user (email is expensive) ---
   try {
     await sendEstimateLimiter.check(5, user.id);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-send" });
     return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
   }
 
@@ -41,7 +45,8 @@ export async function POST(
   };
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-send" });
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
@@ -87,7 +92,7 @@ export async function POST(
   const pdfBuffer = Buffer.from(pdfBase64, "base64");
   const portalUrl = getPortalUrl(id);
 
-  const { error: emailError } = await resend.emails.send({
+  const { error: emailError } = await getResend().emails.send({
     from: FROM,
     to: [clientEmail],
     subject: `Your Estimate from North MS Home Pros — ${estimateNumber}`,

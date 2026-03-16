@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
 import { logAudit } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 /**
  * POST /api/webhooks/stripe
@@ -26,13 +27,31 @@ export async function POST(req: NextRequest) {
   try {
     const Stripe = (await import("stripe")).default;
     stripe = new Stripe(stripeKey);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "webhooks-stripe" });
     return NextResponse.json({ error: "Stripe package not available" }, { status: 503 });
   }
 
-  // Verify webhook signature if secret is configured
+  // Verify webhook signature — ALWAYS required unless explicitly opted out
   let event;
-  if (webhookSecret) {
+  if (!webhookSecret) {
+    // Explicit escape hatch for local development only
+    if (process.env.ALLOW_UNSIGNED_WEBHOOKS === "true") {
+      console.warn("⚠️ ALLOW_UNSIGNED_WEBHOOKS=true — accepting unsigned webhook (local dev only)");
+      try {
+        event = JSON.parse(rawBody) as { type: string; data: { object: Record<string, unknown> } };
+      } catch (err) {
+        captureError(err instanceof Error ? err : new Error(String(err)), { route: "webhooks-stripe" });
+        return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+      }
+    } else {
+      console.error("STRIPE_WEBHOOK_SECRET not configured — rejecting webhook");
+      return NextResponse.json(
+        { error: "Webhook signature verification not configured" },
+        { status: 503 },
+      );
+    }
+  } else {
     const sig = req.headers.get("stripe-signature");
     if (!sig) {
       return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
@@ -40,15 +59,9 @@ export async function POST(req: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
     } catch (err) {
+      captureError(err instanceof Error ? err : new Error(String(err)), { route: "webhooks-stripe" });
       console.error("Stripe webhook signature verification failed:", err);
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
-  } else {
-    // No webhook secret — parse event without verification (dev only)
-    try {
-      event = JSON.parse(rawBody) as { type: string; data: { object: Record<string, unknown> } };
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
   }
 

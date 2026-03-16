@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { getAuthUser } from "@/lib/auth-helpers";
 import { estimateApiLimiter } from "@/lib/rate-limit";
 import { logAudit, getClientIp } from "@/lib/audit";
+import { captureError } from "@/lib/sentry";
 
 export async function POST(
   req: NextRequest,
@@ -19,7 +20,8 @@ export async function POST(
   // --- Rate limiting: 10 requests/minute per user ---
   try {
     await estimateApiLimiter.check(10, user.id);
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-sign" });
     return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
   }
 
@@ -30,7 +32,8 @@ export async function POST(
   };
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    captureError(err instanceof Error ? err : new Error(String(err)), { route: "estimates-sign" });
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
