@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { isConnected } from "../lib/supabase";
 import { useCompanySettings, upsertSetting } from "../lib/store";
+import { useDarkMode } from "../lib/useDarkMode";
 
-const tabs = ["Company", "Estimates", "Notifications", "Integrations"] as const;
+const tabs = ["Company", "Estimates", "Notifications", "Integrations", "Theme"] as const;
 type Tab = (typeof tabs)[number];
 
 export function SettingsPage() {
@@ -11,8 +12,16 @@ export function SettingsPage() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-8 pt-4 pb-1">
-        <p className="text-[12px] text-[var(--secondary)]">Company configuration and preferences</p>
+      <header className="px-8 pt-6 pb-4 slide-up">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-4 w-1 rounded-full bg-[var(--accent)]" />
+              <p className="caps">Configuration</p>
+            </div>
+            <h1 className="text-[20px] font-extrabold tight">Settings</h1>
+          </div>
+        </div>
       </header>
 
       {/* Tab selector */}
@@ -43,6 +52,7 @@ export function SettingsPage() {
             {activeTab === "Estimates" && <EstimatesTab settings={settings} />}
             {activeTab === "Notifications" && <NotificationsTab settings={settings} />}
             {activeTab === "Integrations" && <IntegrationsTab />}
+            {activeTab === "Theme" && <ThemeTab />}
           </>
         )}
       </div>
@@ -128,13 +138,52 @@ function IntegrationsTab() {
   );
 }
 
+function ThemeTab() {
+  const { mode, setMode, isDark } = useDarkMode();
+
+  const options: { value: "light" | "dark" | "system"; label: string; description: string }[] = [
+    { value: "light", label: "Light", description: "Always use light appearance" },
+    { value: "dark", label: "Dark", description: "Always use dark appearance" },
+    { value: "system", label: "System", description: "Follows your OS preference" },
+  ];
+
+  return (
+    <Group title="Appearance">
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[13px]">Theme</p>
+          <div className="inline-flex rounded-md bg-[var(--gray5)] p-0.5">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setMode(opt.value)}
+                className={`rounded px-3 py-1 text-[12px] font-medium transition-colors ${
+                  mode === opt.value
+                    ? "bg-[var(--card)] text-[var(--foreground)] shadow-sm"
+                    : "text-[var(--secondary)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="mt-1.5 text-[11px] text-[var(--secondary)]">
+          {options.find((o) => o.value === mode)?.description}
+        </p>
+      </div>
+      <Row label="Active appearance" value={isDark ? "Dark" : "Light"} />
+    </Group>
+  );
+}
+
 /* ── Shared Components ── */
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-5">
-      <p className="mb-1.5 px-1 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{title}</p>
-      <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] divide-y divide-[var(--sep)]">{children}</div>
+    <div className="mb-6">
+      <p className="caps mb-2 px-1">{title}</p>
+      <div className="surface divide-y divide-[var(--sep)]">{children}</div>
     </div>
   );
 }

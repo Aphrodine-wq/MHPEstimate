@@ -1,23 +1,30 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { Dashboard } from "./components/Dashboard";
-import { EstimatesList } from "./components/EstimatesList";
-import { MaterialsPage } from "./components/MaterialsPage";
-import { InvoicesPage } from "./components/InvoicesPage";
-import { ClientsPage } from "./components/ClientsPage";
-import { CallHistoryPage } from "./components/CallHistoryPage";
-import { AnalyticsPage } from "./components/AnalyticsPage";
-import { SettingsPage } from "./components/SettingsPage";
-import { Profile } from "./components/Profile";
+
+// Lazy load heavy pages
+const EstimatesList = lazy(() => import("./components/EstimatesList").then(m => ({ default: m.EstimatesList })));
+const ProjectsPage = lazy(() => import("./components/ProjectsPage").then(m => ({ default: m.ProjectsPage })));
+const MaterialsPage = lazy(() => import("./components/MaterialsPage").then(m => ({ default: m.MaterialsPage })));
+const InvoicesPage = lazy(() => import("./components/InvoicesPage").then(m => ({ default: m.InvoicesPage })));
+const ClientsPage = lazy(() => import("./components/ClientsPage").then(m => ({ default: m.ClientsPage })));
+const CallHistoryPage = lazy(() => import("./components/CallHistoryPage").then(m => ({ default: m.CallHistoryPage })));
+const AnalyticsPage = lazy(() => import("./components/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
+const SettingsPage = lazy(() => import("./components/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const Profile = lazy(() => import("./components/Profile").then(m => ({ default: m.Profile })));
+const TeamMembersPage = lazy(() => import("./components/TeamMembersPage").then(m => ({ default: m.TeamMembersPage })));
 import { CallAlexFAB, CallAlexPanel } from "./components/CallAlex";
 import { SplashScreen } from "./components/SplashScreen";
 import { AuthScreen } from "./components/AuthScreen";
+import { OnboardingWizard } from "./components/OnboardingWizard";
 import { NewEstimateModal, AddClientModal, LogExpenseModal, UploadInvoiceModal, EditProfileModal } from "./components/FormModals";
 import { EstimateEditorModal } from "./components/EstimateEditorModal";
 import { UpdateBanner } from "./components/UpdateBanner";
 import { OfflineIndicator } from "./components/OfflineIndicator";
-import { useCurrentUser } from "./lib/store";
+import { AppProvider, type AppContextValue } from "./components/AppContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useCurrentUser, useEstimates } from "./lib/store";
 import { supabase, getSession, signOut } from "./lib/supabase";
 import { initSyncHandler } from "./lib/sync-handler";
 
@@ -27,6 +34,7 @@ type AppPhase = "splash" | "auth" | "reset-password" | "ready";
 const PAGE_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   estimates: "Estimates",
+  projects: "Projects",
   materials: "Materials",
   invoices: "Invoices",
   clients: "Clients",
@@ -34,11 +42,13 @@ const PAGE_TITLES: Record<string, string> = {
   analytics: "Analytics",
   settings: "Settings",
   profile: "Profile",
+  team: "Team Members",
 };
 
-const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCallAlex?: () => void; onModal?: (m: string) => void; onEditEstimate?: (estimate: any) => void; onSignOut?: () => void }>> = {
+const pages: Record<string, React.ComponentType<any>> = {
   dashboard: Dashboard,
   estimates: EstimatesList,
+  projects: ProjectsPage,
   materials: MaterialsPage,
   invoices: InvoicesPage,
   clients: ClientsPage,
@@ -46,7 +56,16 @@ const pages: Record<string, React.FC<{ onNavigate?: (page: string) => void; onCa
   analytics: AnalyticsPage,
   settings: SettingsPage,
   profile: Profile,
+  team: TeamMembersPage,
 };
+
+function PageSkeleton() {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--sep)] border-t-[var(--accent)]" />
+    </div>
+  );
+}
 
 export function App() {
   const [phase, setPhase] = useState<AppPhase>("splash");
@@ -54,7 +73,9 @@ export function App() {
   const [callOpen, setCallOpen] = useState(false);
   const [modal, setModal] = useState<ModalType>(null);
   const [editingEstimate, setEditingEstimate] = useState<any>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { user } = useCurrentUser();
+  const { data: estimates, loading: estimatesLoading } = useEstimates();
 
   const openCall = useCallback(() => setCallOpen(true), []);
   const handleModal = useCallback((m: string) => setModal(m as ModalType), []);
@@ -62,6 +83,11 @@ export function App() {
     setEditingEstimate(estimate);
     setModal("edit-estimate");
   }, []);
+
+  const handleEstimateCreated = useCallback((estimate: any) => {
+    setCallOpen(false);
+    openEstimateEditor(estimate);
+  }, [openEstimateEditor]);
 
   // After splash completes, check auth
   const handleSplashReady = useCallback(async () => {
@@ -194,13 +220,43 @@ export function App() {
     };
   }, []);
 
+  // Check if onboarding should show (new user with no estimates)
+  useEffect(() => {
+    if (phase !== "ready" || estimatesLoading) return;
+    const alreadyDone = localStorage.getItem("onboarding_complete") === "true";
+    if (!alreadyDone && estimates.length === 0) {
+      setShowOnboarding(true);
+    }
+  }, [phase, estimates, estimatesLoading]);
+
+  const handleOnboardingComplete = useCallback(() => {
+    setShowOnboarding(false);
+  }, []);
+
   const Page = pages[active] ?? Dashboard;
 
+  const appCtx = useMemo<AppContextValue>(() => ({
+    onNavigate: setActive,
+    onCallAlex: openCall,
+    onModal: handleModal,
+    onEditEstimate: openEstimateEditor,
+    onSignOut: handleSignOut,
+  }), [openCall, handleModal, openEstimateEditor, handleSignOut]);
+
   return (
-    <>
+    <ErrorBoundary>
+      <AppProvider value={appCtx}>
       {phase === "splash" && <SplashScreen onReady={handleSplashReady} />}
       {phase === "auth" && <AuthScreen onAuthenticated={handleAuthenticated} onDevBypass={handleDevBypass} />}
       {phase === "reset-password" && <AuthScreen onAuthenticated={handleAuthenticated} initialView="reset-password" />}
+      {showOnboarding && phase === "ready" && (
+        <OnboardingWizard
+          userName={user?.full_name?.split(" ")[0] ?? null}
+          onComplete={handleOnboardingComplete}
+          onNavigate={setActive}
+          onNewEstimate={() => handleModal("new-estimate")}
+        />
+      )}
       <div className={`flex h-screen overflow-hidden bg-[var(--bg)] ${phase !== "ready" ? "invisible" : ""}`}
           aria-hidden={phase !== "ready"}>
         <Sidebar active={active} onNavigate={setActive} />
@@ -214,11 +270,16 @@ export function App() {
           />
           <UpdateBanner />
           <main className="flex-1 overflow-hidden">
-            <Page onNavigate={setActive} onCallAlex={openCall} onModal={handleModal} onEditEstimate={openEstimateEditor} onSignOut={handleSignOut} />
+            <ErrorBoundary key={active}>
+              <div className="h-full page-enter" key={`page-${active}`}>
+                <Suspense fallback={<PageSkeleton />}>
+                  <Page onNavigate={setActive} onCallAlex={openCall} onModal={handleModal} onEditEstimate={openEstimateEditor} onSignOut={handleSignOut} />
+                </Suspense>
+              </div>
+            </ErrorBoundary>
           </main>
         </div>
-        {!callOpen && <CallAlexFAB onCall={openCall} />}
-        {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} />}
+        {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} onEstimateCreated={handleEstimateCreated} />}
 
         {/* Offline indicator — positioned at bottom-left */}
         <div className="fixed bottom-4 left-4 z-50">
@@ -254,6 +315,7 @@ export function App() {
         onClose={() => { setModal(null); setEditingEstimate(null); }}
         estimate={editingEstimate}
       />
-    </>
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

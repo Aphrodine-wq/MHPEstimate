@@ -10,6 +10,7 @@ interface SidebarProps {
 const mainNav = [
   { id: "dashboard", label: "Dashboard", icon: IconGrid },
   { id: "estimates", label: "Estimates", icon: IconDoc },
+  { id: "projects", label: "Projects", icon: IconProjects },
   { id: "materials", label: "Materials", icon: IconBox },
   { id: "invoices", label: "Invoices", icon: IconReceipt },
   { id: "clients", label: "Clients", icon: IconPeople },
@@ -21,28 +22,34 @@ const toolsNav = [
   { id: "settings", label: "Settings", icon: IconGear },
 ];
 
+const adminNav = [
+  { id: "team", label: "Team", icon: IconTeam },
+];
+
 export function Sidebar({ active, onNavigate }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
   const initials = user
-    ? user.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2)
+    ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2)
     : "--";
 
   return (
-    <div className={`flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-[width] duration-200 ${collapsed ? "w-[68px]" : "w-[252px]"}`}>
+    <div className={`flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-[width] duration-200 shadow-[1px_0_0_var(--sep)] ${collapsed ? "w-[68px]" : "w-[252px]"}`}>
       {/* Drag region for frameless window */}
       <div className="drag h-3 w-full flex-shrink-0" />
 
       {/* Brand header */}
       <div className={`no-drag flex items-center gap-2.5 pt-2 pb-4 ${collapsed ? "justify-center px-3" : "px-5"}`}>
-        <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
+        <img src={mhpLogo} alt="MHP Construction" className="h-10 w-10 flex-shrink-0 rounded-lg object-contain" />
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-[15px] font-bold tracking-tight leading-tight">ProEstimate AI</p>
+            <p className="text-[16px] font-extrabold tracking-tight leading-tight">ProEstimate AI</p>
             <p className="text-[11px] text-[var(--secondary)] leading-tight">MHP Construction</p>
           </div>
         )}
       </div>
+      <div className="mx-4 mb-2 border-b border-[var(--accent)]/20" />
 
       {/* Main Nav */}
       <nav className="no-drag flex-1 overflow-y-auto px-3 pt-1">
@@ -50,10 +57,20 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
           {collapsed ? "" : "Main"}
         </p>
         <NavGroup items={mainNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
-        <p className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
+        <div className="mx-1 mt-3 mb-2 border-b border-[var(--sep)]" />
+        <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
           {collapsed ? "" : "Tools"}
         </p>
         <NavGroup items={toolsNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
+        {isAdmin && (
+          <>
+            <div className="mx-1 mt-3 mb-2 border-b border-[var(--sep)]" />
+            <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
+              {collapsed ? "" : "Admin"}
+            </p>
+            <NavGroup items={adminNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
+          </>
+        )}
       </nav>
 
       {/* Collapse toggle */}
@@ -78,7 +95,7 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
         <button
           onClick={() => onNavigate("profile")}
           className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors ${
-            active === "profile" ? "bg-[var(--accent)]/8" : "hover:bg-[var(--bg)]"
+            active === "profile" ? "bg-[var(--accent)]/[0.08]" : "hover:bg-[var(--bg)]"
           }`}
         >
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-bold text-white">
@@ -86,11 +103,25 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-[13px] font-medium leading-tight truncate">{user?.full_name ?? "Not signed in"}</p>
-              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Connect Supabase"}</p>
+              {user ? (
+                <>
+                  <p className="text-[13px] font-medium leading-tight truncate">{user.full_name}</p>
+                  <p className="text-[11px] text-[var(--secondary)] truncate">{user.role}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[13px] font-medium leading-tight truncate text-[var(--secondary)]">Not signed in</p>
+                  <p className="text-[11px] font-medium text-[var(--accent)]">Sign in</p>
+                </>
+              )}
             </div>
           )}
         </button>
+      </div>
+
+      {/* Version */}
+      <div className={`no-drag pb-2 text-center text-[9px] text-[var(--tertiary)] select-none ${collapsed ? "px-1" : "px-5"}`}>
+        v1.0.0
       </div>
     </div>
   );
@@ -116,10 +147,10 @@ function NavGroup({
             key={item.id}
             onClick={() => onNavigate(item.id)}
             title={collapsed ? item.label : undefined}
-            className={`group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all ${
+            className={`group relative flex w-full items-center gap-2.5 rounded-r-lg py-[7px] text-[13px] transition-all duration-150 ${
               isActive
-                ? "bg-[var(--accent)] font-semibold text-white shadow-sm shadow-[var(--accent)]/20"
-                : "font-medium text-[var(--label)] hover:bg-[var(--bg)]"
+                ? "border-l-[3px] border-l-[var(--accent)] bg-[var(--accent)]/[0.08] pl-[7px] pr-2.5 font-semibold text-[var(--label)]"
+                : "border-l-[3px] border-l-transparent pl-[7px] pr-2.5 font-medium text-[var(--label)] hover:bg-[var(--bg)] hover:translate-x-0.5"
             } ${collapsed ? "justify-center" : ""}`}
           >
             <item.icon active={isActive} />
@@ -135,8 +166,17 @@ function NavGroup({
 
 const ICON_COLOR = "#636366";
 
+function IconProjects({ active }: { active: boolean }) {
+  const c = active ? "var(--accent)" : ICON_COLOR;
+  return (
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+    </svg>
+  );
+}
+
 function IconGrid({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" />
@@ -146,7 +186,7 @@ function IconGrid({ active }: { active: boolean }) {
 }
 
 function IconDoc({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
@@ -156,7 +196,7 @@ function IconDoc({ active }: { active: boolean }) {
 }
 
 function IconBox({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
@@ -166,7 +206,7 @@ function IconBox({ active }: { active: boolean }) {
 }
 
 function IconReceipt({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
@@ -176,7 +216,7 @@ function IconReceipt({ active }: { active: boolean }) {
 }
 
 function IconPeople({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
@@ -186,7 +226,7 @@ function IconPeople({ active }: { active: boolean }) {
 }
 
 function IconPhone({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -195,7 +235,7 @@ function IconPhone({ active }: { active: boolean }) {
 }
 
 function IconChart({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
@@ -203,8 +243,18 @@ function IconChart({ active }: { active: boolean }) {
   );
 }
 
+function IconTeam({ active }: { active: boolean }) {
+  const c = active ? "var(--accent)" : ICON_COLOR;
+  return (
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 function IconGear({ active }: { active: boolean }) {
-  const c = active ? "#fff" : ICON_COLOR;
+  const c = active ? "var(--accent)" : ICON_COLOR;
   return (
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />

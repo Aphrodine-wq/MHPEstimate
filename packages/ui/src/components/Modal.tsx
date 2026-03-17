@@ -16,7 +16,7 @@ export function Modal({
   title,
   description,
   children,
-  width = "w-full max-w-[480px]",
+  width = "w-full max-w-[560px]",
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -98,13 +98,13 @@ export function Modal({
         className={`${width} max-h-[85vh] overflow-hidden rounded-2xl border border-[var(--sep)] bg-[var(--card)] shadow-2xl animate-modal-content`}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[var(--sep)] px-6 py-4">
+        <div className="flex items-start justify-between border-b border-[var(--sep)] px-6 py-5">
           <div>
-            <h2 id={titleId} className="text-[17px] font-semibold tracking-tight">
+            <h2 id={titleId} className="text-[18px] font-bold" style={{ letterSpacing: "-0.025em" }}>
               {title}
             </h2>
             {description && (
-              <p className="mt-0.5 text-[12px] text-[var(--secondary)]">
+              <p className="mt-1 text-[13px] text-[var(--secondary)]">
                 {description}
               </p>
             )}
@@ -207,10 +207,10 @@ export function Field({ label, children }: FieldProps) {
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3 py-2 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-colors";
+  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10 transition-all shadow-sm shadow-black/[0.02]";
 
 export const selectClass =
-  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3 py-2 text-[13px] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-colors appearance-none";
+  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[13px] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10 transition-all appearance-none shadow-sm shadow-black/[0.02] cursor-pointer";
 
 export const textareaClass =
-  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3 py-2 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/20 transition-colors resize-none";
+  "w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[13px] outline-none placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10 transition-all resize-none shadow-sm shadow-black/[0.02]";

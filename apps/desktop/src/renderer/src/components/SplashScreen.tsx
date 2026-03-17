@@ -51,61 +51,51 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
       className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${
         phase === "done" ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
-      style={{ background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)" }}
+      style={{ background: "#ffffff" }}
     >
-      {/* Subtle radial glow behind the logo */}
-      <div
-        className="absolute rounded-full blur-[80px] opacity-30"
-        style={{
-          width: 320,
-          height: 320,
-          background: "radial-gradient(circle, #29abe2 0%, transparent 70%)",
-        }}
-      />
-
       {/* Logo with entrance animation */}
       <div className="relative animate-splash-logo">
         <img
           src={mhpLogo}
           alt="MHP Construction"
-          className="h-28 w-auto drop-shadow-sm"
+          className="h-28 w-auto"
         />
       </div>
 
       {/* App name */}
       <div className="mt-6 animate-splash-text">
-        <h1 className="text-center text-[22px] font-bold tracking-tight text-[#1a1a1a]">
+        <h1 className="text-center text-[22px] font-bold text-[#111318]" style={{ letterSpacing: "-0.03em" }}>
           ProEstimate AI
         </h1>
-        <p className="mt-1 text-center text-[12px] font-medium tracking-wide text-[#8e8e93]">
+        <p className="mt-1 text-center text-[12px] font-medium tracking-wide text-[#9CA3AF]">
           Intelligent Construction Estimating
         </p>
       </div>
 
       {/* Progress bar */}
       <div className="mt-10 w-48 animate-splash-bar">
-        <div className="h-[3px] w-full overflow-hidden rounded-full bg-[#e5e5ea]">
+        <div className="h-[3px] w-full overflow-hidden rounded-full bg-[#E5E7EB]">
           <div
             className="h-full rounded-full transition-[width] duration-100 ease-out"
             style={{
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #29abe2, #007aff)",
+              background: "var(--accent)",
             }}
           />
         </div>
-        <p className="mt-2.5 text-center text-[10px] font-medium text-[#aeaeb2]">
+        <p className="mt-2.5 text-center text-[10px] font-medium text-[#9CA3AF]">
           {progress < 30
-            ? "Loading modules…"
+            ? "Loading modules..."
             : progress < 65
-              ? "Connecting to database…"
+              ? "Connecting to database..."
               : progress < 90
-                ? "Preparing workspace…"
+                ? "Preparing workspace..."
                 : "Ready"}
         </p>
       </div>
 
       {/* Version */}
-      <p className="absolute bottom-6 text-[10px] text-[#c7c7cc]">v{version}</p>
+      <p className="absolute bottom-6 text-[10px] text-[#D1D5DB]">v{version}</p>
     </div>
   );
 }

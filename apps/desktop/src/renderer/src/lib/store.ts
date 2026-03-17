@@ -9,6 +9,8 @@ import type {
   VoiceCall,
   TeamMember,
   EstimateLineItem,
+  JobActual,
+  EstimateChangeOrder,
 } from "@proestimate/shared/types";
 
 // ── Realtime-enabled hooks ──
@@ -336,6 +338,7 @@ export interface Notification {
   time: string;
   read: boolean;
   timestamp: string;
+  type?: "estimate" | "client" | "invoice";
 }
 
 export function useNotifications() {
@@ -362,6 +365,7 @@ export function useNotifications() {
           time: timeAgo(e.created_at),
           read: readIds.has(`est-created-${e.id}`),
           timestamp: e.created_at,
+          type: "estimate",
         });
       }
       if (e.status === "accepted" && e.accepted_at) {
@@ -372,6 +376,7 @@ export function useNotifications() {
           time: timeAgo(e.accepted_at),
           read: readIds.has(`est-accepted-${e.id}`),
           timestamp: e.accepted_at,
+          type: "estimate",
         });
       }
       if (e.status === "sent" && e.sent_at) {
@@ -382,6 +387,7 @@ export function useNotifications() {
           time: timeAgo(e.sent_at),
           read: readIds.has(`est-sent-${e.id}`),
           timestamp: e.sent_at,
+          type: "estimate",
         });
       }
       if (e.valid_through) {
@@ -395,6 +401,7 @@ export function useNotifications() {
             time: timeAgo(e.updated_at),
             read: readIds.has(`est-expiring-${e.id}`),
             timestamp: e.updated_at,
+            type: "estimate",
           });
         }
       }
@@ -411,6 +418,7 @@ export function useNotifications() {
           time: timeAgo(c.created_at),
           read: readIds.has(`cli-added-${c.id}`),
           timestamp: c.created_at,
+          type: "client",
         });
       }
     }
@@ -426,6 +434,7 @@ export function useNotifications() {
           time: timeAgo(inv.created_at),
           read: readIds.has(`inv-uploaded-${inv.id}`),
           timestamp: inv.created_at,
+          type: "invoice",
         });
       }
       if (inv.status === "confirmed") {
@@ -436,6 +445,7 @@ export function useNotifications() {
           time: timeAgo(inv.created_at),
           read: readIds.has(`inv-confirmed-${inv.id}`),
           timestamp: inv.created_at,
+          type: "invoice",
         });
       }
     }
@@ -463,6 +473,124 @@ export function useNotifications() {
   }, [notifications]);
 
   return { notifications, markRead, markAllRead };
+}
+
+export function useTeamMembers() {
+  if (!supabase) return { members: [] as TeamMember[], loading: false, refresh: async () => {} };
+
+  const { rows: members, status, refetch } = useTableSync<TeamMember>({
+    supabase,
+    table: "team_members",
+    orderBy: { column: "full_name", ascending: true },
+  });
+
+  return {
+    members,
+    loading: status === "CONNECTING",
+    refresh: refetch,
+  };
+}
+
+export function useJobActuals(estimateId: string) {
+  const [actuals, setActuals] = useState<JobActual | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase || !estimateId) { setLoading(false); return; }
+    supabase
+      .from("job_actuals")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .maybeSingle()
+      .then(({ data }) => {
+        setActuals(data as JobActual | null);
+        setLoading(false);
+      });
+  }, [estimateId]);
+
+  return { actuals, loading };
+}
+
+export function useChangeOrders(estimateId: string) {
+  const [changeOrders, setChangeOrders] = useState<EstimateChangeOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase || !estimateId) { setChangeOrders([]); setLoading(false); return; }
+    supabase
+      .from("estimate_change_orders")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .order("change_number", { ascending: true })
+      .then(({ data }) => {
+        setChangeOrders((data as EstimateChangeOrder[]) ?? []);
+        setLoading(false);
+      });
+  }, [estimateId]);
+
+  return { changeOrders, loading };
+}
+
+// ── Time Entries ──
+
+export interface TimeEntry {
+  id: string;
+  estimate_id: string;
+  user_id?: string;
+  category: "labor" | "travel" | "admin" | "inspection" | "cleanup" | "other";
+  description: string;
+  duration_min: number;
+  date: string;
+  started_at?: string;
+  ended_at?: string;
+  created_at: string;
+}
+
+const TIME_ENTRIES_KEY = "proestimate_time_entries";
+
+function loadTimeEntries(): TimeEntry[] {
+  try {
+    const raw = localStorage.getItem(TIME_ENTRIES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveTimeEntries(entries: TimeEntry[]) {
+  localStorage.setItem(TIME_ENTRIES_KEY, JSON.stringify(entries));
+}
+
+export function useTimeEntries(estimateId?: string) {
+  const [entries, setEntries] = useState<TimeEntry[]>(() => loadTimeEntries());
+
+  const filtered = estimateId
+    ? entries.filter(e => e.estimate_id === estimateId)
+    : entries;
+
+  const addEntry = useCallback((entry: Omit<TimeEntry, "id" | "created_at">) => {
+    const newEntry: TimeEntry = {
+      ...entry,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    };
+    setEntries(prev => {
+      const updated = [newEntry, ...prev];
+      saveTimeEntries(updated);
+      return updated;
+    });
+    return newEntry;
+  }, []);
+
+  const deleteEntry = useCallback((id: string) => {
+    setEntries(prev => {
+      const updated = prev.filter(e => e.id !== id);
+      saveTimeEntries(updated);
+      return updated;
+    });
+  }, []);
+
+  const totalMinutes = filtered.reduce((sum, e) => sum + e.duration_min, 0);
+
+  return { entries: filtered, allEntries: entries, addEntry, deleteEntry, totalMinutes };
 }
 
 export function useCurrentUser() {

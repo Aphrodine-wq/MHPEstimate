@@ -178,18 +178,18 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
   return (
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center"
-      style={{ background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)" }}
+      style={{ background: "#ffffff" }}
     >
       {/* Drag region for frameless window */}
       <div className="drag absolute inset-x-0 top-0 h-10" />
 
       {/* Background glow */}
       <div
-        className="absolute rounded-full blur-[100px] opacity-20"
+        className="absolute rounded-full blur-[100px] opacity-15"
         style={{
           width: 400,
           height: 400,
-          background: "radial-gradient(circle, #29abe2 0%, transparent 70%)",
+          background: "var(--accent)",
         }}
       />
 
@@ -197,10 +197,10 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <img src={mhpLogo} alt="MHP Construction" className="h-20 w-auto drop-shadow-sm" />
-          <h1 className="mt-4 text-[20px] font-bold tracking-tight text-[#1a1a1a]">
+          <h1 className="mt-4 text-[20px] font-bold text-[var(--label)]" style={{ letterSpacing: "-0.03em", WebkitFontSmoothing: "antialiased" }}>
             ProEstimate AI
           </h1>
-          <p className="mt-1 text-[12px] font-medium text-[#8e8e93]">
+          <p className="mt-1 text-[12px] font-medium text-[var(--tertiary)]">
             {view === "login" && "Sign in to continue"}
             {view === "signup" && "Create your account"}
             {view === "forgot-password" && "Reset your password"}
@@ -210,35 +210,35 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
         </div>
 
         {/* Card */}
-        <div className="no-drag rounded-2xl bg-white p-6 shadow-[0_2px_20px_rgba(0,0,0,0.06)]">
+        <div className="no-drag rounded-2xl bg-white p-6 shadow-[0_2px_24px_rgba(0,0,0,0.08)] border border-[var(--sep)]">
           {error && (
-            <div className="mb-4 rounded-lg bg-[#ff3b300d] px-3 py-2 text-[13px] text-[#ff3b30]">
+            <div className="mb-4 rounded-lg border border-[var(--red)]/30 bg-[#ff3b30]/10 px-3 py-2 text-[13px] text-[var(--red)]">
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 rounded-lg bg-[#34c7590d] px-3 py-2 text-[13px] text-[#34c759]">
+            <div className="mb-4 rounded-lg border border-[var(--green)]/30 bg-[#34c759]/10 px-3 py-2 text-[13px] text-[var(--green)]">
               {success}
             </div>
           )}
 
           {view === "check-email" && (
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#007aff14]">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#007aff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent)]/10">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="4" width="20" height="16" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
               </div>
-              <p className="text-[14px] text-[#1a1a1a]">
+              <p className="text-[14px] text-[var(--label)]">
                 We sent a link to <strong>{email}</strong>
               </p>
-              <p className="mt-2 text-[12px] text-[#8e8e93]">
+              <p className="mt-2 text-[12px] text-[var(--tertiary)]">
                 Click the link in the email to continue.
               </p>
               <button
                 onClick={() => { resetForm(); setView("login"); }}
-                className="mt-6 text-[13px] font-medium text-[#007aff] hover:underline"
+                className="mt-6 text-[13px] font-medium text-[var(--accent)] hover:underline"
               >
                 Back to sign in
               </button>
@@ -248,7 +248,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
           {view === "login" && (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Email</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -256,26 +256,26 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   autoFocus
                   autoComplete="email"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="you@northmshomepros.com"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Password</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="Enter your password"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-[#007aff] px-4 py-2.5 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
               >
                 {loading ? "Signing in…" : "Sign In"}
               </button>
@@ -283,14 +283,14 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                 <button
                   type="button"
                   onClick={() => { resetForm(); setView("forgot-password"); }}
-                  className="text-[12px] text-[#007aff] hover:underline"
+                  className="text-[12px] text-[var(--accent)] hover:underline"
                 >
                   Forgot password?
                 </button>
                 <button
                   type="button"
                   onClick={() => { resetForm(); setView("signup"); }}
-                  className="text-[12px] text-[#007aff] hover:underline"
+                  className="text-[12px] text-[var(--accent)] hover:underline"
                 >
                   Create account
                 </button>
@@ -301,7 +301,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
           {view === "signup" && (
             <form onSubmit={handleSignup} className="space-y-4">
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Full Name</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Full Name</label>
                 <input
                   type="text"
                   value={fullName}
@@ -309,25 +309,25 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   autoFocus
                   autoComplete="name"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="John Smith"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Email</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="you@northmshomepros.com"
                 />
                 <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a @northmshomepros.com email</p>
               </div>
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Password</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Password</label>
                 <input
                   type="password"
                   value={password}
@@ -335,14 +335,14 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="Min 8 characters"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-[#007aff] px-4 py-2.5 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
               >
                 {loading ? "Creating account…" : "Create Account"}
               </button>
@@ -350,7 +350,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                 <button
                   type="button"
                   onClick={() => { resetForm(); setView("login"); }}
-                  className="text-[12px] text-[#007aff] hover:underline"
+                  className="text-[12px] text-[var(--accent)] hover:underline"
                 >
                   Already have an account? Sign in
                 </button>
@@ -361,7 +361,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
           {view === "forgot-password" && (
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Email</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -369,7 +369,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   autoFocus
                   autoComplete="email"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="you@northmshomepros.com"
                 />
                 <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a @northmshomepros.com email</p>
@@ -377,7 +377,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-[#007aff] px-4 py-2.5 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
               >
                 {loading ? "Sending…" : "Send Reset Link"}
               </button>
@@ -385,7 +385,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                 <button
                   type="button"
                   onClick={() => { resetForm(); setView("login"); }}
-                  className="text-[12px] text-[#007aff] hover:underline"
+                  className="text-[12px] text-[var(--accent)] hover:underline"
                 >
                   Back to sign in
                 </button>
@@ -396,7 +396,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
           {view === "reset-password" && (
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">New Password</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">New Password</label>
                 <input
                   type="password"
                   value={password}
@@ -405,12 +405,12 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   autoFocus
                   minLength={8}
                   autoComplete="new-password"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="Min 8 characters"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Confirm Password</label>
+                <label className="mb-1 block text-[12px] font-medium text-[var(--secondary)]">Confirm Password</label>
                 <input
                   type="password"
                   value={confirmPassword}
@@ -418,14 +418,14 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
+                  className="w-full rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-3.5 py-2.5 text-[14px] text-[var(--label)] shadow-sm shadow-black/[0.02] outline-none transition-all placeholder:text-[var(--gray3)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/10"
                   placeholder="Re-enter your password"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-[#007aff] px-4 py-2.5 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-[14px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
               >
                 {loading ? "Updating…" : "Update Password"}
               </button>
@@ -433,7 +433,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                 <button
                   type="button"
                   onClick={() => { resetForm(); setView("login"); }}
-                  className="text-[12px] text-[#007aff] hover:underline"
+                  className="text-[12px] text-[var(--accent)] hover:underline"
                 >
                   Back to sign in
                 </button>
@@ -443,13 +443,13 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
         </div>
 
         {/* Version */}
-        <p className="mt-6 text-center text-[10px] text-[#c7c7cc]">v1.0.0</p>
+        <p className="mt-6 text-center text-[10px] text-[var(--gray3)]">v1.0.0</p>
 
         {/* Dev bypass — only in development */}
         {isDev && onDevBypass && (
           <button
             onClick={onDevBypass}
-            className="mt-3 w-full rounded-lg border border-dashed border-[var(--orange)] bg-[var(--orange)]/5 px-4 py-2 text-[12px] font-medium text-[var(--orange)] transition-colors hover:bg-[var(--orange)]/10"
+            className="mt-3 w-full rounded-lg border border-dashed border-[#374151] px-3 py-1.5 text-[11px] font-medium text-[var(--tertiary)] transition-colors hover:border-[#4b5563] hover:text-[var(--secondary)]"
           >
             Dev Bypass — Skip Auth
           </button>

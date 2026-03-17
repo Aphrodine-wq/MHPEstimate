@@ -11,20 +11,20 @@ interface TopBarProps {
 
 export function TopBar({ title, onModal, onNavigate, user, onSignOut }: TopBarProps) {
   return (
-    <header className="flex h-12 flex-shrink-0 items-center justify-between border-b border-[var(--sep)] bg-[var(--card)]">
+    <header className="flex h-14 flex-shrink-0 items-center justify-between bg-[var(--card)] shadow-[0_1px_0_var(--sep)]">
       {/* Left: Draggable area + breadcrumb */}
       <div className="drag flex flex-1 items-center gap-2 pl-4 h-full">
         <nav className="no-drag flex items-center gap-1.5 text-[13px]">
           <button
             onClick={() => onNavigate("dashboard")}
-            className="text-[var(--secondary)] transition-colors hover:text-[var(--label)]"
+            className="text-[var(--secondary)] transition-colors hover:text-[var(--accent)]"
           >
             Home
           </button>
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="var(--gray3)" strokeWidth="2.5" strokeLinecap="round">
             <path d="m9 18 6-6-6-6" />
           </svg>
-          <span className="font-medium text-[var(--label)]">{title}</span>
+          <span className="font-semibold text-[var(--label)]">{title}</span>
         </nav>
       </div>
 
@@ -43,13 +43,13 @@ export function TopBar({ title, onModal, onNavigate, user, onSignOut }: TopBarPr
         <div className="mx-1 h-5 w-px bg-[var(--sep)]" />
 
         {/* Window controls */}
-        <button onClick={() => window.electronAPI?.minimize()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Minimize">
+        <button onClick={() => window.electronAPI?.minimize()} className="rounded p-2 text-[#636366] transition-colors hover:bg-[var(--bg)]" title="Minimize">
           <svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="5.5" width="8" height="1" rx="0.5" fill="currentColor" /></svg>
         </button>
-        <button onClick={() => window.electronAPI?.maximize()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--bg)]" title="Maximize">
+        <button onClick={() => window.electronAPI?.maximize()} className="rounded p-2 text-[#636366] transition-colors hover:bg-[var(--bg)]" title="Maximize">
           <svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" /></svg>
         </button>
-        <button onClick={() => window.electronAPI?.close()} className="rounded p-1.5 text-[#636366] hover:bg-[var(--red)]/10 hover:text-[var(--red)]" title="Close">
+        <button onClick={() => window.electronAPI?.close()} className="rounded p-2 text-[#636366] transition-colors hover:bg-[var(--red)]/10 hover:text-[var(--red)]" title="Close">
           <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
         </button>
       </div>
@@ -73,13 +73,13 @@ function NotificationsButton() {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[var(--red)] ring-2 ring-[var(--card)]" />
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[var(--red)] ring-2 ring-[var(--card)] status-live" />
         )}
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1.5 w-80 rounded-xl border border-[var(--sep)] bg-[var(--card)] shadow-lg shadow-black/8 animate-modal-content">
+          <div className="absolute right-0 top-full z-50 mt-1.5 w-80 surface-elevated shadow-lg shadow-black/8 animate-modal-content">
             <div className="flex items-center justify-between border-b border-[var(--sep)] px-4 py-3">
               <p className="text-[13px] font-semibold">Notifications</p>
               {unreadCount > 0 && (
@@ -101,11 +101,17 @@ function NotificationsButton() {
                     className={`flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-[var(--bg)] border-b border-[var(--sep)] last:border-b-0 ${!n.read ? "bg-[var(--accent)]/[0.03]" : ""}`}
                   >
                     <div className="flex items-center gap-2">
+                      <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+                        n.type === "estimate" ? "bg-[var(--red)]"
+                        : n.type === "client" ? "bg-[var(--green)]"
+                        : n.type === "invoice" ? "bg-[var(--accent)]"
+                        : "bg-[var(--gray3)]"
+                      }`} />
                       {!n.read && <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--accent)]" />}
                       <span className={`text-[13px] font-medium ${!n.read ? "" : "text-[var(--secondary)]"}`}>{n.title}</span>
                     </div>
-                    <p className="text-[11px] text-[var(--secondary)] pl-3.5">{n.desc}</p>
-                    <p className="text-[10px] text-[var(--tertiary)] pl-3.5">{n.time}</p>
+                    <p className="text-[11px] text-[var(--secondary)] pl-5">{n.desc}</p>
+                    <p className="text-[10px] text-[var(--tertiary)] pl-5">{n.time}</p>
                   </button>
                 ))
               )}
@@ -129,17 +135,17 @@ function QuickAddButton({ onModal }: { onModal: (m: string) => void }) {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]"
+        className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/15 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.98]"
       >
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
         </svg>
-        New
+        + New
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1.5 w-52 rounded-xl border border-[var(--sep)] bg-[var(--card)] p-1.5 shadow-lg shadow-black/8 animate-modal-content">
+          <div className="absolute right-0 top-full z-50 mt-1.5 w-52 surface-elevated p-1.5 shadow-lg shadow-black/8 animate-modal-content">
             <DropdownItem label="New Estimate" desc="Start from scratch" onClick={() => { onModal("new-estimate"); setOpen(false); }} />
             <DropdownItem label="Add Client" desc="New client record" onClick={() => { onModal("add-client"); setOpen(false); }} />
             <DropdownItem label="Log Expense" desc="Record a purchase" onClick={() => { onModal("log-expense"); setOpen(false); }} />
@@ -171,7 +177,7 @@ function UserMenu({ user, onNavigate, onSignOut }: { user: any; onNavigate: (pag
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1.5 w-48 rounded-xl border border-[var(--sep)] bg-[var(--card)] p-1.5 shadow-lg shadow-black/8 animate-modal-content">
+          <div className="absolute right-0 top-full z-50 mt-1.5 w-48 surface-elevated p-1.5 shadow-lg shadow-black/8 animate-modal-content">
             {user && (
               <div className="px-3 py-2 border-b border-[var(--sep)] mb-1">
                 <p className="text-[13px] font-medium truncate">{user.full_name}</p>
@@ -180,13 +186,13 @@ function UserMenu({ user, onNavigate, onSignOut }: { user: any; onNavigate: (pag
             )}
             <button
               onClick={() => { onNavigate("profile"); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+              className="flex w-full items-center gap-2 rounded-r-lg border-l-2 border-l-transparent px-3 py-2 text-left text-[13px] transition-all hover:border-l-[var(--accent)] hover:bg-[var(--bg)]"
             >
               Profile
             </button>
             <button
               onClick={() => { onNavigate("settings"); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+              className="flex w-full items-center gap-2 rounded-r-lg border-l-2 border-l-transparent px-3 py-2 text-left text-[13px] transition-all hover:border-l-[var(--accent)] hover:bg-[var(--bg)]"
             >
               Settings
             </button>

@@ -1,4 +1,5 @@
-import { useEstimates, useActivityFeed } from "../lib/store";
+import { useMemo } from "react";
+import { useEstimates, useCurrentUser, useActivityFeed } from "../lib/store";
 import type { ActivityEntry } from "../lib/store";
 import { isConnected } from "../lib/supabase";
 import { StatusBadge } from "@proestimate/ui/components";
@@ -10,52 +11,7 @@ interface DashboardProps {
   onModal?: (m: string) => void;
 }
 
-const QUOTES = [
-  { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin" },
-  { text: "Quality means doing it right when no one is looking.", author: "Henry Ford" },
-  { text: "Measure twice, cut once.", author: "Proverb" },
-  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
-  { text: "Excellence is not a skill. It is an attitude.", author: "Ralph Marston" },
-  { text: "The details are not the details. They make the design.", author: "Charles Eames" },
-  { text: "Build your reputation by helping other people build theirs.", author: "Anthony J. D'Angelo" },
-  { text: "A good plan today is better than a perfect plan tomorrow.", author: "George S. Patton" },
-  { text: "Price is what you pay. Value is what you get.", author: "Warren Buffett" },
-  { text: "The foundation of every state is the education of its youth.", author: "Diogenes" },
-  { text: "Vision without execution is hallucination.", author: "Thomas Edison" },
-  { text: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt" },
-  { text: "Building a house is about dreaming and finding a way to build that dream with your own hands.", author: "Kevin McCloud" },
-  { text: "Construction is a team sport.", author: "Matt Stevens" },
-  { text: "Safety is not a gadget but a state of mind.", author: "Eleanor Everet" },
-  { text: "Every accomplishment starts with the decision to try.", author: "John F. Kennedy" },
-  { text: "The strength of the team is each individual member.", author: "Phil Jackson" },
-  { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
-  { text: "Well done is better than well said.", author: "Benjamin Franklin" },
-  { text: "Your most unhappy customers are your greatest source of learning.", author: "Bill Gates" },
-  { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
-  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-  { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
-  { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
-  { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
-  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
-];
-
-const ACTIVITY_COLORS: Record<ActivityEntry["type"], string> = {
-  estimate: "bg-[var(--accent)]",
-  client: "bg-[var(--green)]",
-  invoice: "bg-[var(--purple)]",
-  call: "bg-[var(--orange)]",
-};
-
-const ACTIVITY_TYPE_LABEL: Record<ActivityEntry["type"], string> = {
-  estimate: "Estimate",
-  client: "Client",
-  invoice: "Invoice",
-  call: "Call",
-};
+// ── Helpers ──
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -65,230 +21,9 @@ function timeAgo(dateStr: string): string {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
-}
-
-export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
-  const { data: estimates, loading } = useEstimates();
-  const activityEntries = useActivityFeed();
-
-  const todayQuote = QUOTES[Math.floor(Date.now() / 86400000) % QUOTES.length]!;
-
-  const sent = estimates.filter((e) => e.status === "sent" || e.status === "approved");
-  const accepted = estimates.filter((e) => e.status === "accepted");
-  const drafts = estimates.filter((e) => e.status === "draft" || e.status === "in_review");
-  const totalPipeline = sent.reduce((sum, e) => sum + Number(e.grand_total), 0);
-  const totalWon = accepted.reduce((sum, e) => sum + Number(e.grand_total), 0);
-  const avgMargin = estimates.length
-    ? estimates.reduce((sum, e) => sum + Number(e.gross_margin_pct ?? 0), 0) / estimates.length
-    : 0;
-
-  return (
-    <div className="flex h-full flex-col overflow-y-auto">
-      <header className="flex items-center justify-between px-8 pt-5 pb-1">
-        <div>
-          <p className="text-[12px] text-[var(--secondary)]">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-            {!isConnected() && " -- Supabase not connected"}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
-            New Estimate
-          </button>
-        </div>
-      </header>
-
-      {/* KPIs row: 4 metrics + quote of the day */}
-      <div className="grid grid-cols-7 gap-3 px-8 py-4">
-        <div className="col-span-5 grid grid-cols-4 gap-3">
-          <Metric label="Estimate Tracker" value={fmt(totalPipeline)} sub={`${sent.length} pending`} />
-          <Metric label="Won" value={fmt(totalWon)} sub={`${accepted.length} accepted`} />
-          <Metric label="Avg Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "—"} sub="Target 35–42%" />
-          <Metric label="Drafts" value={drafts.length.toString()} sub="In progress" />
-        </div>
-        <div className="col-span-2 flex flex-col rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Quote of the Day</p>
-          <div className="mt-2 flex flex-1 items-start gap-2">
-            <div className="mt-0.5 h-full w-[3px] flex-shrink-0 rounded-full bg-[var(--accent)]" />
-            <div className="min-w-0">
-              <p className="text-[13px] italic leading-snug text-[var(--label)]">{todayQuote.text}</p>
-              <p className="mt-1 text-[11px] text-[var(--secondary)]">— {todayQuote.author}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content: left (estimates + actions/pipeline) + right (activity feed) */}
-      <div className="grid flex-1 grid-cols-7 gap-4 px-8 pb-6">
-        {/* Left column */}
-        <div className="col-span-5 flex flex-col gap-4">
-          {/* Recent estimates */}
-          <div className="flex flex-1 flex-col">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[13px] font-semibold">Recent Estimates</p>
-            </div>
-            <div className="flex-1 overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)]">
-              {loading ? (
-                <LoadingRows count={4} />
-              ) : estimates.length === 0 ? (
-                <div className="flex h-full items-center justify-center py-16">
-                  <p className="text-[13px] text-[var(--secondary)]">No estimates yet</p>
-                </div>
-              ) : (
-                estimates.slice(0, 8).map((est, i, arr) => (
-                  <EstimateRow key={est.id} estimate={est} last={i === arr.length - 1} onNavigate={onNavigate} />
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Quick Actions + Pipeline Breakdown */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="mb-2 text-[13px] font-semibold">Quick Actions</p>
-              <div className="space-y-2">
-                <ActionButton label="New Estimate" desc="Start from scratch" onClick={() => onModal?.("new-estimate")} />
-                <ActionButton label="Quick Ballpark" desc="Voice or manual entry" onClick={() => onCallAlex?.()} />
-                <ActionButton label="Upload Invoice" desc="Add supplier pricing" onClick={() => onModal?.("upload-invoice")} />
-              </div>
-            </div>
-            <div>
-              <p className="mb-2 text-[13px] font-semibold">Estimate Tracker</p>
-              <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-                <p className="text-[22px] font-bold tracking-tight">{fmt(totalPipeline)}</p>
-                <p className="mb-4 text-[11px] text-[var(--secondary)]">Total pending value</p>
-                <div className="space-y-2">
-                  <PipelineRow label="Draft" count={estimates.filter((e) => e.status === "draft").length} total={estimates.length} />
-                  <PipelineRow label="In Review" count={estimates.filter((e) => e.status === "in_review").length} total={estimates.length} />
-                  <PipelineRow label="Sent" count={estimates.filter((e) => e.status === "sent").length} total={estimates.length} />
-                  <PipelineRow label="Approved" count={estimates.filter((e) => e.status === "approved").length} total={estimates.length} />
-                  <PipelineRow label="Accepted" count={accepted.length} total={estimates.length} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right column: Activity Feed */}
-        <div className="col-span-2 flex flex-col">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[13px] font-semibold">Activity Feed</p>
-          </div>
-          <div className="flex-1 overflow-y-auto rounded-xl border border-[var(--sep)] bg-[var(--card)]">
-            <ActivityFeed entries={activityEntries} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ActivityFeed({ entries }: { entries: ActivityEntry[] }) {
-  if (entries.length === 0) {
-    return (
-      <div className="flex h-full items-center justify-center py-16">
-        <p className="text-[13px] text-[var(--secondary)]">No recent activity</p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {entries.map((entry, i) => (
-        <div
-          key={entry.id}
-          className={`flex items-start gap-3 px-4 py-3 ${i < entries.length - 1 ? "border-b border-[var(--sep)]" : ""}`}
-        >
-          <div className="mt-1.5 flex-shrink-0">
-            <div className={`h-2 w-2 rounded-full ${ACTIVITY_COLORS[entry.type]}`} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] leading-snug truncate">{entry.description}</p>
-            <div className="mt-0.5 flex items-center gap-2">
-              <span className="text-[11px] text-[var(--secondary)]">{ACTIVITY_TYPE_LABEL[entry.type]}</span>
-              <span className="text-[11px] text-[var(--tertiary)]">{entry.action}</span>
-            </div>
-          </div>
-          <p className="flex-shrink-0 text-[11px] text-[var(--secondary)]">{timeAgo(entry.timestamp)}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Metric({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{label}</p>
-      <p className="mt-1 text-[22px] font-bold tracking-tight">{value}</p>
-      <p className="text-[11px] text-[var(--secondary)]">{sub}</p>
-    </div>
-  );
-}
-
-function EstimateRow({ estimate, last, onNavigate }: { estimate: Estimate; last: boolean; onNavigate?: (page: string) => void }) {
-  return (
-    <button
-      onClick={() => onNavigate?.("estimates")}
-      className={`flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[var(--bg)] ${!last ? "border-b border-[var(--sep)]" : ""}`}
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="text-[13px] font-medium truncate">{estimate.estimate_number}</p>
-          <StatusBadge status={estimate.status} />
-        </div>
-        <p className="text-[12px] text-[var(--secondary)] truncate">{estimate.project_type}</p>
-      </div>
-      <div className="text-right flex-shrink-0">
-        <p className="text-[13px] font-semibold">{fmt(Number(estimate.grand_total))}</p>
-        {estimate.gross_margin_pct != null && (
-          <p className="text-[11px] text-[var(--secondary)]">{Number(estimate.gross_margin_pct).toFixed(1)}%</p>
-        )}
-      </div>
-    </button>
-  );
-}
-
-function PipelineRow({ label, count, total }: { label: string; count: number; total: number }) {
-  const pct = total > 0 ? (count / total) * 100 : 0;
-  return (
-    <div className="flex items-center gap-3">
-      <p className="w-16 text-[11px] text-[var(--secondary)]">{label}</p>
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--gray5)]">
-        <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${pct}%` }} />
-      </div>
-      <p className="w-4 text-right text-[11px] font-medium">{count}</p>
-    </div>
-  );
-}
-
-function ActionButton({ label, desc, onClick }: { label: string; desc: string; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} className="flex w-full items-center justify-between rounded-xl border border-[var(--sep)] bg-[var(--card)] px-4 py-3 text-left transition-colors hover:bg-[var(--bg)] active:scale-[0.99]">
-      <div>
-        <p className="text-[13px] font-medium">{label}</p>
-        <p className="text-[11px] text-[var(--secondary)]">{desc}</p>
-      </div>
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--gray3)" strokeWidth="2" strokeLinecap="round"><path d="m9 18 6-6-6-6" /></svg>
-    </button>
-  );
-}
-
-function LoadingRows({ count }: { count: number }) {
-  return (
-    <>
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < count - 1 ? "border-b border-[var(--sep)]" : ""}`}>
-          <div className="flex-1 space-y-2">
-            <div className="h-3 w-32 animate-pulse rounded bg-[var(--gray5)]" />
-            <div className="h-2.5 w-20 animate-pulse rounded bg-[var(--gray5)]" />
-          </div>
-          <div className="h-3 w-16 animate-pulse rounded bg-[var(--gray5)]" />
-        </div>
-      ))}
-    </>
-  );
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function fmt(n: number): string {
@@ -296,4 +31,546 @@ function fmt(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
   return `$${n.toLocaleString()}`;
+}
+
+function fmtFull(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function getFirstName(fullName: string): string {
+  return fullName.split(" ")[0] ?? fullName;
+}
+
+function marginColor(pct: number): string {
+  if (pct >= 35) return "var(--green)";
+  if (pct >= 25) return "var(--orange)";
+  return "var(--red)";
+}
+
+const ACTIVITY_COLORS: Record<ActivityEntry["type"], string> = {
+  estimate: "var(--accent)",
+  client: "var(--green)",
+  invoice: "var(--purple)",
+  call: "var(--orange)",
+};
+
+const ACTIVITY_TYPE_LABEL: Record<ActivityEntry["type"], string> = {
+  estimate: "Estimate",
+  client: "Client",
+  invoice: "Invoice",
+  call: "Call",
+};
+
+const STATUS_DOT_COLORS: Record<string, string> = {
+  draft: "var(--gray3)",
+  in_review: "#3B82F6",
+  sent: "#F59E0B",
+  approved: "var(--green)",
+  accepted: "var(--accent)",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: "Draft",
+  in_review: "In Review",
+  sent: "Sent",
+  approved: "Approved",
+  accepted: "Accepted",
+};
+
+// ── Mini Bar Chart ──
+
+function MiniBarChart({ data }: { data: { label: string; value: number }[] }) {
+  const max = Math.max(...data.map((d) => d.value), 1);
+  return (
+    <div className="flex items-end gap-1.5" style={{ height: 48 }}>
+      {data.map((d, i) => (
+        <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
+          <div
+            className="w-full rounded-sm transition-all"
+            style={{
+              height: `${(d.value / max) * 100}%`,
+              minHeight: d.value > 0 ? 4 : 0,
+              backgroundColor:
+                i === data.length - 1 ? "var(--accent)" : "var(--gray4)",
+            }}
+          />
+          <span className="text-[8px] text-[var(--tertiary)]">{d.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Main Component ──
+
+export function Dashboard({ onNavigate, onCallAlex, onModal }: DashboardProps) {
+  const { data: estimates, loading } = useEstimates();
+  const { user } = useCurrentUser();
+  const activityEntries = useActivityFeed();
+
+  // ── Derived data ──
+  const sent = estimates.filter((e) => e.status === "sent" || e.status === "approved");
+  const accepted = estimates.filter((e) => e.status === "accepted");
+  const drafts = estimates.filter((e) => e.status === "draft" || e.status === "in_review");
+  const pending = estimates.filter(
+    (e) => e.status === "draft" || e.status === "in_review" || e.status === "sent" || e.status === "approved"
+  );
+  const totalPipeline = sent.reduce((sum, e) => sum + Number(e.grand_total), 0);
+  const totalWon = accepted.reduce((sum, e) => sum + Number(e.grand_total), 0);
+  const avgMargin = estimates.length
+    ? estimates.reduce((sum, e) => sum + Number(e.gross_margin_pct ?? 0), 0) / estimates.length
+    : 0;
+
+  const firstName = user?.full_name ? getFirstName(user.full_name) : "there";
+
+  const statusGroups = {
+    draft: estimates.filter((e) => e.status === "draft"),
+    in_review: estimates.filter((e) => e.status === "in_review"),
+    sent: estimates.filter((e) => e.status === "sent"),
+    approved: estimates.filter((e) => e.status === "approved"),
+    accepted: estimates.filter((e) => e.status === "accepted"),
+  };
+
+  // ── Monthly estimate counts (last 6 months) ──
+  const monthlyData = useMemo(() => {
+    const now = new Date();
+    const months: { label: string; value: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleDateString("en-US", { month: "short" });
+      const count = estimates.filter((e) => {
+        const ed = new Date(e.created_at);
+        return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
+      }).length;
+      months.push({ label, value: count });
+    }
+    return months;
+  }, [estimates]);
+
+  // ── Pipeline total for bar proportions ──
+  const maxStatusAmount = Math.max(
+    ...Object.values(statusGroups).map((g) =>
+      g.reduce((s, e) => s + Number(e.grand_total), 0)
+    ),
+    1
+  );
+
+  return (
+    <div className="flex h-full flex-col overflow-y-auto">
+      {/* ── Header Section ── */}
+      <header className="px-8 pt-7 pb-4 slide-up">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-4 w-1 rounded-full bg-[var(--accent)]" />
+              <p className="caps">Dashboard</p>
+            </div>
+            <h1 className="text-[26px] font-extrabold tight text-[var(--label)]">
+              {getGreeting()}, {firstName}
+            </h1>
+            <p className="mt-1 text-[14px] text-[var(--secondary)]">
+              {pending.length > 0 ? (
+                <>
+                  You have <span className="font-semibold text-[var(--label)]">{pending.length}</span> pending estimate{pending.length !== 1 ? "s" : ""} worth <span className="font-semibold text-[var(--label)]">{fmt(pending.reduce((s, e) => s + Number(e.grand_total), 0))}</span>
+                </>
+              ) : (
+                "No pending estimates — create one to get started"
+              )}
+              {!isConnected() && (
+                <span className="ml-3 inline-flex items-center gap-1.5 text-[var(--orange)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--orange)] status-live" />
+                  Offline
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Pipeline value callout */}
+            <div className="text-right">
+              <p className="caps mb-0.5">Pipeline</p>
+              <p className="text-[32px] font-extrabold tight tabular text-[var(--label)] leading-none">{fmt(totalPipeline)}</p>
+              <div className="mt-1.5 ml-auto h-[2px] w-12 rounded-full bg-[var(--accent)]" />
+            </div>
+            <div className="h-10 w-px bg-[var(--sep)]" />
+            {/* Mini stats */}
+            <div className="flex gap-5">
+              <MiniStat label="Won" value={fmt(totalWon)} />
+              <MiniStat label="Margin" value={avgMargin ? `${avgMargin.toFixed(1)}%` : "--"} color={avgMargin >= 35 ? "var(--green)" : avgMargin >= 25 ? "var(--orange)" : avgMargin > 0 ? "var(--red)" : undefined} />
+              <MiniStat label="Drafts" value={drafts.length.toString()} />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Main Content — 2-column layout ── */}
+      <div
+        className="grid flex-1 gap-5 px-8 pt-5 pb-4"
+        style={{
+          gridTemplateColumns: "1fr 340px",
+          minHeight: 0,
+        }}
+      >
+        {/* ── LEFT COLUMN: Recent Estimates Table ── */}
+        <div className="flex flex-col slide-up" style={{ animationDelay: "60ms" }}>
+          <div className="mb-2.5 flex items-center justify-between">
+            <p className="text-[13px] font-semibold text-[var(--label)]">
+              Recent Estimates
+            </p>
+            <button
+              onClick={() => onNavigate?.("estimates")}
+              className="text-[12px] font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
+            >
+              View All
+            </button>
+          </div>
+          <div className="flex-1 overflow-hidden surface-elevated">
+            {loading ? (
+              <LoadingRows count={6} />
+            ) : estimates.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center py-16 gap-3">
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: "rgba(196, 30, 58, 0.06)" }}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="var(--accent)"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
+                  </svg>
+                </div>
+                <p className="text-[14px] font-semibold">No estimates yet</p>
+                <p className="text-[12px] text-[var(--secondary)]">
+                  Create your first estimate to get started
+                </p>
+                <button
+                  onClick={() => onModal?.("new-estimate")}
+                  className="mt-1 rounded-lg bg-[var(--accent)] px-4 py-2 text-[12px] font-semibold text-white transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97]"
+                >
+                  Create Estimate
+                </button>
+              </div>
+            ) : (
+              <div className="flex h-full flex-col">
+                {/* Table header */}
+                <div className="flex items-center border-b border-[var(--sep)] px-4 py-2.5">
+                  <span className="w-[100px] text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    #
+                  </span>
+                  <span className="w-[80px] text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    Type
+                  </span>
+                  <span className="flex-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    Client
+                  </span>
+                  <span className="w-[80px] text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    Status
+                  </span>
+                  <span className="w-[90px] text-right text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    Total
+                  </span>
+                  <span className="w-[60px] text-right text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">
+                    Margin
+                  </span>
+                </div>
+                {/* Table rows */}
+                <div className="flex-1 overflow-y-auto">
+                  {estimates.slice(0, 6).map((est, i, arr) => (
+                    <EstimateRow
+                      key={est.id}
+                      estimate={est}
+                      last={i === arr.length - 1}
+                      onNavigate={onNavigate}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── RIGHT COLUMN: Actions + Status + Chart ── */}
+        <div className="flex flex-col gap-4 overflow-y-auto scroll-thin slide-up" style={{ animationDelay: "120ms" }}>
+          {/* Quick Actions — compact row */}
+          <div className="flex gap-2">
+            <button onClick={() => onModal?.("new-estimate")} className="flex-1 flex items-center gap-2 surface px-3 py-2.5 text-left transition-all hover:shadow-[var(--shadow-md)] active:scale-[0.98]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: "rgba(196, 30, 58, 0.08)" }}>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+              </div>
+              <div><p className="text-[11px] font-semibold">New Estimate</p></div>
+            </button>
+            <button onClick={() => onCallAlex?.()} className="flex-1 flex items-center gap-2 surface px-3 py-2.5 text-left transition-all hover:shadow-[var(--shadow-md)] active:scale-[0.98]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: "rgba(34, 197, 94, 0.08)" }}>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--green)" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.09.6.28 1.2.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c1.61.42 2.21.61 2.81.7A2 2 0 0122 16.92z" /></svg>
+              </div>
+              <div><p className="text-[11px] font-semibold">Call Hunter</p></div>
+            </button>
+            <button onClick={() => onModal?.("upload-invoice")} className="flex-1 flex items-center gap-2 surface px-3 py-2.5 text-left transition-all hover:shadow-[var(--shadow-md)] active:scale-[0.98]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: "rgba(139, 92, 246, 0.08)" }}>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--purple)" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+              </div>
+              <div><p className="text-[11px] font-semibold">Upload Invoice</p></div>
+            </button>
+          </div>
+
+          {/* Pipeline Status Board */}
+          {/* Pipeline Funnel */}
+          <div className="surface-elevated p-4 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)] mb-4">
+              Status Board
+            </p>
+            <div className="space-y-3">
+              {(["draft", "in_review", "sent", "approved", "accepted"] as const).map(
+                (key) => {
+                  const group = statusGroups[key];
+                  const amount = group.reduce((s, e) => s + Number(e.grand_total), 0);
+                  const barPct =
+                    maxStatusAmount > 0 ? (amount / maxStatusAmount) * 100 : 0;
+                  return (
+                    <div key={key}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div
+                          className="h-[7px] w-[7px] rounded-full flex-shrink-0"
+                          style={{ backgroundColor: STATUS_DOT_COLORS[key] }}
+                        />
+                        <span className="text-[11px] font-medium text-[var(--label)] flex-1">
+                          {STATUS_LABELS[key]}
+                        </span>
+                        <span
+                          className="text-[10px] font-semibold text-[var(--secondary)]"
+                          style={{ fontVariantNumeric: "tabular-nums" }}
+                        >
+                          {group.length}
+                        </span>
+                        <span
+                          className="text-[10px] text-[var(--secondary)] w-[48px] text-right"
+                          style={{ fontVariantNumeric: "tabular-nums" }}
+                        >
+                          {fmt(amount)}
+                        </span>
+                      </div>
+                      {/* Proportional bar */}
+                      <div className="h-[5px] w-full overflow-hidden rounded-full bg-[var(--gray5)]">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.max(barPct, group.length > 0 ? 3 : 0)}%`,
+                            backgroundColor: STATUS_DOT_COLORS[key],
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          </div>
+
+          {/* Monthly Chart */}
+          <div className="surface-elevated p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)] mb-3">
+              Monthly Estimates
+            </p>
+            <MiniBarChart data={monthlyData} />
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          BOTTOM ROW — Recent Activity (3 compact cards)
+          ══════════════════════════════════════════════ */}
+      {activityEntries.length > 0 && (
+        <div className="px-8 pb-6 slide-up" style={{ animationDelay: "240ms" }}>
+          <p className="mb-2 text-[13px] font-semibold text-[var(--label)]">
+            Recent Activity
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            {activityEntries.slice(0, 3).map((entry) => (
+              <ActivityCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Mini Stat ──
+
+function MiniStat({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="text-right">
+      <p className="caps mb-0.5">{label}</p>
+      <p className="text-[16px] font-bold tight tabular leading-tight" style={color ? { color } : undefined}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+// ── Estimate Table Row ──
+
+function EstimateRow({
+  estimate,
+  last,
+  onNavigate,
+}: {
+  estimate: Estimate;
+  last: boolean;
+  onNavigate?: (page: string) => void;
+}) {
+  const margin =
+    estimate.gross_margin_pct != null ? Number(estimate.gross_margin_pct) : null;
+
+  return (
+    <button
+      onClick={() => onNavigate?.("estimates")}
+      className={`flex w-full items-center px-4 py-3 text-left cursor-pointer transition-colors hover:bg-[var(--bg)] ${
+        !last ? "border-b border-[var(--sep)]" : ""
+      }`}
+    >
+      {/* # */}
+      <span
+        className="w-[100px] text-[13px] font-semibold truncate"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {estimate.estimate_number}
+      </span>
+      {/* Type */}
+      <span className="w-[80px] text-[11px] text-[var(--secondary)] truncate">
+        {estimate.estimate_category === "building" ? "Building" : "Infrastructure"}
+      </span>
+      {/* Client / Project */}
+      <span className="flex-1 text-[12px] text-[var(--secondary)] truncate">
+        {estimate.project_type}
+      </span>
+      {/* Status */}
+      <span className="w-[80px]">
+        <StatusBadge status={estimate.status} />
+      </span>
+      {/* Total */}
+      <span
+        className="w-[90px] text-right text-[13px] font-semibold"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {fmtFull(Number(estimate.grand_total))}
+      </span>
+      {/* Margin */}
+      <span className="w-[60px] flex items-center justify-end gap-1.5">
+        {margin != null ? (
+          <>
+            <span
+              className="inline-block h-[6px] w-[6px] rounded-full"
+              style={{ backgroundColor: marginColor(margin) }}
+            />
+            <span
+              className="text-[12px] text-[var(--secondary)]"
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
+              {margin.toFixed(1)}%
+            </span>
+          </>
+        ) : (
+          <span className="text-[12px] text-[var(--tertiary)]">--</span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+// ── Activity Card (horizontal) ──
+
+function ActivityCard({ entry }: { entry: ActivityEntry }) {
+  return (
+    <div className="surface flex items-start gap-3 px-4 py-3.5 transition-all hover:shadow-[var(--shadow-md)]">
+      <div
+        className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: `${ACTIVITY_COLORS[entry.type]}12` }}
+      >
+        <div
+          className="h-2 w-2 rounded-full"
+          style={{ backgroundColor: ACTIVITY_COLORS[entry.type] }}
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-medium leading-snug truncate">
+          {entry.description}
+        </p>
+        <div className="mt-0.5 flex items-center gap-2">
+          <span className="text-[10px] font-semibold text-[var(--secondary)]">
+            {ACTIVITY_TYPE_LABEL[entry.type]}
+          </span>
+          <span className="text-[10px] text-[var(--tertiary)]">{entry.action}</span>
+        </div>
+      </div>
+      <p className="flex-shrink-0 text-[10px] text-[var(--tertiary)]">
+        {timeAgo(entry.timestamp)}
+      </p>
+    </div>
+  );
+}
+
+// ── Loading Skeleton ──
+
+function LoadingRows({ count }: { count: number }) {
+  return (
+    <div>
+      {/* Skeleton header */}
+      <div className="flex items-center border-b border-[var(--sep)] px-4 py-2.5">
+        <div className="h-2.5 w-16 animate-pulse rounded bg-[var(--gray5)]" />
+        <div className="ml-4 h-2.5 w-14 animate-pulse rounded bg-[var(--gray5)]" />
+        <div className="ml-4 h-2.5 w-24 flex-1 animate-pulse rounded bg-[var(--gray5)]" />
+        <div className="ml-4 h-2.5 w-14 animate-pulse rounded bg-[var(--gray5)]" />
+        <div className="ml-4 h-2.5 w-16 animate-pulse rounded bg-[var(--gray5)]" />
+      </div>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className={`flex items-center gap-3 px-4 py-3 ${
+            i < count - 1 ? "border-b border-[var(--sep)]" : ""
+          }`}
+        >
+          <div className="w-[100px]">
+            <div className="h-3 w-20 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+          <div className="w-[80px]">
+            <div className="h-2.5 w-14 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+          <div className="flex-1">
+            <div className="h-2.5 w-28 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+          <div className="w-[80px]">
+            <div className="h-4 w-12 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+          <div className="w-[90px] flex justify-end">
+            <div className="h-3 w-16 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+          <div className="w-[60px] flex justify-end">
+            <div className="h-3 w-10 animate-pulse rounded bg-[var(--gray5)]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

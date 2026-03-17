@@ -551,7 +551,7 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
 
           {/* Table header */}
           <div
-            className="grid items-center gap-2 px-2 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]"
+            className="grid items-center gap-2 px-2 pb-1.5 caps"
             style={{ gridTemplateColumns: "1fr 80px 90px 100px 100px 36px" }}
           >
             <span>Description</span>
@@ -678,8 +678,8 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
           </div>
 
           {/* Right: financial summary */}
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--bg)] p-4 space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)] mb-2">
+          <div className="surface-elevated p-4 space-y-2">
+            <p className="caps mb-2">
               Financial Summary
             </p>
 
@@ -795,7 +795,7 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
       {/* ── Validation Results Panel ── */}
       {validationResults.length > 0 && (
         <div className="px-6 pb-4">
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--bg)] overflow-hidden">
+          <div className="surface overflow-hidden">
             {/* Collapsible header */}
             <button
               type="button"
@@ -913,7 +913,7 @@ export function EstimateEditorModal({ open, onClose, estimate }: EstimateEditorM
             type="button"
             disabled={saving}
             onClick={() => handleSave(true)}
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50"
+            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50"
           >
             {saving ? "Sending..." : "Save & Send"}
           </button>

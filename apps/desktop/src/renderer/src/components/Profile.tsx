@@ -11,22 +11,30 @@ export function Profile({ onModal, onSignOut }: { onNavigate?: (page: string) =>
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-8 pt-4 pb-1">
-        <p className="text-[12px] text-[var(--secondary)]">Account and preferences</p>
+      <header className="px-8 pt-6 pb-4 slide-up">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-4 w-1 rounded-full bg-[var(--accent)]" />
+              <p className="caps">Profile</p>
+            </div>
+            <h1 className="text-[20px] font-extrabold tight">Account & Preferences</h1>
+          </div>
+        </div>
       </header>
 
-      <div className="mx-auto w-full max-w-2xl px-8 py-4">
+      <div className="slide-up mx-auto w-full max-w-2xl px-8 py-4">
         {/* User card */}
-        <div className="mb-5 flex items-center gap-4 rounded-xl border border-[var(--sep)] bg-[var(--card)] p-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--gray5)] text-[22px] font-semibold text-[var(--gray1)]">
+        <div className="surface-elevated mb-5 flex items-center gap-4 p-6">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent)] text-[26px] font-bold text-white shadow-sm shadow-[var(--accent)]/20">
             {loading ? "…" : initials}
           </div>
           <div className="flex-1">
-            <h2 className="text-[20px] font-bold">{user?.full_name ?? "Not signed in"}</h2>
+            <h2 className="tight text-[20px] font-bold">{user?.full_name ?? "Not signed in"}</h2>
             <p className="text-[13px] text-[var(--secondary)]">{user?.role ?? "Connect Supabase to sign in"}</p>
             {user && <p className="mt-0.5 text-[11px] text-[var(--tertiary)]">Member since {new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>}
           </div>
-          <button onClick={() => onModal?.("edit-profile")} className="rounded-lg border border-[var(--sep)] px-3 py-1.5 text-[13px] font-medium text-[var(--accent)] transition-colors hover:bg-[var(--bg)]">
+          <button onClick={() => onModal?.("edit-profile")} className="rounded-lg border border-[var(--sep)] px-3 py-1.5 text-[13px] font-medium text-[var(--accent)] shadow-sm shadow-[var(--accent)]/20 transition-colors hover:bg-[var(--accent-hover)] hover:text-white">
             Edit
           </button>
         </div>
@@ -58,7 +66,7 @@ export function Profile({ onModal, onSignOut }: { onNavigate?: (page: string) =>
                 await signOut();
               }
             }}
-            className="w-full rounded-xl border border-[var(--sep)] bg-[var(--card)] px-4 py-3 text-left text-[13px] font-medium text-[var(--red)] transition-colors hover:bg-[var(--red)]/5"
+            className="surface w-full px-4 py-3 text-left text-[13px] font-medium text-[var(--red)] transition-colors hover:bg-[var(--red)]/5"
           >
             Sign Out
           </button>
@@ -71,8 +79,8 @@ export function Profile({ onModal, onSignOut }: { onNavigate?: (page: string) =>
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-5">
-      <p className="mb-1.5 px-1 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{title}</p>
-      <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] divide-y divide-[var(--sep)]">{children}</div>
+      <p className="caps mb-1.5 px-1">{title}</p>
+      <div className="surface divide-y divide-[var(--sep)]">{children}</div>
     </div>
   );
 }
@@ -82,7 +90,7 @@ function Row({ label, value, action }: { label: string; value: string; action?: 
     <div className="flex items-center justify-between px-4 py-3">
       <p className="text-[13px]">{label}</p>
       <div className="flex items-center gap-1">
-        <p className="text-[13px] text-[var(--secondary)]">{value}</p>
+        <p className={`text-[13px] text-[var(--secondary)]${value.includes("%") ? " tabular" : ""}`}>{value}</p>
         {action && <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="var(--gray3)" strokeWidth="2.5" strokeLinecap="round"><path d="m9 18 6-6-6-6" /></svg>}
       </div>
     </div>
@@ -95,7 +103,7 @@ function ToggleRow({ label, on, onToggle }: { label: string; on: boolean; onTogg
       <p className="text-[13px]">{label}</p>
       <button
         onClick={onToggle}
-        className={`relative h-[28px] w-[46px] rounded-full transition-colors ${on ? "bg-[var(--green)]" : "bg-[var(--gray4)]"}`}
+        className={`relative h-[28px] w-[46px] rounded-full shadow-inner transition-colors ${on ? "bg-[var(--green)]" : "bg-[var(--gray4)]"}`}
       >
         <div className={`absolute top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow transition-transform ${on ? "translate-x-[20px]" : "translate-x-[2px]"}`} />
       </button>

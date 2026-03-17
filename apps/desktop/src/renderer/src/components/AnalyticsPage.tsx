@@ -134,22 +134,30 @@ export function AnalyticsPage() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <header className="px-4 md:px-8 pt-4 pb-1">
-        <p className="text-[12px] text-[var(--secondary)]">Performance metrics and trends</p>
+      <header className="px-8 pt-6 pb-4 slide-up">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-4 w-1 rounded-full bg-[var(--accent)]" />
+              <p className="caps">Performance metrics and trends</p>
+            </div>
+            <h1 className="text-[20px] font-extrabold tight">Business Overview</h1>
+          </div>
+        </div>
       </header>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 px-4 md:px-8 py-4">
+      <div className="grid grid-cols-4 gap-3 px-8 py-4 slide-up stagger-1">
         <StatCard label="Pipeline Value" value={pipelineValue > 0 ? `$${(pipelineValue / 1000).toFixed(0)}K` : "$0"} sub={`${estimates.filter((e) => ["draft", "in_review", "sent"].includes(e.status)).length} active`} />
         <StatCard label="Total Revenue" value={totalRevenue > 0 ? `$${(totalRevenue / 1000).toFixed(0)}K` : "$0"} sub={`${accepted.length} accepted`} />
-        <StatCard label="Win Rate" value={winRate > 0 ? `${winRate.toFixed(0)}%` : "\u2014"} sub={sent.length > 0 ? `${accepted.length}W / ${declined.length}L of ${sent.length} sent` : "No sent estimates"} />
+        <StatCard label="Win Rate" value={winRate > 0 ? `${winRate.toFixed(0)}%` : "\u2014"} sub={sent.length > 0 ? `${accepted.length}W / ${declined.length}L of ${sent.length} sent` : "No sent estimates"} accentTop={sent.length > 0 ? (winRate >= 60 ? "#22c55e" : winRate < 40 ? "#ef4444" : undefined) : undefined} />
         <StatCard label="Avg Margin" value={avgMargin > 0 ? `${avgMargin.toFixed(1)}%` : "\u2014"} sub="Target 35-42%" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 md:px-8 pb-6">
+      <div className="grid grid-cols-2 gap-4 px-8 pb-6 slide-up stagger-2">
         {/* By Project Type */}
         <div>
-          <p className="mb-2 text-[13px] font-semibold">By Project Type</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)]">
+          <p className="caps mb-2">By Project Type</p>
+          <div className="surface-elevated">
             {Object.keys(byType).length === 0 ? (
               <p className="p-4 text-center text-[13px] text-[var(--secondary)]">No data yet</p>
             ) : (
@@ -160,10 +168,10 @@ export function AnalyticsPage() {
                       <p className="text-[13px] font-medium">{type}</p>
                       <p className="text-[11px] text-[var(--secondary)]">{data.count} estimate{data.count !== 1 ? "s" : ""}</p>
                     </div>
-                    <p className="text-[13px] font-semibold">${data.total.toLocaleString()}</p>
+                    <p className="text-[13px] font-semibold tabular">${data.total.toLocaleString()}</p>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-[var(--gray5)]">
-                    <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${(data.total / byTypeMax) * 100}%`, minWidth: "4px" }} />
+                  <div className="h-[6px] overflow-hidden rounded-full bg-[var(--gray5)]">
+                    <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${(data.total / byTypeMax) * 100}%`, minWidth: data.total > 0 ? "6px" : "0" }} />
                   </div>
                 </div>
               ))
@@ -173,8 +181,8 @@ export function AnalyticsPage() {
 
         {/* Conversion Funnel */}
         <div>
-          <p className="mb-2 text-[13px] font-semibold">Conversion Funnel</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4 space-y-3">
+          <p className="caps mb-2">Conversion Funnel</p>
+          <div className="surface-elevated p-4 space-y-3">
             <FunnelRow label="Created" count={estimates.length} total={estimates.length} />
             <FunnelRow label="Sent" count={sent.length} total={estimates.length} />
             <FunnelRow label="Accepted" count={accepted.length} total={estimates.length} color="#22c55e" />
@@ -184,37 +192,37 @@ export function AnalyticsPage() {
       </div>
 
       {/* Monthly Trends */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 md:px-8 pb-6">
+      <div className="grid grid-cols-2 gap-4 px-8 pb-6 slide-up stagger-3">
         <div>
-          <p className="mb-2 text-[13px] font-semibold">Monthly Estimates</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4 space-y-2">
+          <p className="caps mb-2">Monthly Estimates</p>
+          <div className="surface-elevated p-4 space-y-2">
             {monthlyData.map((m) => (
               <div key={m.label} className="flex items-center gap-3">
                 <p className="w-14 shrink-0 text-right text-[11px] text-[var(--secondary)]">{m.label}</p>
-                <div className="flex-1 h-5 rounded bg-[var(--bg)] overflow-hidden">
+                <div className="flex-1 h-[8px] rounded-full bg-[var(--bg)] overflow-hidden">
                   <div
-                    className="h-full rounded bg-[var(--accent)] transition-all"
+                    className="h-full rounded-full bg-[var(--accent)] transition-all"
                     style={{ width: `${(m.count / maxMonthlyCount) * 100}%`, minWidth: m.count > 0 ? "8px" : "0" }}
                   />
                 </div>
-                <p className="w-6 shrink-0 text-[13px] font-medium">{m.count}</p>
+                <p className="w-6 shrink-0 text-[13px] font-medium tabular">{m.count}</p>
               </div>
             ))}
           </div>
         </div>
         <div>
-          <p className="mb-2 text-[13px] font-semibold">Monthly Value</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4 space-y-2">
+          <p className="caps mb-2">Monthly Value</p>
+          <div className="surface-elevated p-4 space-y-2">
             {monthlyData.map((m) => (
               <div key={m.label} className="flex items-center gap-3">
                 <p className="w-14 shrink-0 text-right text-[11px] text-[var(--secondary)]">{m.label}</p>
-                <div className="flex-1 h-5 rounded bg-[var(--bg)] overflow-hidden">
+                <div className="flex-1 h-[8px] rounded-full bg-[var(--bg)] overflow-hidden">
                   <div
-                    className="h-full rounded bg-[#22c55e] transition-all"
+                    className="h-full rounded-full bg-[#22c55e] transition-all"
                     style={{ width: `${(m.value / maxMonthlyValue) * 100}%`, minWidth: m.value > 0 ? "8px" : "0" }}
                   />
                 </div>
-                <p className="w-16 shrink-0 text-right text-[13px] font-medium">{m.value > 0 ? `$${(m.value / 1000).toFixed(0)}K` : "$0"}</p>
+                <p className="w-16 shrink-0 text-right text-[13px] font-medium tabular">{m.value > 0 ? `$${(m.value / 1000).toFixed(0)}K` : "$0"}</p>
               </div>
             ))}
           </div>
@@ -222,19 +230,19 @@ export function AnalyticsPage() {
       </div>
 
       {/* Margin Analysis by Project Type */}
-      <div className="px-4 md:px-8 pb-6">
-        <p className="mb-2 text-[13px] font-semibold">Margin Analysis by Project Type</p>
-        <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] overflow-x-auto">
+      <div className="px-8 pb-6 slide-up stagger-4">
+        <p className="caps mb-2">Margin Analysis by Project Type</p>
+        <div className="surface-elevated overflow-x-auto">
           {Object.keys(marginByType).length === 0 ? (
             <p className="p-4 text-center text-[13px] text-[var(--secondary)]">No data yet</p>
           ) : (
             <table className="w-full min-w-[400px]">
               <thead>
                 <tr className="border-b border-[var(--sep)]">
-                  <th className="px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Project Type</th>
-                  <th className="px-4 py-2.5 text-right text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Count</th>
-                  <th className="px-4 py-2.5 text-right text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Avg Margin</th>
-                  <th className="px-4 py-2.5 text-right text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Total Revenue</th>
+                  <th className="caps px-4 py-2.5 text-left">Project Type</th>
+                  <th className="caps px-4 py-2.5 text-right">Count</th>
+                  <th className="caps px-4 py-2.5 text-right">Avg Margin</th>
+                  <th className="caps px-4 py-2.5 text-right">Total Revenue</th>
                 </tr>
               </thead>
               <tbody>
@@ -246,11 +254,11 @@ export function AnalyticsPage() {
                     return (
                       <tr key={type} className={i < arr.length - 1 ? "border-b border-[var(--sep)]" : ""}>
                         <td className="px-4 py-2.5 text-[13px] font-medium">{type}</td>
-                        <td className="px-4 py-2.5 text-right text-[13px]">{data.count}</td>
-                        <td className="px-4 py-2.5 text-right text-[13px] font-semibold" style={{ color }}>
+                        <td className="px-4 py-2.5 text-right text-[13px] tabular">{data.count}</td>
+                        <td className="px-4 py-2.5 text-right text-[13px] font-semibold tabular" style={{ color }}>
                           {avg.toFixed(1)}%
                         </td>
-                        <td className="px-4 py-2.5 text-right text-[13px] font-medium">${data.totalRevenue.toLocaleString()}</td>
+                        <td className="px-4 py-2.5 text-right text-[13px] font-medium tabular">${data.totalRevenue.toLocaleString()}</td>
                       </tr>
                     );
                   })}
@@ -260,11 +268,11 @@ export function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 md:px-8 pb-6">
+      <div className="grid grid-cols-2 gap-4 px-8 pb-6 slide-up stagger-5">
         {/* Top Clients */}
         <div>
-          <p className="mb-2 text-[13px] font-semibold">Top Clients</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)]">
+          <p className="caps mb-2">Top Clients</p>
+          <div className="surface-elevated">
             {topClients.length === 0 ? (
               <p className="p-4 text-center text-[13px] text-[var(--secondary)]">No client data yet</p>
             ) : (
@@ -279,7 +287,7 @@ export function AnalyticsPage() {
                       <p className="text-[11px] text-[var(--secondary)]">{c.count} estimate{c.count !== 1 ? "s" : ""}</p>
                     </div>
                   </div>
-                  <p className="text-[13px] font-semibold">${c.total.toLocaleString()}</p>
+                  <p className="text-[13px] font-semibold tabular">${c.total.toLocaleString()}</p>
                 </div>
               ))
             )}
@@ -288,8 +296,8 @@ export function AnalyticsPage() {
 
         {/* Estimate Age Analysis */}
         <div>
-          <p className="mb-2 text-[13px] font-semibold">Estimate Age Analysis</p>
-          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4 space-y-3">
+          <p className="caps mb-2">Estimate Age Analysis</p>
+          <div className="surface-elevated p-4 space-y-0">
             <AgeRow label="Avg days in Draft" value={avgDaysInDraft} count={draftEstimates.length} />
             <AgeRow label="Avg days Draft to Sent" value={avgDaysToSent} count={sentEstimates.length} />
             <AgeRow label="Avg days Sent to Accepted" value={avgDaysToAccepted} count={acceptedEstimates.length} />
@@ -299,13 +307,13 @@ export function AnalyticsPage() {
       </div>
 
       {/* Revenue by Tier */}
-      <div className="px-4 md:px-8 pb-8">
-        <p className="mb-2 text-[13px] font-semibold">Revenue by Tier</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="px-8 pb-8 slide-up stagger-5">
+        <p className="caps mb-2">Revenue by Tier</p>
+        <div className="grid grid-cols-3 gap-3">
           {(["Budget", "Midrange", "High End"] as const).map((tier) => (
-            <div key={tier} className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{tier}</p>
-              <p className="mt-1 text-[22px] font-bold tracking-tight">
+            <div key={tier} className="surface-elevated p-5 card-hover">
+              <p className="caps">{tier}</p>
+              <p className="mt-1 text-[22px] font-bold tight tabular">
                 {(revenueByTier[tier] ?? 0) > 0 ? `$${((revenueByTier[tier] ?? 0) / 1000).toFixed(1)}K` : "$0"}
               </p>
               <p className="mt-0.5 text-[11px] text-[var(--secondary)]">
@@ -319,11 +327,11 @@ export function AnalyticsPage() {
   );
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function StatCard({ label, value, sub, accentTop }: { label: string; value: string; sub?: string; accentTop?: string }) {
   return (
-    <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-4">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">{label}</p>
-      <p className="mt-1 text-[22px] font-bold tracking-tight">{value}</p>
+    <div className={`surface-elevated p-5 card-hover ${accentTop ? "border-t-2" : ""}`} style={accentTop ? { borderTopColor: accentTop } : undefined}>
+      <p className="caps">{label}</p>
+      <p className="mt-1 text-[22px] font-bold tight tabular">{value}</p>
       {sub && <p className="mt-0.5 text-[11px] text-[var(--secondary)]">{sub}</p>}
     </div>
   );
@@ -335,10 +343,10 @@ function FunnelRow({ label, count, total, color }: { label: string; count: numbe
     <div>
       <div className="flex justify-between mb-1">
         <p className="text-[12px] text-[var(--secondary)]">{label}</p>
-        <p className="text-[12px] font-medium">{count}{total > 0 ? ` (${pct.toFixed(0)}%)` : ""}</p>
+        <p className="text-[12px] font-medium tabular">{count}{total > 0 ? ` (${pct.toFixed(0)}%)` : ""}</p>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-[var(--gray5)]">
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color ?? "var(--accent)" }} />
+      <div className="h-[6px] overflow-hidden rounded-full bg-[var(--gray5)]">
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, minWidth: count > 0 ? "6px" : "0", backgroundColor: color ?? "var(--accent)" }} />
       </div>
     </div>
   );
@@ -346,12 +354,12 @@ function FunnelRow({ label, count, total, color }: { label: string; count: numbe
 
 function AgeRow({ label, value, count }: { label: string; value: number; count: number }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between border-b border-[var(--sep)] last:border-b-0 py-3 first:pt-0 last:pb-0">
       <div>
         <p className="text-[13px] font-medium">{label}</p>
         <p className="text-[11px] text-[var(--secondary)]">{count} estimate{count !== 1 ? "s" : ""}</p>
       </div>
-      <p className="text-[13px] font-semibold">
+      <p className="text-[13px] font-semibold tabular">
         {count > 0 ? `${value.toFixed(1)} days` : "\u2014"}
       </p>
     </div>

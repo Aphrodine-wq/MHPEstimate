@@ -55,70 +55,126 @@ export function NewEstimateModal({ open, onClose, onCreated }: NewEstimateModalP
     onClose();
   };
 
+  const PROJECT_TYPES = [
+    { value: "General", icon: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" },
+    { value: "Kitchen Remodel", icon: "M3 3h18v18H3zM3 9h18M9 3v18" },
+    { value: "Bathroom Remodel", icon: "M2 12h20M2 12a10 10 0 0020 0M2 12a10 10 0 0120 0" },
+    { value: "Flooring", icon: "M3 21h18M3 21V3h18v18M9 3v18M15 3v18M3 9h18M3 15h18" },
+    { value: "Roofing", icon: "M3 9l9-7 9 7M4 10v11h16V10" },
+    { value: "Painting", icon: "M19 11V5a2 2 0 00-2-2H7a2 2 0 00-2 2v6M12 11v10M8 21h8" },
+    { value: "Siding", icon: "M4 3h16v18H4zM4 9h16M4 15h16" },
+    { value: "Deck / Patio", icon: "M2 20h20M4 20V10l8-6 8 6v10M10 20v-6h4v6" },
+    { value: "Addition", icon: "M12 5v14M5 12h14" },
+    { value: "Full Renovation", icon: "M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" },
+  ];
+
+  const TIERS = [
+    { value: "budget", label: "Budget", color: "#22C55E", desc: "Economy-grade materials, basic finishes. Best for rentals and tight budgets." },
+    { value: "midrange", label: "Midrange", color: "#F59E0B", desc: "Brand-name materials, standard upgrades. Most popular for homeowner renovations." },
+    { value: "high_end", label: "High End", color: "#8B5CF6", desc: "Premium materials, custom craftsmanship, luxury finishes." },
+  ] as const;
+
   return (
-    <Modal open={open} onClose={resetAndClose} title="New Estimate" description="Create a new construction estimate">
-      <div className="space-y-4 px-6 py-5">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Project Type">
-            <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className={selectClass}>
-              <option>General</option>
-              <option>Kitchen Remodel</option>
-              <option>Bathroom Remodel</option>
-              <option>Flooring</option>
-              <option>Roofing</option>
-              <option>Painting</option>
-              <option>Siding</option>
-              <option>Deck / Patio</option>
-              <option>Addition</option>
-              <option>Full Renovation</option>
-            </select>
-          </Field>
+    <Modal open={open} onClose={resetAndClose} title="New Estimate" description="Set up your project details, then add line items" width="w-full max-w-[720px]">
+      <div className="space-y-5 px-6 py-6">
+        {/* Project Type Grid */}
+        <Field label="Project Type">
+          <div className="grid grid-cols-5 gap-2">
+            {PROJECT_TYPES.map((pt) => (
+              <button
+                key={pt.value}
+                onClick={() => setProjectType(pt.value)}
+                className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center transition-all ${
+                  projectType === pt.value
+                    ? "border-[var(--accent)] bg-[var(--accent)]/5 shadow-sm"
+                    : "border-[var(--sep)] hover:border-[var(--gray3)] hover:bg-[var(--bg)]"
+                }`}
+              >
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                  projectType === pt.value ? "bg-[var(--accent)]/10" : "bg-[var(--gray5)]"
+                }`}>
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke={projectType === pt.value ? "var(--accent)" : "var(--gray1)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={pt.icon} />
+                  </svg>
+                </div>
+                <span className={`text-[10px] font-medium leading-tight ${projectType === pt.value ? "text-[var(--accent)]" : "text-[var(--secondary)]"}`}>
+                  {pt.value}
+                </span>
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        {/* Client + Address row */}
+        <div className="grid grid-cols-2 gap-4">
           <Field label="Client">
             <select value={clientId} onChange={(e) => setClientId(e.target.value)} className={selectClass}>
-              <option value="">— No client —</option>
+              <option value="">-- Select client --</option>
               {clients?.map((c: any) => (
                 <option key={c.id} value={c.id}>{c.full_name}</option>
               ))}
             </select>
           </Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
           <Field label="Project Address">
             <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, City, State" className={inputClass} />
           </Field>
-          <Field label="Valid Through">
-            <input type="date" value={validThrough} onChange={(e) => setValidThrough(e.target.value)} className={inputClass} />
-          </Field>
         </div>
+
+        {/* Pricing Tier Cards */}
         <Field label="Pricing Tier">
-          <div className="flex rounded-lg bg-[var(--gray5)] p-0.5">
-            {([["budget", "Budget"], ["midrange", "Midrange"], ["high_end", "High End"]] as const).map(([val, label]) => (
-              <button key={val} onClick={() => setTier(val)} className={`flex-1 rounded-md py-1.5 text-[12px] font-medium transition-all ${tier === val ? "bg-[var(--card)] text-[var(--label)] shadow-sm" : "text-[var(--secondary)]"}`}>
-                {label}
+          <div className="grid grid-cols-3 gap-3">
+            {TIERS.map((t) => (
+              <button
+                key={t.value}
+                onClick={() => setTier(t.value)}
+                className={`flex flex-col rounded-xl border p-3.5 text-left transition-all ${
+                  tier === t.value
+                    ? "border-current shadow-sm"
+                    : "border-[var(--sep)] hover:border-[var(--gray3)]"
+                }`}
+                style={tier === t.value ? { borderColor: t.color, backgroundColor: `${t.color}08` } : undefined}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                  <span className="text-[12px] font-bold" style={tier === t.value ? { color: t.color } : undefined}>{t.label}</span>
+                </div>
+                <p className="mt-1.5 text-[10px] leading-relaxed text-[var(--secondary)]">{t.desc}</p>
               </button>
             ))}
           </div>
-          <p className="mt-1.5 text-[11px] text-[var(--secondary)]">
-            {tier === "budget" && "Economy-grade materials, basic finishes, cost-effective labor. Best for rental properties, quick flips, or tight budgets."}
-            {tier === "midrange" && "Quality brand-name materials, standard upgrades, professional finishes. The most popular choice for homeowner renovations."}
-            {tier === "high_end" && "Premium and designer-grade materials, custom craftsmanship, luxury finishes. For high-end homes and clients who want the best."}
-          </p>
         </Field>
-        <Field label="Scope Inclusions">
-          <textarea value={scopeInclusions} onChange={(e) => setScopeInclusions(e.target.value)} placeholder="One per line: Material supply and installation..." rows={3} className={textareaClass} />
-        </Field>
-        <Field label="Scope Exclusions">
-          <textarea value={scopeExclusions} onChange={(e) => setScopeExclusions(e.target.value)} placeholder="One per line: Structural modifications..." rows={3} className={textareaClass} />
-        </Field>
+
+        {/* Valid through */}
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Valid Through">
+            <input type="date" value={validThrough} onChange={(e) => setValidThrough(e.target.value)} className={inputClass} />
+          </Field>
+          <div />
+        </div>
+
+        {/* Scope */}
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Scope Inclusions">
+            <textarea value={scopeInclusions} onChange={(e) => setScopeInclusions(e.target.value)} placeholder="One per line:&#10;Material supply and installation&#10;Cleanup and debris removal" rows={4} className={textareaClass} />
+          </Field>
+          <Field label="Scope Exclusions">
+            <textarea value={scopeExclusions} onChange={(e) => setScopeExclusions(e.target.value)} placeholder="One per line:&#10;Structural modifications&#10;Permits and inspections" rows={4} className={textareaClass} />
+          </Field>
+        </div>
+
+        {/* Notes */}
         <Field label="Site Conditions / Notes">
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any special conditions..." rows={3} className={textareaClass} />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Access restrictions, existing damage, special requirements..." rows={3} className={textareaClass} />
         </Field>
       </div>
-      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
-        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Creating…" : "Create Estimate"}
-        </button>
+      <div className="flex items-center justify-between border-t border-[var(--sep)] px-6 py-4">
+        <p className="text-[11px] text-[var(--tertiary)]">You can add line items after creating</p>
+        <div className="flex gap-2">
+          <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-5 py-2.5 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
+          <button onClick={handleSubmit} disabled={saving} className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50">
+            {saving ? "Creating..." : "Create Estimate"}
+          </button>
+        </div>
       </div>
     </Modal>
   );
@@ -166,12 +222,12 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={resetAndClose} title="Add Client" description="Add a new client to your database">
-      <div className="space-y-4 px-6 py-5">
+    <Modal open={open} onClose={resetAndClose} title="Add Client" description="Add a new client to your database" width="w-full max-w-[600px]">
+      <div className="space-y-5 px-6 py-6">
         <Field label="Full Name *">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="John Smith" className={inputClass} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="John Smith" className={inputClass} autoFocus />
         </Field>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <Field label="Email">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="john@example.com" className={inputClass} />
           </Field>
@@ -179,29 +235,37 @@ export function AddClientModal({ open, onClose }: AddClientModalProps) {
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" className={inputClass} />
           </Field>
         </div>
-        <Field label="Street Address">
-          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St" className={inputClass} />
-        </Field>
-        <div className="grid grid-cols-3 gap-3">
-          <Field label="City">
-            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={inputClass} />
+
+        <div className="rounded-lg border border-[var(--sep)] bg-[var(--bg)] p-4 space-y-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--secondary)]">Address</p>
+          <Field label="Street">
+            <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St" className={inputClass} />
           </Field>
-          <Field label="State">
-            <input value={state} onChange={(e) => setState(e.target.value)} placeholder="TX" className={inputClass} />
-          </Field>
-          <Field label="ZIP">
-            <input value={zip} onChange={(e) => setZip(e.target.value)} placeholder="75001" className={inputClass} />
-          </Field>
+          <div className="grid grid-cols-3 gap-3">
+            <Field label="City">
+              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Jackson" className={inputClass} />
+            </Field>
+            <Field label="State">
+              <input value={state} onChange={(e) => setState(e.target.value)} placeholder="MS" className={inputClass} />
+            </Field>
+            <Field label="ZIP">
+              <input value={zip} onChange={(e) => setZip(e.target.value)} placeholder="39201" className={inputClass} />
+            </Field>
+          </div>
         </div>
+
         <Field label="Notes">
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes..." rows={2} className={textareaClass} />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Preferred contact method, referral source, etc." rows={2} className={textareaClass} />
         </Field>
       </div>
-      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
-        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving || !name.trim()} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Saving…" : "Add Client"}
-        </button>
+      <div className="flex items-center justify-between border-t border-[var(--sep)] px-6 py-4">
+        <p className="text-[11px] text-[var(--tertiary)]">* Required field</p>
+        <div className="flex gap-2">
+          <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-5 py-2.5 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
+          <button onClick={handleSubmit} disabled={saving || !name.trim()} className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50">
+            {saving ? "Saving..." : "Add Client"}
+          </button>
+        </div>
       </div>
     </Modal>
   );
@@ -257,8 +321,8 @@ export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={resetAndClose} title="Log Expense" description="Record a business expense">
-      <div className="space-y-4 px-6 py-5">
+    <Modal open={open} onClose={resetAndClose} title="Log Expense" description="Record a business expense" width="w-full max-w-[600px]">
+      <div className="space-y-5 px-6 py-6">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Category">
             <select value={category} onChange={(e) => setCategory(e.target.value)} className={selectClass}>
@@ -292,10 +356,10 @@ export function LogExpenseModal({ open, onClose }: LogExpenseModalProps) {
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Receipt #, job reference, etc." rows={2} className={textareaClass} />
         </Field>
       </div>
-      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
-        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving || !description.trim() || !amount} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Saving…" : "Log Expense"}
+      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-4">
+        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-5 py-2.5 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
+        <button onClick={handleSubmit} disabled={saving || !description.trim() || !amount} className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50">
+          {saving ? "Saving..." : "Log Expense"}
         </button>
       </div>
     </Modal>
@@ -337,11 +401,11 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={resetAndClose} title="Upload Invoice" description="Add a supplier invoice for pricing extraction">
-      <div className="space-y-4 px-6 py-5">
+    <Modal open={open} onClose={resetAndClose} title="Upload Invoice" description="Add a supplier invoice for pricing extraction" width="w-full max-w-[600px]">
+      <div className="space-y-5 px-6 py-6">
         {/* Drop zone */}
         <div
-          className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--gray4)] bg-[var(--bg)] px-6 py-8 transition-colors hover:border-[var(--accent)]"
+          className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--gray4)] bg-[var(--bg)] px-6 py-10 transition-all hover:border-[var(--accent)] hover:bg-[var(--accent)]/[0.02] cursor-pointer"
           onClick={() => {
             const input = document.createElement("input");
             input.type = "file";
@@ -383,10 +447,10 @@ export function UploadInvoiceModal({ open, onClose }: UploadInvoiceModalProps) {
           <input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className={inputClass} />
         </Field>
       </div>
-      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
-        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Uploading…" : "Upload Invoice"}
+      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-4">
+        <button onClick={resetAndClose} className="rounded-lg border border-[var(--sep)] px-5 py-2.5 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
+        <button onClick={handleSubmit} disabled={saving} className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50">
+          {saving ? "Uploading..." : "Upload Invoice"}
         </button>
       </div>
     </Modal>
@@ -426,25 +490,34 @@ export function EditProfileModal({ open, onClose, user }: EditProfileModalProps)
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Edit Profile" width="w-[400px]">
-      <div className="space-y-4 px-6 py-5">
+    <Modal open={open} onClose={onClose} title="Edit Profile" width="w-full max-w-[480px]">
+      <div className="space-y-5 px-6 py-6">
+        {/* Avatar + name header */}
+        <div className="flex items-center gap-4 rounded-xl bg-[var(--bg)] p-4">
+          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[18px] font-bold text-white">
+            {user?.full_name?.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--"}
+          </div>
+          <div>
+            <p className="text-[15px] font-bold">{user?.full_name || "Unknown"}</p>
+            <p className="text-[12px] text-[var(--secondary)] capitalize">{user?.role || "Team Member"}</p>
+          </div>
+        </div>
+
         <Field label="Full Name">
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
         </Field>
         <Field label="Email">
-          <input value={user?.email ?? ""} disabled className={`${inputClass} opacity-50 cursor-not-allowed`} />
+          <input value={user?.email ?? ""} disabled className={`${inputClass} opacity-40 cursor-not-allowed`} />
+          <p className="mt-1 text-[10px] text-[var(--tertiary)]">Contact admin to change email</p>
         </Field>
         <Field label="Phone">
           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" className={inputClass} />
         </Field>
-        <Field label="Role">
-          <input value={user?.role ?? ""} disabled className={`${inputClass} opacity-50 cursor-not-allowed capitalize`} />
-        </Field>
       </div>
-      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-3">
-        <button onClick={onClose} className="rounded-lg border border-[var(--sep)] px-4 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
-        <button onClick={handleSubmit} disabled={saving || !name.trim()} className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50">
-          {saving ? "Saving…" : "Save Changes"}
+      <div className="flex justify-end gap-2 border-t border-[var(--sep)] px-6 py-4">
+        <button onClick={onClose} className="rounded-lg border border-[var(--sep)] px-5 py-2.5 text-[13px] font-medium transition-colors hover:bg-[var(--bg)]">Cancel</button>
+        <button onClick={handleSubmit} disabled={saving || !name.trim()} className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:bg-[var(--accent-hover)] active:scale-[0.97] disabled:opacity-50">
+          {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </Modal>

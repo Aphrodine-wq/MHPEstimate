@@ -53,7 +53,7 @@ export function UpdateBanner() {
         {update.status === "available" && (
           <button
             onClick={() => window.electronAPI?.downloadUpdate()}
-            className="rounded-md bg-[var(--accent)] px-3 py-1 text-[12px] font-semibold text-white hover:brightness-110 transition-all"
+            className="rounded-md bg-[var(--accent)] px-3 py-1 text-[12px] font-semibold text-white hover:bg-[var(--accent-hover)] transition-all"
           >
             Download
           </button>
@@ -69,7 +69,7 @@ export function UpdateBanner() {
         {update.status === "downloaded" && (
           <button
             onClick={() => window.electronAPI?.installUpdate()}
-            className="rounded-md bg-[var(--green)] px-3 py-1 text-[12px] font-semibold text-white hover:brightness-110 transition-all"
+            className="rounded-md bg-[var(--green)] px-3 py-1 text-[12px] font-semibold text-white hover:bg-[var(--accent-hover)] transition-all"
           >
             Restart & Install
           </button>

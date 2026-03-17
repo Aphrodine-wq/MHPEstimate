@@ -3,16 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   main: {
-    build: {
-      rollupOptions: {
-        external: [
-          "electron",
-          "better-sqlite3",
-          "electron-updater",
-          "electron-log",
-        ],
-      },
-    },
+    plugins: [externalizeDepsPlugin()],
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
