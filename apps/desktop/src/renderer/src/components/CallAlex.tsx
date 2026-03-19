@@ -63,14 +63,14 @@ export function CallAlexFAB({ onCall }: { onCall: () => void }) {
   );
 }
 
-export function CallAlexPanel({ onClose }: { onClose: () => void }) {
+export function CallAlexPanel({ onClose, onEstimateCreated }: { onClose: () => void; onEstimateCreated?: (estimate: any) => void }) {
   return (
     <Suspense fallback={
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--gray4)] border-t-[var(--accent)]" />
       </div>
     }>
-      <LazyCallAlexPanel onClose={onClose} />
+      <LazyCallAlexPanel onClose={onClose} onEstimateCreated={onEstimateCreated} />
     </Suspense>
   );
 }

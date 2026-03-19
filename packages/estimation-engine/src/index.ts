@@ -51,3 +51,67 @@ export {
   type PadDivision,
   type GradingAnalysis,
 } from "./importers";
+
+// ── Auto Estimate ──
+export {
+  generateAutoEstimate,
+  type AutoEstimateInput,
+  type AutoEstimateResult,
+  type AutoEstimateLineItem,
+} from "./calculations/auto-estimate";
+
+// Re-export indirect costs for convenience
+export {
+  INDIRECT_COSTS,
+  INDIRECT_COST_CATEGORY_LABELS,
+  getIndirectCostsForProject,
+  calculateIndirectCost,
+  type IndirectCost,
+} from "@proestimate/shared/constants/indirect-costs";
+
+// Re-export live pricing utilities for convenience
+export {
+  TRADE_LABOR_RATES,
+  CATEGORY_TO_TRADE,
+  getTradeRateForCategory,
+  getAdjustedTradeRate,
+  type TradeRate,
+} from "@proestimate/shared/constants/trade-labor-rates";
+export {
+  COMMODITY_INDICES,
+  calculateCommodityAdjustment,
+  getCommodityIndicesForCategory,
+  type CommodityIndex,
+} from "@proestimate/shared/constants/commodity-indices";
+
+// ── Clone Estimate ──
+export {
+  cloneAndAdjustEstimate,
+  type CloneEstimateInput,
+  type CloneEstimateResult,
+} from "./calculations/clone-estimate";
+
+// ── Win Prediction ──
+export {
+  predictWinProbability,
+  type WinPredictionInput,
+  type WinPredictionResult,
+  type PriceSuggestion,
+} from "./calculations/win-prediction";
+
+// ── iCal Export ──
+export {
+  generateICalendar,
+  generateVEvent,
+  type ICalPhase,
+  type ICalOptions,
+} from "./ical-export";
+
+// ── Material Cart ──
+export {
+  buildCartLinks,
+  buildHomeDepotCartUrl,
+  buildLowesCartUrl,
+  type CartLineItem,
+  type CartResult,
+} from "./material-cart";

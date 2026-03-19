@@ -14,6 +14,17 @@ const AnalyticsPage = lazy(() => import("./components/AnalyticsPage").then(m => 
 const SettingsPage = lazy(() => import("./components/SettingsPage").then(m => ({ default: m.SettingsPage })));
 const Profile = lazy(() => import("./components/Profile").then(m => ({ default: m.Profile })));
 const TeamMembersPage = lazy(() => import("./components/TeamMembersPage").then(m => ({ default: m.TeamMembersPage })));
+const SchedulePage = lazy(() => import("./components/SchedulePage").then(m => ({ default: m.SchedulePage })));
+const SubcontractorsPage = lazy(() => import("./components/SubcontractorsPage").then(m => ({ default: m.SubcontractorsPage })));
+const WarrantyPage = lazy(() => import("./components/WarrantyPage").then(m => ({ default: m.WarrantyPage })));
+const FinancialReportsPage = lazy(() => import("./components/FinancialReportsPage").then(m => ({ default: m.FinancialReportsPage })));
+const ProposalPage = lazy(() => import("./components/ProposalPage").then(m => ({ default: m.ProposalPage })));
+const PhotoLogPage = lazy(() => import("./components/PhotoLogPage").then(m => ({ default: m.PhotoLogPage })));
+const DailyLogPage = lazy(() => import("./components/DailyLogPage").then(m => ({ default: m.DailyLogPage })));
+const TakeoffPage = lazy(() => import("./components/TakeoffPage").then(m => ({ default: m.TakeoffPage })));
+const SelectionsPage = lazy(() => import("./components/SelectionsPage").then(m => ({ default: m.SelectionsPage })));
+const PurchaseOrdersPage = lazy(() => import("./components/PurchaseOrdersPage").then(m => ({ default: m.PurchaseOrdersPage })));
+const TimeTrackingPage = lazy(() => import("./components/TimeTrackingPage").then(m => ({ default: m.TimeTrackingPage })));
 import { CallAlexFAB, CallAlexPanel } from "./components/CallAlex";
 import { SplashScreen } from "./components/SplashScreen";
 import { AuthScreen } from "./components/AuthScreen";
@@ -43,6 +54,17 @@ const PAGE_TITLES: Record<string, string> = {
   settings: "Settings",
   profile: "Profile",
   team: "Team Members",
+  schedule: "Schedule",
+  subcontractors: "Subcontractors",
+  warranty: "Warranty",
+  reports: "Financial Reports",
+  proposal: "Proposal",
+  photos: "Photo Log",
+  dailylog: "Daily Log",
+  takeoff: "Takeoff",
+  selections: "Selections",
+  purchaseorders: "Purchase Orders",
+  timetracking: "Time Tracking",
 };
 
 const pages: Record<string, React.ComponentType<any>> = {
@@ -57,6 +79,17 @@ const pages: Record<string, React.ComponentType<any>> = {
   settings: SettingsPage,
   profile: Profile,
   team: TeamMembersPage,
+  schedule: SchedulePage,
+  subcontractors: SubcontractorsPage,
+  warranty: WarrantyPage,
+  reports: FinancialReportsPage,
+  proposal: ProposalPage,
+  photos: PhotoLogPage,
+  dailylog: DailyLogPage,
+  takeoff: TakeoffPage,
+  selections: SelectionsPage,
+  purchaseorders: PurchaseOrdersPage,
+  timetracking: TimeTrackingPage,
 };
 
 function PageSkeleton() {

@@ -16,6 +16,9 @@ describe("DEFAULT_FLAGS", () => {
       "voice_ai", "dark_mode", "ml_pricing", "ocr_invoices",
       "mobile_app", "multi_tier", "realtime_collab",
       "document_export", "analytics", "change_orders",
+      "portal_access", "auto_estimate", "photo_estimate",
+      "win_prediction", "quickbooks_integration", "material_cart_links",
+      "job_scheduling", "docusign_integration",
     ];
     for (const key of expectedKeys) {
       expect(key in DEFAULT_FLAGS).toBe(true);
@@ -65,6 +68,10 @@ describe("resolveFlags", () => {
       ocr_invoices: true, mobile_app: true, multi_tier: true,
       realtime_collab: true, document_export: true,
       analytics: true, change_orders: true,
+      portal_access: true, auto_estimate: true, photo_estimate: true,
+      win_prediction: true, quickbooks_integration: true,
+      material_cart_links: true, job_scheduling: true,
+      docusign_integration: true,
     };
     const flags = resolveFlags(allTrue);
     for (const v of Object.values(flags)) expect(v).toBe(true);

@@ -24,7 +24,18 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         {isAuth ? (
-          <Stack.Screen name="(tabs)" />
+          <>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="estimate/[id]" />
+            <Stack.Screen name="estimates/new" options={{ presentation: "modal" }} />
+            <Stack.Screen name="client/[id]" />
+            <Stack.Screen name="clients/new" options={{ presentation: "modal" }} />
+            <Stack.Screen name="analytics/index" />
+            <Stack.Screen name="calls/index" />
+            <Stack.Screen name="materials/index" />
+            <Stack.Screen name="change-orders/[estimateId]" />
+            <Stack.Screen name="job-actuals/[estimateId]" />
+          </>
         ) : (
           <Stack.Screen name="auth" />
         )}

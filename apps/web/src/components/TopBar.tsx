@@ -12,29 +12,28 @@ interface TopBarProps {
 }
 
 export function TopBar({ title, onModal, onNavigate, user, onSignOut, onToggleMobileMenu }: TopBarProps) {
-  const [helpOpen, setHelpOpen] = useState(false);
   return (
-    <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-[var(--sep)] bg-[var(--card)] px-3 md:px-6">
+    <header className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-[var(--sep)] bg-[var(--card)] px-3 md:px-6">
       {/* Left: Hamburger + Breadcrumb */}
       <div className="flex items-center gap-2">
         {/* Mobile hamburger */}
         <button
           onClick={onToggleMobileMenu}
           aria-label="Toggle navigation menu"
-          className="rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)] md:hidden"
+          className="rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--fill)] hover:text-[var(--label)] md:hidden"
         >
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <nav className="flex items-center gap-1.5 text-[13px]">
+        <nav className="flex items-center gap-1.5 text-sm">
           <button
             onClick={() => onNavigate("dashboard")}
             className="hidden sm:inline text-[var(--secondary)] transition-colors hover:text-[var(--label)]"
           >
             Home
           </button>
-          <svg className="hidden sm:block" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="var(--gray3)" strokeWidth="2.5" strokeLinecap="round">
+          <svg className="hidden sm:block h-3 w-3 text-[var(--gray3)]" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <path d="m9 18 6-6-6-6" />
           </svg>
           <span className="font-medium text-[var(--label)]">{title}</span>
@@ -50,36 +49,13 @@ export function TopBar({ title, onModal, onNavigate, user, onSignOut, onToggleMo
         <NotificationsButton />
 
         {/* Help */}
-        <button onClick={() => setHelpOpen(true)} aria-label="Help" className="hidden sm:flex rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]">
+        <button aria-label="Help" className="hidden sm:flex rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--fill)] hover:text-[var(--label)]">
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <path d="M12 17h.01" />
           </svg>
         </button>
-
-        {/* Help modal */}
-        {helpOpen && (
-          <>
-            <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setHelpOpen(false)} />
-            <div className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--sep)] bg-[var(--card)] p-5 shadow-xl animate-modal-content">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[15px] font-semibold">Keyboard Shortcuts</p>
-                <button onClick={() => setHelpOpen(false)} className="rounded-md p-1 hover:bg-[var(--bg)]">
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                </button>
-              </div>
-              <div className="space-y-2 text-[13px]">
-                {[["N", "New estimate"],["C", "Add client"],["↑ / ↓", "Navigate lists"],["Esc", "Close panels"]].map(([key, desc]) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <span className="text-[var(--secondary)]">{desc}</span>
-                    <kbd className="rounded-md border border-[var(--sep)] bg-[var(--bg)] px-2 py-0.5 text-[11px] font-medium">{key}</kbd>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
 
         {/* Divider */}
         <div className="hidden sm:block mx-1.5 h-6 w-px bg-[var(--sep)]" />
@@ -103,7 +79,7 @@ function NotificationsButton() {
         aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : "Notifications"}
         aria-expanded={open}
         aria-haspopup="true"
-        className="relative rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--label)]"
+        className="relative rounded-lg p-2 text-[var(--gray1)] transition-colors hover:bg-[var(--fill)] hover:text-[var(--label)]"
       >
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -136,7 +112,7 @@ function NotificationsButton() {
                     key={n.id}
                     role="menuitem"
                     onClick={() => markRead(n.id)}
-                    className={`flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-[var(--bg)] border-b border-[var(--sep)] last:border-b-0 ${!n.read ? "bg-[var(--accent)]/[0.03]" : ""}`}
+                    className={`flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-[var(--fill)] border-b border-[var(--sep)] last:border-b-0 ${!n.read ? "bg-[var(--accent)]/[0.03]" : ""}`}
                   >
                     <div className="flex items-center gap-2">
                       {!n.read && <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--accent)]" />}
@@ -148,13 +124,11 @@ function NotificationsButton() {
                 ))
               )}
             </div>
-            {notifications.length > 0 && (
-              <div className="border-t border-[var(--sep)] px-4 py-2">
-                <button onClick={markAllRead} className="w-full text-center text-[12px] font-medium text-[var(--secondary)] hover:text-[var(--label)] transition-colors">
-                  Clear all
-                </button>
-              </div>
-            )}
+            <div className="border-t border-[var(--sep)] px-4 py-2">
+              <button className="w-full text-center text-[12px] font-medium text-[var(--accent)] hover:underline">
+                View All Notifications
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -172,7 +146,7 @@ function QuickAddButton({ onModal }: { onModal: (m: string) => void }) {
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="Create new item"
-        className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]"
+        className="flex items-center gap-1.5 rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/15 transition-all hover:brightness-110 active:scale-[0.97]"
       >
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
@@ -183,6 +157,7 @@ function QuickAddButton({ onModal }: { onModal: (m: string) => void }) {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div role="menu" className="absolute right-0 top-full z-50 mt-1.5 w-52 rounded-xl border border-[var(--sep)] bg-[var(--card)] p-1.5 shadow-lg shadow-black/8 animate-modal-content">
+            <DropdownItem label="Quick Estimate" desc="Price in 60 seconds" onClick={() => { onModal("quick-estimate"); setOpen(false); }} />
             <DropdownItem label="New Estimate" desc="Start from scratch" onClick={() => { onModal("new-estimate"); setOpen(false); }} />
             <DropdownItem label="Add Client" desc="New client record" onClick={() => { onModal("add-client"); setOpen(false); }} />
             <DropdownItem label="Log Expense" desc="Record a purchase" onClick={() => { onModal("log-expense"); setOpen(false); }} />
@@ -205,7 +180,7 @@ function UserMenu({ user, onNavigate, onSignOut }: { user: TeamMember | null; on
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="User menu"
-        className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[var(--bg)]"
+        className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[var(--fill)]"
       >
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-bold text-white">
           {initials}
@@ -227,7 +202,7 @@ function UserMenu({ user, onNavigate, onSignOut }: { user: TeamMember | null; on
             <button
               role="menuitem"
               onClick={() => { onNavigate("profile"); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--fill)]"
             >
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -238,7 +213,7 @@ function UserMenu({ user, onNavigate, onSignOut }: { user: TeamMember | null; on
             <button
               role="menuitem"
               onClick={() => { onNavigate("settings"); setOpen(false); }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--bg)]"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] transition-colors hover:bg-[var(--fill)]"
             >
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" />
@@ -275,7 +250,7 @@ function DropdownItem({ label, desc, onClick }: { label: string; desc: string; o
     <button
       role="menuitem"
       onClick={onClick}
-      className="flex w-full flex-col rounded-lg px-3 py-2 text-left transition-colors hover:bg-[var(--bg)]"
+      className="flex w-full flex-col rounded-lg px-3 py-2 text-left transition-colors hover:bg-[var(--fill)]"
     >
       <span className="text-[13px] font-medium">{label}</span>
       <span className="text-[11px] text-[var(--secondary)]">{desc}</span>

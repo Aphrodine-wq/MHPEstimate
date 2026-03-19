@@ -48,13 +48,13 @@ describe("env-validation", () => {
     delete process.env.SUPABASE_SERVICE_ROLE_KEY;
     delete process.env.RESEND_API_KEY;
     delete process.env.NEXT_PUBLIC_SENTRY_DSN;
-    delete process.env.PORTAL_SECRET;
+    delete process.env.PORTAL_TOKEN_SECRET;
 
     const missing = validateEnv();
     expect(missing).toContain("SUPABASE_SERVICE_ROLE_KEY");
     expect(missing).toContain("RESEND_API_KEY");
     expect(missing).toContain("NEXT_PUBLIC_SENTRY_DSN");
-    expect(missing).toContain("PORTAL_SECRET");
+    expect(missing).toContain("PORTAL_TOKEN_SECRET");
   });
 
   it("returns empty array when all production vars are set", () => {
@@ -64,7 +64,7 @@ describe("env-validation", () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-key";
     process.env.RESEND_API_KEY = "re_test_key";
     process.env.NEXT_PUBLIC_SENTRY_DSN = "https://sentry.io/123";
-    process.env.PORTAL_SECRET = "super-secret-key";
+    process.env.PORTAL_TOKEN_SECRET = "super-secret-key";
 
     const missing = validateEnv();
     expect(missing).toEqual([]);

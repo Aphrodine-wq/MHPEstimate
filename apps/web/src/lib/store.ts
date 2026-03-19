@@ -12,6 +12,7 @@ import type {
   EstimateLineItem,
   JobActual,
   EstimateChangeOrder,
+  JobPhase,
 } from "@proestimate/shared/types";
 
 // ── Realtime-enabled hooks ──
@@ -580,4 +581,49 @@ export function useCurrentUser() {
   }, []);
 
   return { user, loading };
+}
+
+// ── Templates hook ──
+
+export function useTemplates() {
+  const { rows, status, refetch } = useTableSync<{
+    id: string;
+    name: string;
+    project_type: string | null;
+    tier: string | null;
+    line_items: unknown[];
+    inclusions: string[];
+    exclusions: string[];
+    created_at: string;
+  }>({
+    supabase: supabase!,
+    table: "estimate_templates",
+    orderBy: { column: "created_at", ascending: false },
+    enabled: !!supabase,
+  });
+  if (!supabase) return { data: [] as typeof rows, loading: false, refresh: NOOP_REFRESH };
+  return { data: rows, loading: status === "CONNECTING", refresh: refetch };
+}
+
+// ── Job Phases hook ──
+
+export function useJobPhases(estimateId: string | null) {
+  const [data, setData] = useState<JobPhase[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    if (!supabase || !estimateId) { setData([]); setLoading(false); return; }
+    setLoading(true);
+    const { data: rows } = await supabase
+      .from("job_phases")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .order("sort_order");
+    setData((rows as JobPhase[]) ?? []);
+    setLoading(false);
+  }, [estimateId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  return { data, phases: data, loading, refresh };
 }

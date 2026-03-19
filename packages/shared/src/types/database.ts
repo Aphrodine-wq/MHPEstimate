@@ -1,3 +1,74 @@
+// ── Multi-Tenant ──
+
+export type OrgMemberRole = "owner" | "admin" | "estimator" | "pm" | "field_tech" | "sales";
+
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "incomplete";
+
+export type BillingPlanId = "free" | "pro" | "enterprise" | "apprentice" | "journeyman" | "master" | "gc";
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id: string;
+  phone: string | null;
+  email: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  website: string | null;
+  logo_url: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  billing_email: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BillingPlan {
+  id: BillingPlanId;
+  name: string;
+  stripe_price_id: string | null;
+  max_team_members: number | null;
+  max_estimates_per_month: number | null;
+  features: Record<string, boolean>;
+  call_hunter_minutes_per_month: number | null;
+  price_monthly_cents: number;
+  created_at: string;
+}
+
+export interface Subscription {
+  id: string;
+  organization_id: string;
+  plan_id: BillingPlanId;
+  stripe_subscription_id: string | null;
+  status: SubscriptionStatus;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  trial_end: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrgMember {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role: OrgMemberRole;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // ── Team & Auth ──
 
 export type TeamRole = "estimator" | "pm" | "field_tech" | "sales" | "admin" | "owner";
@@ -45,7 +116,7 @@ export type EstimateStatus =
   | "expired";
 
 export type EstimateTier = "budget" | "midrange" | "high_end" | "good" | "better" | "best";
-export type EstimateSource = "manual" | "voice" | "template";
+export type EstimateSource = "manual" | "voice" | "template" | "auto" | "photo";
 
 export type EstimateCategory = "building" | "infrastructure";
 
@@ -135,7 +206,7 @@ export interface EstimateChangeOrder {
 
 export type ProductTier = "budget" | "mid" | "premium";
 export type PriceSource = "home_depot" | "lowes" | "invoice" | "manual";
-export type PriceFreshness = "green" | "yellow" | "orange" | "red";
+export type PriceFreshness = "green" | "yellow" | "orange" | "red" | "gray";
 
 export interface Product {
   id: string;
@@ -248,12 +319,15 @@ export type AuditActionType =
   | "estimate_sent"
   | "estimate_accepted"
   | "estimate_declined"
+  | "estimate_viewed"
+  | "estimate_cloned"
   | "line_item_added"
   | "line_item_updated"
   | "line_item_removed"
   | "change_order_created"
   | "change_order_approved"
   | "change_order_rejected"
+  | "change_order_signed"
   | "client_created"
   | "client_updated"
   | "client_deleted"
@@ -277,7 +351,29 @@ export type AuditActionType =
   | "estimate_reminder_deleted"
   | "change_order_client_approved"
   | "change_order_client_rejected"
-  | "change_order_notification_sent";
+  | "change_order_notification_sent"
+  | "auto_estimate_generated"
+  | "photo_estimate_generated"
+  | "purchase_order_created"
+  | "po_items_received"
+  | "selection_sheet_created"
+  | "selection_item_selected"
+  | "schedule_generated"
+  | "schedule_updated"
+  | "schedule_exported"
+  | "quickbooks_connected"
+  | "quickbooks_disconnected"
+  | "material_cart_generated"
+  | "time_entry_clock_in"
+  | "time_entry_clock_out"
+  | "subcontractor_created"
+  | "win_score_calculated"
+  | "sub_bid_created"
+  | "sub_bid_updated"
+  | "purchase_order_status_changed"
+  | "purchase_order_updated"
+  | "selection_sheet_status_changed"
+  | "selection_sheet_updated";
 
 export type AuditEntityType =
   | "estimate"
@@ -291,6 +387,14 @@ export type AuditEntityType =
   | "estimate_version"
   | "estimate_reminder"
   | "company_settings"
+  | "purchase_order"
+  | "selection_sheet"
+  | "selection_item"
+  | "job_phase"
+  | "integration_connection"
+  | "time_entry"
+  | "subcontractor"
+  | "sub_bid"
   | "product";
 
 export interface AuditLog {
@@ -331,4 +435,28 @@ export interface EstimateReminder {
   message: string | null;
   created_by: string;
   created_at: string;
+}
+
+// ── Job Scheduling ──
+
+export type JobPhaseStatus = "not_started" | "in_progress" | "completed" | "blocked" | "skipped";
+
+export interface JobPhase {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  phase_name: string;
+  sort_order: number;
+  start_date: string | null;
+  end_date: string | null;
+  status: JobPhaseStatus;
+  crew_assigned: string[];
+  notes: string | null;
+  milestone_id: string | null;
+  color: string | null;
+  dependencies: string[];
+  actual_start: string | null;
+  actual_end: string | null;
+  created_at: string;
+  updated_at: string;
 }

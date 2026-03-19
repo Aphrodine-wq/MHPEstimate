@@ -14,6 +14,7 @@ vi.mock("@elevenlabs/react", () => ({
 // Mock mediaDevices (not available in jsdom)
 Object.defineProperty(navigator, "mediaDevices", {
   writable: true,
+  configurable: true,
   value: { getUserMedia: vi.fn().mockResolvedValue({}) },
 });
 

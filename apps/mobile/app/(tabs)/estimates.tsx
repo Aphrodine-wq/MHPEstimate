@@ -2,7 +2,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } fr
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState, useCallback } from "react";
-import { useEstimates, createEstimate } from "@/lib/store";
+import { useEstimates } from "@/lib/store";
 import { StatusBadge } from "@/components/StatusBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { colors } from "@/lib/theme";
@@ -33,8 +33,8 @@ export default function EstimatesScreen() {
     setRefreshing(false);
   }, [refresh]);
 
-  const handleNewEstimate = async () => {
-    await createEstimate();
+  const handleNewEstimate = () => {
+    router.push("/estimates/new");
   };
 
   const renderItem = ({ item }: { item: Estimate }) => (

@@ -14,4 +14,5 @@ export {
   StatusBadge,
   STATUS_LABEL,
   STATUS_STYLE,
+  SegmentedControl,
 } from "./components";

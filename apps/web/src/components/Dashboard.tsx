@@ -91,6 +91,9 @@ export function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => onModal?.("quick-estimate")} className="rounded-lg border border-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-[var(--accent)] transition-all hover:bg-[var(--accent)]/5 active:scale-[0.98]">
+            Quick Estimate
+          </button>
           <button onClick={() => onModal?.("new-estimate")} className="rounded-lg bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-[var(--accent)]/20 transition-all hover:brightness-110 active:scale-[0.98]">
             New Estimate
           </button>
@@ -154,9 +157,9 @@ export function Dashboard() {
             <div>
               <p className="mb-2 text-[13px] font-semibold">Quick Actions</p>
               <div className="space-y-2">
-                <ActionButton label="New Estimate" desc="Start from scratch" onClick={() => onModal?.("new-estimate")} />
+                <ActionButton label="Quick Estimate" desc="Price in 60 seconds" onClick={() => onModal?.("quick-estimate")} />
+                <ActionButton label="New Estimate" desc="Full estimate form" onClick={() => onModal?.("new-estimate")} />
                 <ActionButton label="Add Client" desc="Add a new client" onClick={() => onModal?.("add-client")} />
-                <ActionButton label="Quick Ballpark" desc="Voice or manual entry" onClick={() => onCallAlex?.()} />
                 <ActionButton label="Upload Invoice" desc="Add supplier pricing" onClick={() => onModal?.("upload-invoice")} />
                 <ActionButton label="View Analytics" desc="Reports & insights" onClick={() => onNavigate?.("analytics")} />
               </div>

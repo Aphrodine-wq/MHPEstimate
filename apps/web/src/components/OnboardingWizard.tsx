@@ -7,11 +7,12 @@ interface OnboardingWizardProps {
   onComplete: () => void;
   onNavigate: (page: string) => void;
   onNewEstimate: () => void;
+  onCallAlex?: () => void;
 }
 
 const TOTAL_STEPS = 4;
 
-export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstimate }: OnboardingWizardProps) {
+export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstimate, onCallAlex }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
   const [exiting, setExiting] = useState(false);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
@@ -56,16 +57,16 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
       className={`fixed inset-0 z-[90] flex items-center justify-center transition-opacity duration-400 ${
         exiting ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
-      style={{ background: "linear-gradient(135deg, #f0f4f8 0%, #e8eef5 50%, #f5f7fa 100%)" }}
+      style={{ background: "#f0f4f8" }}
     >
       {/* Decorative background elements */}
       <div
         className="absolute top-[-10%] right-[-5%] rounded-full blur-[120px] opacity-20"
-        style={{ width: 500, height: 500, background: "radial-gradient(circle, #29abe2 0%, transparent 70%)" }}
+        style={{ width: 500, height: 500, background: "#29abe2" }}
       />
       <div
         className="absolute bottom-[-10%] left-[-5%] rounded-full blur-[120px] opacity-15"
-        style={{ width: 400, height: 400, background: "radial-gradient(circle, #007aff 0%, transparent 70%)" }}
+        style={{ width: 400, height: 400, background: "#007aff" }}
       />
 
       {/* Card */}
@@ -79,7 +80,7 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
             className="h-full transition-[width] duration-500 ease-out rounded-r-full"
             style={{
               width: `${progressPct}%`,
-              background: "linear-gradient(90deg, #29abe2, #007aff)",
+              background: "#29abe2",
             }}
           />
         </div>
@@ -111,7 +112,7 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
                   style={{
                     width: i === step ? 24 : 8,
                     background: i === step
-                      ? "linear-gradient(90deg, #29abe2, #007aff)"
+                      ? "#29abe2"
                       : i < step
                         ? "var(--accent)"
                         : "var(--gray4)",
@@ -136,7 +137,7 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
                 <button
                   onClick={next}
                   className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: "linear-gradient(135deg, #29abe2, #007aff)" }}
+                  style={{ background: "#007aff" }}
                 >
                   Get Started
                 </button>
@@ -145,7 +146,7 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
                 <button
                   onClick={next}
                   className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: "linear-gradient(135deg, #29abe2, #007aff)" }}
+                  style={{ background: "#007aff" }}
                 >
                   Next
                 </button>
@@ -154,7 +155,7 @@ export function OnboardingWizard({ userName, onComplete, onNavigate, onNewEstima
                 <button
                   onClick={finish}
                   className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: "linear-gradient(135deg, #34c759, #28a745)" }}
+                  style={{ background: "#34c759" }}
                 >
                   Done
                 </button>
@@ -207,7 +208,7 @@ function StepWelcome({ name }: { name: string }) {
       <div
         className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
         style={{
-          background: "linear-gradient(135deg, #29abe2, #007aff)",
+          background: "#007aff",
           animation: "onboarding-float 3s ease-in-out infinite",
         }}
       >
@@ -314,7 +315,7 @@ function StepMeetAlex() {
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-lg"
         style={{
-          background: "linear-gradient(135deg, #34c759, #28a745)",
+          background: "#34c759",
           animation: "onboarding-float 3s ease-in-out infinite",
         }}
       >
@@ -363,21 +364,21 @@ function StepAllSet({ onAction }: { onAction: (action: string) => void }) {
       icon: "M12 4v16m8-8H4",
       title: "Create First Estimate",
       desc: "Jump right in",
-      gradient: "linear-gradient(135deg, #29abe2, #007aff)",
+      bg: "#007aff",
     },
     {
       id: "dashboard",
       icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
       title: "Explore Dashboard",
       desc: "See the overview",
-      gradient: "linear-gradient(135deg, #5856d6, #af52de)",
+      bg: "#5856d6",
     },
     {
       id: "settings",
       icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
       title: "View Settings",
       desc: "Customize your setup",
-      gradient: "linear-gradient(135deg, #ff9500, #ff6b00)",
+      bg: "#ff9500",
     },
   ];
 
@@ -411,7 +412,7 @@ function StepAllSet({ onAction }: { onAction: (action: string) => void }) {
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: a.gradient }}
+              style={{ background: a.bg }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d={a.icon} />

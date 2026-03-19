@@ -295,6 +295,7 @@ describe("mapMoasureToEstimate", () => {
     segments: [],
     layers: [],
     points: [],
+    paths: [],
     source_format: "json" as const,
     raw_content: "{}",
   };
@@ -405,6 +406,7 @@ describe("validateMoasureMeasurement", () => {
     ],
     layers: [],
     points: [],
+    paths: [],
     source_format: "json" as const,
     raw_content: "{}",
   };

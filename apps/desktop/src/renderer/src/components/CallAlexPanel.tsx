@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID ?? "";
 
-export default function CallAlexPanel({ onClose }: { onClose: () => void }) {
+export default function CallAlexPanel({ onClose, onEstimateCreated: _onEstimateCreated }: { onClose: () => void; onEstimateCreated?: (estimate: any) => void }) {
   const [error, setError] = useState<string | null>(null);
   const endingRef = useRef(false);
 

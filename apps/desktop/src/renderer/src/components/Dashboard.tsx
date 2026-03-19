@@ -9,6 +9,8 @@ interface DashboardProps {
   onNavigate?: (page: string) => void;
   onCallAlex?: () => void;
   onModal?: (m: string) => void;
+  onEditEstimate?: (estimate: any) => void;
+  onSignOut?: () => void;
 }
 
 // ── Helpers ──

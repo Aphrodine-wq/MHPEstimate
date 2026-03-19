@@ -1,9 +1,8 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert, TextInput } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState, useCallback } from "react";
 import { useClients } from "@/lib/store";
-import { supabase } from "@/lib/supabase";
 import { EmptyState } from "@/components/EmptyState";
 import { colors } from "@/lib/theme";
 import type { Client } from "@proestimate/shared/types";
@@ -30,20 +29,7 @@ export default function ClientsScreen() {
   }, [refresh]);
 
   const handleAddClient = () => {
-    Alert.prompt(
-      "Add Client",
-      "Enter client's full name:",
-      async (name) => {
-        if (!name?.trim() || !supabase) return;
-        const { error } = await supabase.from("clients").insert({ full_name: name.trim() });
-        if (error) {
-          Alert.alert("Error", "Failed to add client");
-        } else {
-          Alert.alert("Success", "Client added");
-        }
-      },
-      "plain-text"
-    );
+    router.push("/clients/new");
   };
 
   const filtered = search

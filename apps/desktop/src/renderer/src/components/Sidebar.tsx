@@ -1,101 +1,158 @@
 import { useState } from "react";
 import { useCurrentUser } from "../lib/store";
-import mhpLogo from "../assets/mhp-logo.png";
+import {
+  HomeIcon,
+  DocumentTextIcon,
+  ReceiptPercentIcon,
+  UsersIcon,
+  PhoneIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  FolderIcon,
+} from "@heroicons/react/24/outline";
+import {
+  HomeIcon as HomeIconSolid,
+  DocumentTextIcon as DocumentTextIconSolid,
+  ReceiptPercentIcon as ReceiptPercentIconSolid,
+  UsersIcon as UsersIconSolid,
+  PhoneIcon as PhoneIconSolid,
+  ChartBarIcon as ChartBarIconSolid,
+  Cog6ToothIcon as Cog6ToothIconSolid,
+  FolderIcon as FolderIconSolid,
+} from "@heroicons/react/24/solid";
+import type { ComponentType, SVGProps } from "react";
+
+const mhpLogo = "/mhp-logo.png";
+
+type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 interface SidebarProps {
   active: string;
   onNavigate: (page: string) => void;
+  callActive?: boolean;
+  onCall?: () => void;
 }
 
-const mainNav = [
-  { id: "dashboard", label: "Dashboard", icon: IconGrid },
-  { id: "estimates", label: "Estimates", icon: IconDoc },
-  { id: "projects", label: "Projects", icon: IconProjects },
-  { id: "materials", label: "Materials", icon: IconBox },
-  { id: "invoices", label: "Invoices", icon: IconReceipt },
-  { id: "clients", label: "Clients", icon: IconPeople },
-  { id: "calls", label: "Call History", icon: IconPhone },
+const navItems = [
+  { id: "home", label: "Dashboard", icon: HomeIcon, iconActive: HomeIconSolid },
+  { id: "estimates", label: "Estimates", icon: DocumentTextIcon, iconActive: DocumentTextIconSolid },
+  { id: "projects", label: "Projects", icon: FolderIcon, iconActive: FolderIconSolid },
+  { id: "clients", label: "Clients", icon: UsersIcon, iconActive: UsersIconSolid },
+  { id: "invoices", label: "Invoices", icon: ReceiptPercentIcon, iconActive: ReceiptPercentIconSolid },
+  { id: "reports", label: "Reports", icon: ChartBarIcon, iconActive: ChartBarIconSolid },
+  { id: "settings", label: "Settings", icon: Cog6ToothIcon, iconActive: Cog6ToothIconSolid },
 ];
 
-const toolsNav = [
-  { id: "analytics", label: "Analytics", icon: IconChart },
-  { id: "settings", label: "Settings", icon: IconGear },
-];
-
-const adminNav = [
-  { id: "team", label: "Team", icon: IconTeam },
-];
-
-export function Sidebar({ active, onNavigate }: SidebarProps) {
+export function Sidebar({ active, onNavigate, callActive, onCall }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
-  const isAdmin = user?.role === "admin" || user?.role === "owner";
   const initials = user
     ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2)
     : "--";
 
   return (
-    <div className={`flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-[width] duration-200 shadow-[1px_0_0_var(--sep)] ${collapsed ? "w-[68px]" : "w-[252px]"}`}>
+    <div className={`flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-all duration-[var(--duration-normal)] ${collapsed ? "w-[68px]" : "w-[280px]"}`}>
       {/* Drag region for frameless window */}
       <div className="drag h-3 w-full flex-shrink-0" />
 
       {/* Brand header */}
       <div className={`no-drag flex items-center gap-2.5 pt-2 pb-4 ${collapsed ? "justify-center px-3" : "px-5"}`}>
-        <img src={mhpLogo} alt="MHP Construction" className="h-10 w-10 flex-shrink-0 rounded-lg object-contain" />
+        <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-[16px] font-extrabold tracking-tight leading-tight">ProEstimate AI</p>
+            <p className="text-[15px] font-bold tracking-tight leading-tight">ProEstimate AI</p>
             <p className="text-[11px] text-[var(--secondary)] leading-tight">MHP Construction</p>
           </div>
         )}
       </div>
-      <div className="mx-4 mb-2 border-b border-[var(--accent)]/20" />
 
-      {/* Main Nav */}
+      {/* Call Alex Hero Card */}
+      {collapsed ? (
+        <div className="no-drag px-3 mb-2">
+          <button
+            onClick={() => onCall?.()}
+            className={`flex w-full items-center justify-center rounded-xl p-3 transition-all ${
+              callActive
+                ? "bg-[var(--accent)] text-white"
+                : "bg-[var(--accent-light)] text-[var(--accent)] hover:bg-[var(--accent-medium)]"
+            }`}
+            title={callActive ? "Alex is listening..." : "Call Alex"}
+          >
+            {callActive ? (
+              <span className="relative flex h-5 w-5 items-center justify-center">
+                <span className="absolute h-3 w-3 rounded-full bg-red-400 animate-pulse" />
+              </span>
+            ) : (
+              <PhoneIcon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="no-drag mx-3 mb-3 mt-1">
+          <button
+            onClick={() => onCall?.()}
+            className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 transition-all ${
+              callActive
+                ? "border-[var(--accent)] bg-[var(--accent)] text-white shadow-md"
+                : "border-[var(--accent-medium)] bg-[var(--accent-light)] hover:border-[var(--accent)] hover:shadow-sm"
+            }`}
+          >
+            <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${
+              callActive ? "bg-white/20" : "bg-[var(--accent)]/10"
+            }`}>
+              {callActive ? (
+                <span className="relative flex h-5 w-5 items-center justify-center">
+                  <span className="absolute h-3 w-3 rounded-full bg-red-400 animate-pulse" />
+                </span>
+              ) : (
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={callActive ? "#fff" : "var(--accent)"} strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              )}
+            </div>
+            <div className="min-w-0 text-left">
+              <p className={`text-[14px] font-semibold leading-tight ${callActive ? "text-white" : "text-[var(--accent)]"}`}>
+                {callActive ? "Alex is listening..." : "Call Alex"}
+              </p>
+              <p className={`text-[12px] leading-tight mt-0.5 ${callActive ? "text-white/70" : "text-[var(--secondary)]"}`}>
+                {callActive ? "Click to open call" : "Voice estimation assistant"}
+              </p>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Nav */}
       <nav className="no-drag flex-1 overflow-y-auto px-3 pt-1">
-        <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
-          {collapsed ? "" : "Main"}
-        </p>
-        <NavGroup items={mainNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
-        <div className="mx-1 mt-3 mb-2 border-b border-[var(--sep)]" />
-        <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
-          {collapsed ? "" : "Tools"}
-        </p>
-        <NavGroup items={toolsNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
-        {isAdmin && (
-          <>
-            <div className="mx-1 mt-3 mb-2 border-b border-[var(--sep)]" />
-            <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
-              {collapsed ? "" : "Admin"}
-            </p>
-            <NavGroup items={adminNav} active={active} onNavigate={onNavigate} collapsed={collapsed} />
-          </>
-        )}
+        <NavGroup items={navItems} active={active} onNavigate={onNavigate} collapsed={collapsed} />
       </nav>
 
-      {/* Collapse toggle */}
-      <div className="no-drag px-3 pb-1">
+      {/* Separator + Collapse toggle */}
+      <div className="mx-3 h-px bg-[var(--sep)]" />
+      <div className="no-drag px-3 py-2">
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex w-full items-center justify-center rounded-lg p-2 text-[var(--gray2)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--gray1)]"
+          className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[12px] font-medium text-[var(--secondary)] transition-colors hover:bg-[var(--fill)] hover:text-[var(--label)] ${collapsed ? "justify-center" : ""}`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            {collapsed ? (
-              <><path d="M13 17l5-5-5-5" /><path d="M6 17l5-5-5-5" /></>
-            ) : (
-              <><path d="M11 17l-5-5 5-5" /><path d="M18 17l-5-5 5-5" /></>
-            )}
-          </svg>
+          {collapsed
+            ? <ChevronDoubleRightIcon className="h-3.5 w-3.5" />
+            : <>
+                <ChevronDoubleLeftIcon className="h-3.5 w-3.5" />
+                <span>Collapse</span>
+              </>
+          }
         </button>
       </div>
 
       {/* User */}
-      <div className="no-drag border-t border-[var(--sep)] p-3">
+      <div className="no-drag p-3">
         <button
           onClick={() => onNavigate("profile")}
           className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors ${
-            active === "profile" ? "bg-[var(--accent)]/[0.08]" : "hover:bg-[var(--bg)]"
+            active === "profile" ? "bg-[var(--accent-light)]" : "hover:bg-[var(--fill)]"
           }`}
         >
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-bold text-white">
@@ -103,25 +160,11 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
-              {user ? (
-                <>
-                  <p className="text-[13px] font-medium leading-tight truncate">{user.full_name}</p>
-                  <p className="text-[11px] text-[var(--secondary)] truncate">{user.role}</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[13px] font-medium leading-tight truncate text-[var(--secondary)]">Not signed in</p>
-                  <p className="text-[11px] font-medium text-[var(--accent)]">Sign in</p>
-                </>
-              )}
+              <p className="text-[14px] font-medium leading-tight truncate">{user?.full_name ?? "Not signed in"}</p>
+              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Connect Supabase"}</p>
             </div>
           )}
         </button>
-      </div>
-
-      {/* Version */}
-      <div className={`no-drag pb-2 text-center text-[9px] text-[var(--tertiary)] select-none ${collapsed ? "px-1" : "px-5"}`}>
-        v1.0.0
       </div>
     </div>
   );
@@ -133,132 +176,32 @@ function NavGroup({
   onNavigate,
   collapsed,
 }: {
-  items: { id: string; label: string; icon: React.FC<{ active: boolean }> }[];
+  items: { id: string; label: string; icon: HeroIcon; iconActive: HeroIcon }[];
   active: string;
   onNavigate: (id: string) => void;
   collapsed: boolean;
 }) {
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-1">
       {items.map((item) => {
         const isActive = active === item.id;
+        const Icon = isActive ? item.iconActive : item.icon;
         return (
           <button
             key={item.id}
             onClick={() => onNavigate(item.id)}
             title={collapsed ? item.label : undefined}
-            className={`group relative flex w-full items-center gap-2.5 rounded-r-lg py-[7px] text-[13px] transition-all duration-150 ${
+            className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-[14.5px] transition-all duration-[var(--duration-fast)] ${
               isActive
-                ? "border-l-[3px] border-l-[var(--accent)] bg-[var(--accent)]/[0.08] pl-[7px] pr-2.5 font-semibold text-[var(--label)]"
-                : "border-l-[3px] border-l-transparent pl-[7px] pr-2.5 font-medium text-[var(--label)] hover:bg-[var(--bg)] hover:translate-x-0.5"
+                ? "bg-[var(--accent-light)] text-[var(--accent)] font-semibold border-l-[3px] border-[var(--accent)]"
+                : "font-medium text-[var(--label)] hover:bg-[var(--fill)] hover:translate-x-0.5"
             } ${collapsed ? "justify-center" : ""}`}
           >
-            <item.icon active={isActive} />
+            <Icon className={`h-[19px] w-[19px] flex-shrink-0 ${isActive ? "text-[var(--accent)]" : "text-[var(--gray1)]"}`} />
             {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
           </button>
         );
       })}
     </div>
-  );
-}
-
-/* -- Icons: #636366 for better contrast -- */
-
-const ICON_COLOR = "#636366";
-
-function IconProjects({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-    </svg>
-  );
-}
-
-function IconGrid({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
-  );
-}
-
-function IconDoc({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-      <path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" />
-    </svg>
-  );
-}
-
-function IconBox({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-      <path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" />
-    </svg>
-  );
-}
-
-function IconReceipt({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-      <path d="M8 10h8" /><path d="M8 14h4" />
-    </svg>
-  );
-}
-
-function IconPeople({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconPhone({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  );
-}
-
-function IconChart({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
-    </svg>
-  );
-}
-
-function IconTeam({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconGear({ active }: { active: boolean }) {
-  const c = active ? "var(--accent)" : ICON_COLOR;
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
   );
 }

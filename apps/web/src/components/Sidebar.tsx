@@ -1,42 +1,106 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useCurrentUser } from "../lib/store";
 const mhpLogo = "/mhp-logo.png";
+import {
+  Squares2X2Icon,
+  DocumentTextIcon,
+  CubeIcon,
+  ReceiptPercentIcon,
+  UsersIcon,
+  PhoneIcon,
+  Cog6ToothIcon,
+  UserGroupIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  SparklesIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
+import {
+  Squares2X2Icon as Squares2X2IconSolid,
+  DocumentTextIcon as DocumentTextIconSolid,
+  CubeIcon as CubeIconSolid,
+  ReceiptPercentIcon as ReceiptPercentIconSolid,
+  UsersIcon as UsersIconSolid,
+  PhoneIcon as PhoneIconSolid,
+  Cog6ToothIcon as Cog6ToothIconSolid,
+  UserGroupIcon as UserGroupIconSolid,
+  SparklesIcon as SparklesIconSolid,
+  CalendarDaysIcon as CalendarDaysIconSolid,
+  ClockIcon as ClockIconSolid,
+  WrenchScrewdriverIcon as WrenchScrewdriverIconSolid,
+} from "@heroicons/react/24/solid";
+import type { ComponentType, SVGProps } from "react";
+
+type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
+
+const PAGE_ROUTES: Record<string, string> = {
+  dashboard: "/dashboard",
+  estimates: "/estimates",
+  materials: "/materials",
+  invoices: "/invoices",
+  clients: "/clients",
+  schedule: "/schedule",
+  "time-tracking": "/time-tracking",
+  subcontractors: "/subcontractors",
+  calls: "/calls",
+  analytics: "/analytics",
+  settings: "/settings",
+  profile: "/profile",
+  team: "/team",
+  upgrade: "/upgrade",
+};
 
 interface SidebarProps {
   active: string;
   onNavigate: (page: string) => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  callActive?: boolean;
+  onCall?: () => void;
 }
 
 const mainNav = [
-  { id: "dashboard", label: "Dashboard", icon: IconGrid },
-  { id: "estimates", label: "Estimates", icon: IconDoc },
-  { id: "materials", label: "Materials", icon: IconBox },
-  { id: "invoices", label: "Invoices", icon: IconReceipt },
-  { id: "clients", label: "Clients", icon: IconPeople },
-  { id: "calls", label: "Call History", icon: IconPhone },
+  { id: "dashboard", label: "Dashboard", icon: Squares2X2Icon, iconActive: Squares2X2IconSolid },
+  { id: "estimates", label: "Estimates", icon: DocumentTextIcon, iconActive: DocumentTextIconSolid },
+  { id: "calls", label: "Calls", icon: PhoneIcon, iconActive: PhoneIconSolid },
+  { id: "clients", label: "Clients", icon: UsersIcon, iconActive: UsersIconSolid },
+  { id: "schedule", label: "Schedule", icon: CalendarDaysIcon, iconActive: CalendarDaysIconSolid },
+  { id: "time-tracking", label: "Time Tracking", icon: ClockIcon, iconActive: ClockIconSolid },
+  { id: "invoices", label: "Invoices", icon: ReceiptPercentIcon, iconActive: ReceiptPercentIconSolid },
 ];
 
 const toolsNav = [
-  { id: "analytics", label: "Analytics", icon: IconChart },
-  { id: "settings", label: "Settings", icon: IconGear },
+  { id: "materials", label: "Materials", icon: CubeIcon, iconActive: CubeIconSolid },
+  { id: "subcontractors", label: "Subs", icon: WrenchScrewdriverIcon, iconActive: WrenchScrewdriverIconSolid },
+  { id: "team", label: "Team", icon: UserGroupIcon, iconActive: UserGroupIconSolid },
+  { id: "settings", label: "Settings", icon: Cog6ToothIcon, iconActive: Cog6ToothIconSolid },
 ];
 
-const adminNav = [
-  { id: "team", label: "Team", icon: IconTeam },
+const upgradeNav = [
+  { id: "upgrade", label: "Upgrade", icon: SparklesIcon, iconActive: SparklesIconSolid },
 ];
 
-export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
-  const isAdmin = user?.role === "admin" || user?.role === "owner";
+  const [ttsReady, setTtsReady] = useState(false);
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_TTS_HEALTH_URL;
+    if (!url) return;
+    const controller = new AbortController();
+    fetch(url, { signal: controller.signal })
+      .then((res) => setTtsReady(res.ok))
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
   const initials = user?.full_name
     ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--"
     : "--";
 
-  const handleNavigate = (page: string) => {
-    onNavigate(page);
+  const handleMobileClose = () => {
     onMobileClose?.();
   };
 
@@ -45,11 +109,11 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
       {/* Mobile overlay backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] md:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
           onClick={onMobileClose}
         />
       )}
-      <div className={`sidebar-root flex h-screen flex-shrink-0 flex-col border-r border-[var(--sep)] bg-[var(--card)] transition-all duration-200 ${collapsed ? "w-[68px]" : "w-[252px]"} fixed inset-y-0 left-0 z-50 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}>
+      <div className={`sidebar-root flex h-screen flex-shrink-0 flex-col bg-[var(--card)] transition-all duration-[var(--duration-normal)] ${collapsed ? "w-[68px]" : "w-[280px]"} fixed inset-y-0 left-0 z-50 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}>
       {/* Brand header */}
       <div className={`flex items-center gap-2.5 pt-5 pb-4 ${collapsed ? "justify-center px-3" : "px-5"}`}>
         <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
@@ -61,50 +125,102 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
         )}
       </div>
 
+      {/* Alex Voice Bot Card */}
+      {process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID && (
+        collapsed ? (
+          <div className="px-3 mb-2">
+            <button
+              onClick={() => onCall?.()}
+              className={`flex w-full items-center justify-center rounded-xl p-3 transition-all ${
+                callActive
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--accent-light)] text-[var(--accent)] hover:bg-[var(--accent-medium)]"
+              }`}
+              title={callActive ? "Alex is listening..." : "Alex"}
+            >
+              {callActive ? (
+                <span className="relative flex h-5 w-5 items-center justify-center">
+                  <span className="absolute h-3 w-3 rounded-full bg-red-400 animate-call-pulse" />
+                </span>
+              ) : (
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="mx-3 mb-3 mt-1">
+            <button
+              onClick={() => onCall?.()}
+              className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 transition-all ${
+                callActive
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-white shadow-md"
+                  : "border-[var(--accent-medium)] bg-[var(--accent-light)] hover:border-[var(--accent)] hover:shadow-sm"
+              }`}
+            >
+              <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${
+                callActive ? "bg-white/20" : "bg-[var(--accent)]/10"
+              }`}>
+                {callActive ? (
+                  <span className="relative flex h-5 w-5 items-center justify-center">
+                    <span className="absolute h-3 w-3 rounded-full bg-red-400 animate-call-pulse" />
+                  </span>
+                ) : (
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={callActive ? "#fff" : "var(--accent)"} strokeWidth="1.5" strokeLinecap="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                )}
+              </div>
+              <div className="min-w-0 text-left">
+                <p className={`text-[14px] font-semibold leading-tight ${callActive ? "text-white" : "text-[var(--accent)]"}`}>
+                  {callActive ? "Alex is listening..." : "Alex"}
+                </p>
+                <p className={`text-[12px] leading-tight mt-0.5 ${callActive ? "text-white/70" : "text-[var(--secondary)]"}`}>
+                  {callActive ? "Click to open call" : "Voice estimation assistant"}
+                </p>
+              </div>
+            </button>
+          </div>
+        )
+      )}
+
       {/* Main Nav */}
       <nav role="navigation" aria-label="Main navigation" className="flex-1 overflow-y-auto px-3 pt-1">
-        <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
+        <p className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--tertiary)]">
           {collapsed ? "" : "Main"}
         </p>
-        <NavGroup items={mainNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
-        <p className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
+        <NavGroup items={mainNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
+        <p className="mt-4 mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--tertiary)]">
           {collapsed ? "" : "Tools"}
         </p>
-        <NavGroup items={toolsNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
-        {isAdmin && (
-          <>
-            <p className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--gray2)]">
-              {collapsed ? "" : "Admin"}
-            </p>
-            <NavGroup items={adminNav} active={active} onNavigate={handleNavigate} collapsed={collapsed} />
-          </>
-        )}
+        <NavGroup items={toolsNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
+        <div className="mt-3" />
+        <NavGroup items={upgradeNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
       </nav>
 
       {/* Collapse toggle */}
       <div className="px-3 pb-1">
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex w-full items-center justify-center rounded-lg p-2 text-[var(--gray2)] transition-colors hover:bg-[var(--bg)] hover:text-[var(--gray1)]"
+          className="flex w-full items-center justify-center rounded-lg p-2 text-[var(--gray2)] transition-colors hover:bg-[var(--fill)] hover:text-[var(--gray1)]"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            {collapsed ? (
-              <><path d="M13 17l5-5-5-5" /><path d="M6 17l5-5-5-5" /></>
-            ) : (
-              <><path d="M11 17l-5-5 5-5" /><path d="M18 17l-5-5 5-5" /></>
-            )}
-          </svg>
+          {collapsed ? <ChevronDoubleRightIcon className="h-4 w-4" /> : <ChevronDoubleLeftIcon className="h-4 w-4" />}
         </button>
       </div>
 
+      {/* Separator above user section */}
+      <div className="mx-3 h-px bg-[var(--sep)]" />
+
       {/* User */}
-      <div className="border-t border-[var(--sep)] p-3">
-        <button
-          onClick={() => handleNavigate("profile")}
+      <div className="p-3">
+        <Link
+          href="/profile"
+          onClick={handleMobileClose}
           className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors ${
-            active === "profile" ? "bg-[var(--accent)]/8" : "hover:bg-[var(--bg)]"
+            active === "profile" ? "bg-[var(--accent-light)]" : "hover:bg-[var(--fill)]"
           }`}
         >
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[11px] font-bold text-white">
@@ -112,11 +228,11 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-[13px] font-medium leading-tight truncate">{user?.full_name ?? "My Account"}</p>
-              <p className="text-[11px] text-[var(--secondary)] truncate capitalize">{user?.role ?? "Team Member"}</p>
+              <p className="text-[14px] font-medium leading-tight truncate">{user?.full_name ?? "Not signed in"}</p>
+              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Connect Supabase"}</p>
             </div>
           )}
-        </button>
+        </Link>
       </div>
     </div>
     </>
@@ -126,125 +242,38 @@ export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }: Sideb
 function NavGroup({
   items,
   active,
-  onNavigate,
+  onMobileClose,
   collapsed,
 }: {
-  items: { id: string; label: string; icon: React.FC<{ active: boolean }> }[];
+  items: { id: string; label: string; icon: HeroIcon; iconActive: HeroIcon }[];
   active: string;
-  onNavigate: (id: string) => void;
+  onMobileClose: () => void;
   collapsed: boolean;
 }) {
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-1">
       {items.map((item) => {
         const isActive = active === item.id;
+        const Icon = isActive ? item.iconActive : item.icon;
+        const href = PAGE_ROUTES[item.id] || `/${item.id}`;
         return (
-          <button
+          <Link
             key={item.id}
-            onClick={() => onNavigate(item.id)}
+            href={href}
+            onClick={onMobileClose}
             title={collapsed ? item.label : undefined}
             aria-current={isActive ? "page" : undefined}
-            className={`group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all ${
+            className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] transition-all duration-[var(--duration-fast)] ${
               isActive
-                ? "bg-[var(--accent)] font-semibold text-white shadow-sm shadow-[var(--accent)]/20"
-                : "font-medium text-[var(--label)] hover:bg-[var(--bg)]"
+                ? "bg-[var(--accent-light)] text-[var(--accent)] font-semibold border-l-2 border-[var(--accent)]"
+                : "font-medium text-[var(--label)] hover:bg-[var(--fill)] hover:translate-x-0.5"
             } ${collapsed ? "justify-center" : ""}`}
           >
-            <item.icon active={isActive} />
+            <Icon className={`h-5 w-5 flex-shrink-0 ${isActive ? "text-[var(--accent)]" : "text-[var(--gray1)]"}`} />
             {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
-          </button>
+          </Link>
         );
       })}
     </div>
-  );
-}
-
-/* -- Icons: #636366 for better contrast -- */
-
-function IconGrid({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
-    </svg>
-  );
-}
-
-function IconDoc({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-      <path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" />
-    </svg>
-  );
-}
-
-function IconBox({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-      <path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" />
-    </svg>
-  );
-}
-
-function IconReceipt({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-      <path d="M8 10h8" /><path d="M8 14h4" />
-    </svg>
-  );
-}
-
-function IconPeople({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconPhone({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  );
-}
-
-function IconChart({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
-    </svg>
-  );
-}
-
-function IconTeam({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconGear({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#636366";
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
   );
 }

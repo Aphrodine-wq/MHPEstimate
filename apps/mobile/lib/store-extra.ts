@@ -88,3 +88,44 @@ export function useChangeOrders(estimateId: string | null) {
 
   return { data, loading, refresh };
 }
+
+// ── Job Photos ──
+
+export interface JobPhoto {
+  id: string;
+  estimate_id: string;
+  url: string;
+  category: "before" | "during" | "after" | "issue" | "material" | "inspection";
+  notes: string | null;
+  created_at: string;
+}
+
+export function useJobPhotos(estimateId: string | null) {
+  const [data, setData] = useState<JobPhoto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    if (!supabase || !estimateId) { setData([]); setLoading(false); return; }
+    setLoading(true);
+    const { data: rows } = await supabase
+      .from("job_photos")
+      .select("*")
+      .eq("estimate_id", estimateId)
+      .order("created_at", { ascending: false });
+    setData((rows as JobPhoto[]) ?? []);
+    setLoading(false);
+  }, [estimateId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  useEffect(() => {
+    if (!supabase || !estimateId) return;
+    const channel = supabase
+      .channel(`sync-photos-${estimateId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "job_photos", filter: `estimate_id=eq.${estimateId}` }, () => refresh())
+      .subscribe();
+    return () => { supabase!.removeChannel(channel); };
+  }, [estimateId, refresh]);
+
+  return { data, loading, refresh };
+}

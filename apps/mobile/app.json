@@ -28,7 +28,14 @@
     "platforms": ["ios", "android"],
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ProEstimate to access your photos for job documentation.",
+          "cameraPermission": "Allow ProEstimate to use the camera to take job site photos."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

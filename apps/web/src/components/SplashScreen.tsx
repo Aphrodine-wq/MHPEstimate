@@ -46,15 +46,15 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
       className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${
         phase === "done" ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
-      style={{ background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)" }}
+      style={{ background: "#f8fafc" }}
     >
-      {/* Subtle radial glow behind the logo */}
+      {/* Subtle accent glow behind the logo */}
       <div
         className="absolute rounded-full blur-[80px] opacity-30"
         style={{
           width: 320,
           height: 320,
-          background: "radial-gradient(circle, #29abe2 0%, transparent 70%)",
+          background: "#29abe2",
         }}
       />
 
@@ -84,7 +84,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
             className="h-full rounded-full transition-[width] duration-100 ease-out"
             style={{
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #29abe2, #007aff)",
+              background: "#29abe2",
             }}
           />
         </div>

@@ -1,4 +1,11 @@
 export type {
+  OrgMemberRole,
+  SubscriptionStatus,
+  BillingPlanId,
+  Organization,
+  BillingPlan,
+  Subscription,
+  OrgMember,
   TeamMember,
   TeamRole,
   Client,
@@ -27,6 +34,8 @@ export type {
   EstimateReminder,
   ReminderType,
   ReminderStatus,
+  JobPhase,
+  JobPhaseStatus,
 } from "./database";
 
 export type { ValidationCheck, ValidationResult, ValidationSeverity } from "./validation";

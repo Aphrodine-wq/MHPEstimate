@@ -659,7 +659,7 @@ export default function PortalPage(): JSX.Element {
           >
             <div
               style={{
-                background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_LIGHT} 100%)`,
+                background: NAVY,
                 padding: "28px 32px",
                 display: "flex",
                 justifyContent: "space-between",

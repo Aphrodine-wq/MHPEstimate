@@ -179,15 +179,15 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
   return (
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center"
-      style={{ background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)" }}
+      style={{ background: "#f8fafc" }}
     >
-      {/* Background glow */}
+      {/* Background accent */}
       <div
         className="absolute rounded-full blur-[100px] opacity-20"
         style={{
           width: 400,
           height: 400,
-          background: "radial-gradient(circle, #29abe2 0%, transparent 70%)",
+          background: "#29abe2",
         }}
       />
 

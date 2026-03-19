@@ -4,7 +4,9 @@ import { TABS, UNIT_OPTIONS, DRYWALL_UNIT, DRYWALL_HINT, fmt, type DraftLine, ty
 import { PriceFreshnessBadge } from "../PriceFreshnessBadge";
 import { MoasureImport } from "../MoasureImport";
 import { PlanImport } from "../PlanImport";
+import { BulkPriceAdjustment } from "./BulkPriceAdjustment";
 import type { PriceFreshness } from "@proestimate/shared/types";
+import type { LaborRatePreset } from "../../hooks/useLaborRates";
 
 /** Map suggestion confidence to a price freshness indicator */
 function confidenceToFreshness(confidence: "high" | "medium" | "low"): PriceFreshness {
@@ -21,7 +23,10 @@ export interface EstimateLineItemsSectionProps {
   addLine: () => void;
   removeLine: (key: string) => void;
   onAddLines?: (newLines: DraftLine[]) => void;
+  onBulkUpdate?: (updatedLines: DraftLine[]) => void;
   estimateCategory?: EstimateCategory;
+  /** Labor rate presets — when provided, shows a Trade dropdown on labor line items */
+  laborRates?: LaborRatePreset[];
 }
 
 /** Check if a description is drywall-related to auto-suggest board feet */
@@ -38,7 +43,9 @@ export function EstimateLineItemsSection({
   addLine,
   removeLine,
   onAddLines,
+  onBulkUpdate,
   estimateCategory = "building",
+  laborRates,
 }: EstimateLineItemsSectionProps) {
   // For infrastructure, show all items in a single list grouped by division
   // For building, use the existing Material/Labor/Subcontractor tabs
@@ -59,6 +66,20 @@ export function EstimateLineItemsSection({
 
   const handleDismissSuggestion = (key: string) => {
     setSuggestions((prev) => ({ ...prev, [key]: null }));
+  };
+
+  // Labor rate preset auto-fill: when a trade is selected, fill labor_cost and set unit to "hour"
+  const showTradeDropdown = activeTab === "labor" && laborRates && laborRates.length > 0;
+
+  const handleTradeSelect = (key: string, tradeName: string) => {
+    if (!laborRates) return;
+    const preset = laborRates.find((r) => r.trade === tradeName);
+    if (preset) {
+      updateLine(key, "description", `${preset.trade} (${preset.role})`);
+      updateLine(key, "labor_cost", Number(preset.hourly_rate));
+      updateLine(key, "retail_price", Number(preset.hourly_rate));
+      updateLine(key, "unit", "hour");
+    }
   };
 
   return (
@@ -105,6 +126,9 @@ export function EstimateLineItemsSection({
               <PlanImport onImport={onAddLines} projectType="general" />
               <MoasureImport onImport={onAddLines} projectType={activeTab === "material" ? "general" : undefined} />
             </>
+          )}
+          {onBulkUpdate && lines.filter((l) => l.description.trim() !== "").length > 0 && (
+            <BulkPriceAdjustment lines={lines} onBulkUpdate={onBulkUpdate} />
           )}
           <button
             type="button"
@@ -157,8 +181,24 @@ export function EstimateLineItemsSection({
                     className="grid items-center gap-2 rounded-lg border border-[var(--sep)] bg-[var(--bg)] px-2 py-1.5"
                     style={{ gridTemplateColumns: "1fr 64px 80px 96px 96px 96px 90px 36px" }}
                   >
-                    {/* Description */}
+                    {/* Description (with optional trade dropdown for labor tab) */}
                     <div className="flex flex-col">
+                      {showTradeDropdown && (
+                        <select
+                          className="w-full rounded-md border-none bg-transparent px-1.5 py-0.5 text-[11px] text-[var(--accent)] outline-none cursor-pointer"
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) handleTradeSelect(line._key, e.target.value);
+                          }}
+                        >
+                          <option value="">Select trade to auto-fill rate...</option>
+                          {laborRates!.map((r) => (
+                            <option key={r.id} value={r.trade}>
+                              {r.trade} ({r.role}) -- ${Number(r.hourly_rate).toFixed(2)}/hr
+                            </option>
+                          ))}
+                        </select>
+                      )}
                       <input
                         className="w-full rounded-md border-none bg-transparent px-2 py-1 text-[13px] outline-none placeholder:text-[var(--gray3)]"
                         placeholder="Item description..."

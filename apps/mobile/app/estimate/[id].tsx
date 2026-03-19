@@ -5,6 +5,8 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useLineItems, useClients } from "@/lib/store";
 import { supabase } from "@/lib/supabase";
 import { StatusBadge } from "@/components/StatusBadge";
+import { PhotoGallery } from "@/components/PhotoGallery";
+import { SwipeToDelete } from "@/components/SwipeToDelete";
 import { colors, spacing, fontSize } from "@/lib/theme";
 import type { Estimate, EstimateLineItem, Client } from "@proestimate/shared/types";
 
@@ -29,7 +31,7 @@ const TIERS = [
   { label: "High End", value: "high_end" },
 ];
 
-type Tab = "details" | "lines" | "summary";
+type Tab = "details" | "lines" | "photos" | "summary";
 
 export default function EstimateDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -227,7 +229,7 @@ export default function EstimateDetailScreen() {
 
         {/* Tabs */}
         <View style={styles.tabBar}>
-          {(["details", "lines", "summary"] as Tab[]).map((tab) => (
+          {(["details", "lines", "photos", "summary"] as Tab[]).map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, activeTab === tab && styles.activeTab]}
@@ -275,6 +277,13 @@ export default function EstimateDetailScreen() {
               onAdd={handleAddLineItem}
               onDelete={handleDeleteLine}
             />
+          )}
+
+          {activeTab === "photos" && id && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Job Photos</Text>
+              <PhotoGallery estimateId={id} />
+            </View>
           )}
 
           {activeTab === "summary" && (
@@ -493,23 +502,27 @@ function LinesTab({
               <Text style={styles.catTotal}>{fmt(catTotal)}</Text>
             </View>
             {items.map((line: EstimateLineItem, i: number) => (
-              <TouchableOpacity
-                key={line.id}
-                style={[styles.lineRow, i < items.length - 1 && styles.borderBottom]}
-                onLongPress={() => onDelete(line.id)}
-              >
-                <View style={styles.lineInfo}>
-                  <Text style={styles.lineDesc} numberOfLines={1}>{line.description}</Text>
-                  <Text style={styles.lineMeta}>
-                    {line.quantity} {line.unit} @ {fmt(Number(line.unit_price))}
-                  </Text>
+              <SwipeToDelete key={line.id} onDelete={() => onDelete(line.id)}>
+                <View
+                  style={[styles.lineRow, i < items.length - 1 && styles.borderBottom, { backgroundColor: colors.card }]}
+                >
+                  <View style={styles.lineInfo}>
+                    <Text style={styles.lineDesc} numberOfLines={1}>{line.description}</Text>
+                    <Text style={styles.lineMeta}>
+                      {line.quantity} {line.unit} @ {fmt(Number(line.unit_price))}
+                    </Text>
+                  </View>
+                  <Text style={styles.linePrice}>{fmt(Number(line.extended_price))}</Text>
                 </View>
-                <Text style={styles.linePrice}>{fmt(Number(line.extended_price))}</Text>
-              </TouchableOpacity>
+              </SwipeToDelete>
             ))}
           </View>
         );
       })}
+
+      {lineItems.length > 0 && (
+        <Text style={styles.swipeHint}>Swipe left on any item to delete</Text>
+      )}
 
       {lineItems.length === 0 && !showAddLine && (
         <View style={styles.emptyLines}>
@@ -699,6 +712,7 @@ const styles = StyleSheet.create({
   lineMeta: { fontSize: 11, color: colors.secondary, marginTop: 2 },
   linePrice: { fontSize: 14, fontWeight: "600", color: colors.text },
   borderBottom: { borderBottomWidth: 1, borderBottomColor: colors.sep },
+  swipeHint: { fontSize: 11, color: colors.gray3, textAlign: "center", marginTop: 8, marginBottom: 4 },
   emptyLines: { padding: 32, alignItems: "center" },
   emptyLinesText: { color: colors.secondary, fontSize: 13, textAlign: "center" },
   summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 6 },

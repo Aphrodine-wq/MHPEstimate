@@ -129,3 +129,51 @@ export const estimateApiLimiter = rateLimit({
   interval: 60_000,
   uniqueTokenPerInterval: 500,
 });
+
+/** Billing API limiter (checkout, portal, webhooks) — 10 per minute per user */
+export const billingApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Auto-estimate / photo-estimate / OCR — 10 per minute per user */
+export const autoEstimateLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Pricing data ingest — 30 per minute per IP */
+export const ingestApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Integration endpoints (QuickBooks, materials, etc.) — 10 per minute per user */
+export const integrationApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Time tracking (clock in/out) — 20 per minute per user */
+export const timeTrackingApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Purchase order API — 10 per minute per user */
+export const purchaseOrderApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Selection sheets — 20 per minute per user */
+export const selectionApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});
+
+/** Organization management — 10 per minute per user */
+export const orgApiLimiter = rateLimit({
+  interval: 60_000,
+  uniqueTokenPerInterval: 500,
+});

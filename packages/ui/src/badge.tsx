@@ -2,23 +2,47 @@ import * as React from "react";
 
 interface BadgeProps {
   variant?: "default" | "success" | "warning" | "error" | "info";
+  size?: "sm" | "md";
+  dot?: boolean;
   children: React.ReactNode;
   className?: string;
 }
 
 const variantClasses = {
-  default: "bg-gray-100 text-gray-800",
-  success: "bg-green-100 text-green-800",
-  warning: "bg-yellow-100 text-yellow-800",
-  error: "bg-red-100 text-red-800",
-  info: "bg-blue-100 text-blue-800",
+  default: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+  success: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  warning: "bg-amber-50 text-amber-700 ring-amber-200",
+  error: "bg-red-50 text-red-700 ring-red-200",
+  info: "bg-sky-50 text-sky-700 ring-sky-200",
 };
 
-export function Badge({ variant = "default", children, className = "" }: BadgeProps) {
+const dotColors = {
+  default: "bg-neutral-400",
+  success: "bg-emerald-500",
+  warning: "bg-amber-500",
+  error: "bg-red-500",
+  info: "bg-sky-500",
+};
+
+const sizeClasses = {
+  sm: "px-2 py-0.5 text-[10px]",
+  md: "px-2.5 py-0.5 text-xs",
+};
+
+export function Badge({
+  variant = "default",
+  size = "md",
+  dot = false,
+  children,
+  className = "",
+}: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full font-medium ring-1 ring-inset ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
+      {dot && (
+        <span className={`h-1.5 w-1.5 rounded-full ${dotColors[variant]}`} />
+      )}
       {children}
     </span>
   );

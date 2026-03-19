@@ -17,6 +17,7 @@ import { TIERS, type DraftLine, type TabKey, type TierKey, type EstimateCategory
 import { PhotoCapture, type CapturedPhoto } from "./PhotoCapture";
 import { DigitalSignature } from "./DigitalSignature";
 import { ChangeOrders } from "./ChangeOrders";
+import { useLaborRates } from "../hooks/useLaborRates";
 
 let keyCounter = 0;
 const nextKey = () => `draft-${++keyCounter}-${Date.now()}`;
@@ -36,13 +37,31 @@ const normalizeTier = (t: string): TierKey => {
   return map[t] ?? (TIERS.includes(t as TierKey) ? (t as TierKey) : "midrange");
 };
 
+type EditorTab = "details" | "lineitems" | "summary" | "validation" | "changeorders" | "photos" | "versions" | "milestones" | "preview" | "materials" | "schedule";
+
+const EDITOR_TABS: { id: EditorTab; label: string }[] = [
+  { id: "details", label: "Details" },
+  { id: "lineitems", label: "Line Items" },
+  { id: "summary", label: "Summary" },
+  { id: "validation", label: "Validation" },
+  { id: "changeorders", label: "Change Orders" },
+  { id: "photos", label: "Photos" },
+  { id: "versions", label: "Versions" },
+  { id: "milestones", label: "Milestones" },
+  { id: "preview", label: "Preview" },
+  { id: "materials", label: "Order Materials" },
+  { id: "schedule", label: "Schedule" },
+];
+
 export function EstimateEditorModal({ open, onClose, estimate }: { open: boolean; onClose: () => void; estimate: Estimate | null }) {
   const { data: clients } = useClients();
   const { data: existingLines } = useLineItems(estimate?.id ?? null);
   const { user } = useCurrentUser();
   const { data: companySettings } = useCompanySettings();
   const { changeOrders } = useChangeOrders(estimate?.id ?? "");
+  const { rates: laborRates } = useLaborRates();
 
+  const [editorTab, setEditorTab] = useState<EditorTab>("details");
   const [projectType, setProjectType] = useState("General");
   const [clientId, setClientId] = useState<string | null>(null);
   const [tier, setTier] = useState<TierKey>("midrange");
@@ -73,6 +92,11 @@ export function EstimateEditorModal({ open, onClose, estimate }: { open: boolean
 
   const isAdmin = user?.role === "admin" || user?.role === "owner";
   const status = estimate?.status ?? "draft";
+
+  // Reset tab when opening a new estimate
+  useEffect(() => {
+    if (open) setEditorTab("details");
+  }, [open, estimate?.id]);
 
   useEffect(() => {
     if (!open || !estimate) return;
@@ -385,68 +409,185 @@ export function EstimateEditorModal({ open, onClose, estimate }: { open: boolean
     <Modal open={open} onClose={onClose} title={`Edit ${estimate.estimate_number}`} description={`${categoryLabel} \u00B7 ${estimate.project_type}`} width="w-full max-w-[1040px]">
       <StatusBanner status={status} />
 
-      <div className="px-6 py-5 space-y-5">
-        <EstimateHeaderSection
-          projectType={projectType} setProjectType={setProjectType}
-          clientId={clientId} setClientId={setClientId}
-          tier={tier} setTier={setTier}
-          projectAddress={projectAddress} setProjectAddress={setProjectAddress}
-          validThrough={validThrough} setValidThrough={setValidThrough}
-          clients={clients}
-          estimateCategory={estimateCategory} setEstimateCategory={setEstimateCategory}
-          foundationType={foundationType} setFoundationType={setFoundationType}
-          foundationBlockHeight={foundationBlockHeight} setFoundationBlockHeight={setFoundationBlockHeight}
-          squareFootage={squareFootage} setSquareFootage={setSquareFootage}
-          costPerSqft={calcs.costPerSqft}
-        />
-
-        <EstimateLineItemsSection
-          lines={lines} activeTab={activeTab} setActiveTab={setActiveTab}
-          updateLine={updateLine} addLine={addLine} removeLine={removeLine}
-          onAddLines={(newLines) => setLines((prev) => [...prev, ...newLines])}
-          estimateCategory={estimateCategory}
-        />
-
-        <EstimateSummarySection
-          siteConditions={siteConditions} setSiteConditions={setSiteConditions}
-          inclusionsText={inclusionsText} setInclusionsText={setInclusionsText}
-          exclusionsText={exclusionsText} setExclusionsText={setExclusionsText}
-          permitsFees={permitsFees} setPermitsFees={setPermitsFees}
-          overheadPct={overheadPct} setOverheadPct={setOverheadPct}
-          contingencyPct={contingencyPct} setContingencyPct={setContingencyPct}
-          taxPct={taxPct} setTaxPct={setTaxPct}
-          calcs={calcs} marginColor={marginColor}
-          estimateCategory={estimateCategory}
-        />
-
-        {/* Change Orders -- shown for approved/sent/accepted estimates */}
-        {["approved", "sent", "accepted"].includes(status) && (
-          <ChangeOrders estimateId={estimate.id} estimateStatus={status} />
-        )}
-
-        {/* Site Photos */}
-        <div>
-          <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Site Photos</p>
-          <PhotoCapture onPhotosChange={setSitePhotos} maxPhotos={5} />
+      {/* Editor Tabs */}
+      <div className="border-b border-[var(--sep)] overflow-x-auto">
+        <div className="flex px-4 gap-0.5">
+          {EDITOR_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setEditorTab(tab.id)}
+              className={`flex-shrink-0 px-3 py-2.5 text-[12px] font-medium border-b-2 transition-colors ${
+                editorTab === tab.id
+                  ? "border-[var(--accent)] text-[var(--accent)]"
+                  : "border-transparent text-[var(--secondary)] hover:text-[var(--label)] hover:border-[var(--gray3)]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-
-        {/* Digital Signature -- show for sent/approved estimates awaiting client acceptance */}
-        {["sent", "approved"].includes(status) && (
-          <DigitalSignature
-            onSign={(dataUrl) => {
-              setSignatureDataUrl(dataUrl);
-              toast.success("Signature captured");
-            }}
-            signerName={clients.find((c) => c.id === (clientId ?? estimate?.client_id))?.full_name ?? "Client"}
-          />
-        )}
       </div>
 
-      <EstimateValidationPanel
-        validationResults={validationResults}
-        validationOpen={validationOpen}
-        setValidationOpen={setValidationOpen}
-      />
+      {/* Tab Content */}
+      <div className="px-6 py-5">
+        {editorTab === "details" && (
+          <div className="space-y-5">
+            <EstimateHeaderSection
+              projectType={projectType} setProjectType={setProjectType}
+              clientId={clientId} setClientId={setClientId}
+              tier={tier} setTier={setTier}
+              projectAddress={projectAddress} setProjectAddress={setProjectAddress}
+              validThrough={validThrough} setValidThrough={setValidThrough}
+              clients={clients}
+              estimateCategory={estimateCategory} setEstimateCategory={setEstimateCategory}
+              foundationType={foundationType} setFoundationType={setFoundationType}
+              foundationBlockHeight={foundationBlockHeight} setFoundationBlockHeight={setFoundationBlockHeight}
+              squareFootage={squareFootage} setSquareFootage={setSquareFootage}
+              costPerSqft={calcs.costPerSqft}
+            />
+          </div>
+        )}
+
+        {editorTab === "lineitems" && (
+          <EstimateLineItemsSection
+            lines={lines} activeTab={activeTab} setActiveTab={setActiveTab}
+            updateLine={updateLine} addLine={addLine} removeLine={removeLine}
+            onAddLines={(newLines) => setLines((prev) => [...prev, ...newLines])}
+            onBulkUpdate={(updatedLines) => {
+              const changed = updatedLines.filter((ul, i) => ul.retail_price !== lines[i]?.retail_price).length;
+              setLines(updatedLines);
+              if (changed > 0) toast.success(`Updated ${changed} line item${changed === 1 ? "" : "s"}`);
+            }}
+            estimateCategory={estimateCategory}
+            laborRates={laborRates}
+          />
+        )}
+
+        {editorTab === "summary" && (
+          <EstimateSummarySection
+            siteConditions={siteConditions} setSiteConditions={setSiteConditions}
+            inclusionsText={inclusionsText} setInclusionsText={setInclusionsText}
+            exclusionsText={exclusionsText} setExclusionsText={setExclusionsText}
+            permitsFees={permitsFees} setPermitsFees={setPermitsFees}
+            overheadPct={overheadPct} setOverheadPct={setOverheadPct}
+            contingencyPct={contingencyPct} setContingencyPct={setContingencyPct}
+            taxPct={taxPct} setTaxPct={setTaxPct}
+            calcs={calcs} marginColor={marginColor}
+            estimateCategory={estimateCategory}
+          />
+        )}
+
+        {editorTab === "validation" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[15px] font-semibold">Validation Results</h3>
+              <button
+                onClick={handleRunValidation}
+                disabled={validating}
+                className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50"
+              >
+                {validating ? "Running\u2026" : "Run Validation"}
+              </button>
+            </div>
+            <EstimateValidationPanel
+              validationResults={validationResults}
+              validationOpen={true}
+              setValidationOpen={setValidationOpen}
+            />
+          </div>
+        )}
+
+        {editorTab === "changeorders" && (
+          <div>
+            {["approved", "sent", "viewed", "negotiating", "accepted"].includes(status) ? (
+              <ChangeOrders estimateId={estimate.id} estimateStatus={status} />
+            ) : (
+              <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+                <p className="text-[13px] text-[var(--secondary)]">
+                  Change orders are available after an estimate is approved.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {editorTab === "photos" && (
+          <div className="space-y-6">
+            <div>
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[var(--secondary)]">Site Photos</p>
+              <PhotoCapture onPhotosChange={setSitePhotos} maxPhotos={5} />
+            </div>
+
+            {["sent", "viewed", "negotiating", "approved"].includes(status) && (
+              <DigitalSignature
+                onSign={(dataUrl) => {
+                  setSignatureDataUrl(dataUrl);
+                  toast.success("Signature captured");
+                }}
+                signerName={clients.find((c) => c.id === (clientId ?? estimate?.client_id))?.full_name ?? "Client"}
+              />
+            )}
+          </div>
+        )}
+
+        {editorTab === "versions" && (
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+            <p className="text-[15px] font-semibold mb-1">Version History</p>
+            <p className="text-[13px] text-[var(--secondary)]">
+              Compare previous versions of this estimate. Each save creates a version snapshot.
+            </p>
+            <p className="text-[11px] text-[var(--tertiary)] mt-3">Coming soon</p>
+          </div>
+        )}
+
+        {editorTab === "milestones" && (
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+            <p className="text-[15px] font-semibold mb-1">Milestone Payments</p>
+            <p className="text-[13px] text-[var(--secondary)]">
+              Break this estimate into payment milestones tied to project phases.
+            </p>
+            <p className="text-[11px] text-[var(--tertiary)] mt-3">Coming soon</p>
+          </div>
+        )}
+
+        {editorTab === "preview" && (
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+            <p className="text-[15px] font-semibold mb-1">Estimate Preview</p>
+            <p className="text-[13px] text-[var(--secondary)]">
+              Preview how this estimate will look to your client before sending.
+            </p>
+            <div className="mt-4">
+              <button
+                onClick={handleDownloadPDF}
+                disabled={generatingPdf}
+                className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[13px] font-medium text-white transition-all active:scale-[0.97] disabled:opacity-50"
+              >
+                {generatingPdf ? "Generating\u2026" : "Download PDF Preview"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {editorTab === "materials" && (
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+            <p className="text-[15px] font-semibold mb-1">Order Materials</p>
+            <p className="text-[13px] text-[var(--secondary)]">
+              Generate material orders from this estimate's line items.
+            </p>
+            <p className="text-[11px] text-[var(--tertiary)] mt-3">Coming soon</p>
+          </div>
+        )}
+
+        {editorTab === "schedule" && (
+          <div className="rounded-xl border border-[var(--sep)] bg-[var(--card)] p-8 text-center">
+            <p className="text-[15px] font-semibold mb-1">Project Schedule</p>
+            <p className="text-[13px] text-[var(--secondary)]">
+              Define construction phases, assign crews, and set timelines for this project.
+            </p>
+            <p className="text-[11px] text-[var(--tertiary)] mt-3">Coming soon</p>
+          </div>
+        )}
+      </div>
 
       <EditorFooter
         estimateId={estimate.id}

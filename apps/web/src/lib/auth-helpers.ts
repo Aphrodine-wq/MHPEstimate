@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest } from "next/server";
 import { getEnv } from "./env";
+import { createServiceClient } from "./supabase-server";
 
 /**
  * Extracts and validates the Supabase auth session from an incoming API request.
@@ -75,4 +76,73 @@ const ALLOWED_DOMAIN = "@northmshomepros.com";
 export function isAllowedDomain(email: string | undefined | null): boolean {
   if (!email) return false;
   return email.trim().toLowerCase().endsWith(ALLOWED_DOMAIN);
+}
+
+/**
+ * Mask an email address for safe logging. "james@example.com" -> "ja***@example.com"
+ */
+export function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!local || !domain) return "***@***";
+  const visible = local.slice(0, Math.min(2, local.length));
+  return `${visible}***@${domain}`;
+}
+
+/**
+ * Resolve the calling user's organization ID.
+ *
+ * Prefers the `pe-org-id` cookie (set at login) and validates the user is
+ * an active member of that org.  Falls back to looking up org_members.
+ */
+export async function getUserOrgId(
+  request: NextRequest,
+  userId: string,
+): Promise<string | null> {
+  const supabase = createServiceClient();
+
+  // Try cookie first
+  const cookieOrgId = request.cookies.get("pe-org-id")?.value;
+  if (cookieOrgId) {
+    const { data } = await supabase
+      .from("org_members")
+      .select("organization_id")
+      .eq("user_id", userId)
+      .eq("organization_id", cookieOrgId)
+      .eq("is_active", true)
+      .single();
+    if (data) return data.organization_id;
+  }
+
+  // Fallback: first active org membership
+  const { data } = await supabase
+    .from("org_members")
+    .select("organization_id")
+    .eq("user_id", userId)
+    .eq("is_active", true)
+    .limit(1)
+    .single();
+
+  return data?.organization_id ?? null;
+}
+
+/**
+ * Verify that an estimate belongs to the given organization.
+ *
+ * Returns the estimate row on success, or null if the estimate doesn't exist
+ * or belongs to a different org.
+ */
+export async function verifyEstimateOwnership(
+  estimateId: string,
+  orgId: string,
+  selectColumns = "id, organization_id",
+): Promise<Record<string, unknown> | null> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("estimates")
+    .select(selectColumns)
+    .eq("id", estimateId)
+    .eq("organization_id", orgId)
+    .single();
+
+  return data as Record<string, unknown> | null;
 }

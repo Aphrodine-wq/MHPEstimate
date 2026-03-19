@@ -5,6 +5,7 @@ const CFG: Record<PriceFreshness, { label: string; dot: string; text: string; bg
   yellow: { label: "Recent",  dot: "bg-yellow-400",      text: "text-yellow-600",       bg: "bg-yellow-400/10" },
   orange: { label: "Aging",   dot: "bg-[var(--orange)]", text: "text-[var(--orange)]", bg: "bg-[var(--orange)]/10" },
   red:    { label: "Stale",   dot: "bg-[var(--red)]",    text: "text-[var(--red)]",    bg: "bg-[var(--red)]/10" },
+  gray:   { label: "N/A",     dot: "bg-gray-400",        text: "text-gray-500",         bg: "bg-gray-400/10" },
 };
 
 function timeAgo(dateStr: string): string {

@@ -42,7 +42,7 @@ describe("ErrorBoundary", () => {
       return <div>No error</div>;
     }
 
-    render(
+    const { rerender } = render(
       <ErrorBoundary>
         <Thrower />
       </ErrorBoundary>

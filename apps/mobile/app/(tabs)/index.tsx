@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState, useCallback } from "react";
-import { useEstimates, useActivityFeed, createEstimate } from "@/lib/store";
+import { useEstimates, useActivityFeed } from "@/lib/store";
 import { StatusBadge } from "@/components/StatusBadge";
 import { colors, spacing, fontSize } from "@/lib/theme";
 import type { Estimate } from "@proestimate/shared/types";
@@ -44,8 +44,8 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [refresh]);
 
-  const handleNewEstimate = async () => {
-    await createEstimate();
+  const handleNewEstimate = () => {
+    router.push("/estimates/new");
   };
 
   const sent = estimates.filter((e) => e.status === "sent" || e.status === "approved");
@@ -72,11 +72,22 @@ export default function DashboardScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.dateText}>{today}</Text>
-          <TouchableOpacity style={styles.newButton} onPress={handleNewEstimate} activeOpacity={0.8}>
-            <Text style={styles.newButtonText}>New Estimate</Text>
-          </TouchableOpacity>
+          <View>
+            <Text style={styles.dateText}>{today}</Text>
+            <Text style={styles.greeting}>MHP Estimate</Text>
+          </View>
         </View>
+
+        {/* Big New Estimate Button */}
+        <TouchableOpacity style={styles.bigNewButton} onPress={handleNewEstimate} activeOpacity={0.8}>
+          <View style={styles.bigNewLeft}>
+            <Text style={styles.bigNewIcon}>+</Text>
+          </View>
+          <View style={styles.bigNewContent}>
+            <Text style={styles.bigNewTitle}>New Estimate</Text>
+            <Text style={styles.bigNewSub}>Start a new project estimate</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* KPIs */}
         <View style={styles.kpiRow}>
@@ -192,13 +203,29 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dateText: { fontSize: 12, color: colors.secondary },
-  newButton: {
+  greeting: { fontSize: 20, fontWeight: "700", color: colors.text, marginTop: 2 },
+  bigNewButton: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.accent,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 14,
+    gap: 14,
+    minHeight: 68,
   },
-  newButtonText: { color: "#fff", fontSize: 12, fontWeight: "600" },
+  bigNewLeft: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bigNewIcon: { color: "#fff", fontSize: 24, fontWeight: "600" },
+  bigNewContent: { flex: 1 },
+  bigNewTitle: { color: "#fff", fontSize: 17, fontWeight: "700" },
+  bigNewSub: { color: "rgba(255,255,255,0.75)", fontSize: 12, marginTop: 2 },
   kpiRow: {
     flexDirection: "row",
     gap: 10,

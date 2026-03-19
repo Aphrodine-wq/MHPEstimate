@@ -1,10 +1,10 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
 function getSecret(): string {
-  const secret = process.env.PORTAL_SECRET;
+  const secret = process.env.PORTAL_TOKEN_SECRET;
   if (!secret) {
     throw new Error(
-      "PORTAL_SECRET environment variable is required. " +
+      "PORTAL_TOKEN_SECRET environment variable is required. " +
         "Generate one with: openssl rand -hex 32",
     );
   }

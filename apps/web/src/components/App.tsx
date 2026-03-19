@@ -8,8 +8,9 @@ import type { Estimate } from "@proestimate/shared/types";
 
 function PageSkeleton() {
   return (
-    <div className="flex h-full items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--sep)] border-t-[var(--accent)]" />
+    <div className="p-6 space-y-4">
+      <div className="h-24 rounded-xl bg-[var(--fill)] animate-pulse" />
+      <div className="h-24 rounded-xl bg-[var(--fill)] animate-pulse" />
     </div>
   );
 }
@@ -24,12 +25,16 @@ const AnalyticsPage = dynamic(() => import("./AnalyticsPage").then(m => ({ defau
 const SettingsPage = dynamic(() => import("./SettingsPage").then(m => ({ default: m.SettingsPage })), { ssr: false, loading: () => <PageSkeleton /> });
 const Profile = dynamic(() => import("./Profile").then(m => ({ default: m.Profile })), { ssr: false, loading: () => <PageSkeleton /> });
 const TeamMembersPage = dynamic(() => import("./TeamMembersPage").then(m => ({ default: m.TeamMembersPage })), { ssr: false, loading: () => <PageSkeleton /> });
+const ScheduleView = dynamic(() => import("./ScheduleView").then(m => ({ default: m.ScheduleView })), { ssr: false, loading: () => <PageSkeleton /> });
 const CallAlexFAB = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexFAB })), { ssr: false });
 const CallAlexPanel = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexPanel })), { ssr: false });
 import { SplashScreen } from "./SplashScreen";
 import { AuthScreen } from "./AuthScreen";
 import { OnboardingWizard } from "./OnboardingWizard";
 import { NewEstimateModal } from "./NewEstimateModal";
+import { AutoEstimateModal } from "./AutoEstimateModal";
+import { CloneEstimateModal } from "./CloneEstimateModal";
+import { QuickEstimate } from "./QuickEstimate";
 import { AddClientModal } from "./AddClientModal";
 import { LogExpenseModal } from "./LogExpenseModal";
 import { UploadInvoiceModal } from "./UploadInvoiceModal";
@@ -40,9 +45,10 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { useCurrentUser, useEstimates } from "../lib/store";
 import { supabase, getSession, signOut } from "../lib/supabase";
 import { setUserContext, clearUserContext } from "../lib/sentry";
+import { useDarkMode } from "../lib/useDarkMode";
 import { Toaster } from "react-hot-toast";
 
-type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate";
+type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate" | "auto-estimate" | "clone-estimate" | "quick-estimate";
 type AppPhase = "splash" | "auth" | "reset-password" | "ready";
 
 // Pages no longer receive props — they use useAppContext() instead
@@ -57,6 +63,7 @@ const PAGE_TITLES: Record<string, string> = {
   settings: "Settings",
   profile: "Profile",
   team: "Team Members",
+  schedule: "Schedule",
 };
 
 const pages: Record<string, React.ComponentType> = {
@@ -70,6 +77,7 @@ const pages: Record<string, React.ComponentType> = {
   settings: SettingsPage,
   profile: Profile,
   team: TeamMembersPage,
+  schedule: ScheduleView,
 };
 
 export function App() {
@@ -79,9 +87,11 @@ export function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modal, setModal] = useState<ModalType>(null);
   const [editingEstimate, setEditingEstimate] = useState<Estimate | null>(null);
+  const [sourceEstimate, setSourceEstimate] = useState<Estimate | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { user } = useCurrentUser();
   const { data: estimates, loading: estimatesLoading } = useEstimates();
+  useDarkMode();
 
   const openCall = useCallback(() => setCallOpen(true), []);
   const handleModal = useCallback((m: string) => setModal(m as ModalType), []);
@@ -172,11 +182,12 @@ export function App() {
           onComplete={handleOnboardingComplete}
           onNavigate={setActive}
           onNewEstimate={() => handleModal("new-estimate")}
+          onCallAlex={openCall}
         />
       )}
       <div className={`flex h-screen overflow-hidden bg-[var(--bg)] ${phase !== "ready" ? "invisible" : ""}`}
           aria-hidden={phase !== "ready"}>
-        <Sidebar active={active} onNavigate={(page) => { setActive(page); setMobileMenuOpen(false); }} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+        <Sidebar active={active} onNavigate={(page) => { setActive(page); setMobileMenuOpen(false); }} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} callActive={callOpen} onCall={openCall} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <TopBar
             title={PAGE_TITLES[active] ?? "Dashboard"}
@@ -186,8 +197,8 @@ export function App() {
             onSignOut={handleSignOut}
             onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)}
           />
-          <main id="main-content" className="flex-1 overflow-hidden" tabIndex={-1}>
-            <ErrorBoundary key={active}>
+          <main id="main-content" key={active} className="flex-1 overflow-hidden animate-page-enter" tabIndex={-1}>
+            <ErrorBoundary>
               <Page />
             </ErrorBoundary>
           </main>
@@ -195,7 +206,10 @@ export function App() {
         {!callOpen && <CallAlexFAB onCall={openCall} />}
         {callOpen && <CallAlexPanel onClose={() => setCallOpen(false)} onEstimateCreated={handleEstimateCreated} />}
       </div>
+      <QuickEstimate open={modal === "quick-estimate"} onClose={() => setModal(null)} />
       <NewEstimateModal open={modal === "new-estimate"} onClose={() => setModal(null)} onCreated={(est) => { openEstimateEditor(est); }} />
+      <AutoEstimateModal open={modal === "auto-estimate"} onClose={() => setModal(null)} onCreated={(est) => { openEstimateEditor(est); }} />
+      <CloneEstimateModal open={modal === "clone-estimate"} onClose={() => { setModal(null); setSourceEstimate(null); }} sourceEstimate={sourceEstimate} onCreated={(est) => { openEstimateEditor(est); }} />
       <AddClientModal open={modal === "add-client"} onClose={() => setModal(null)} />
       <LogExpenseModal open={modal === "log-expense"} onClose={() => setModal(null)} />
       <UploadInvoiceModal open={modal === "upload-invoice"} onClose={() => setModal(null)} />
@@ -206,9 +220,12 @@ export function App() {
         toastOptions={{
           style: {
             background: "var(--card)",
-            color: "var(--text)",
-            borderRadius: "0.5rem",
-            fontSize: "0.875rem",
+            color: "var(--label)",
+            borderRadius: "16px",
+            fontSize: "13px",
+            boxShadow: "var(--shadow-lg)",
+            border: "1px solid var(--sep)",
+            padding: "12px 16px",
           },
           success: { duration: 3000 },
           error: { duration: 5000 },
