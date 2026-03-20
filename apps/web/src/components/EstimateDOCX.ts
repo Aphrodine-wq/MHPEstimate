@@ -33,7 +33,7 @@ const BLACK = "1a1a1a";
 /* -- Default company fallback -- */
 
 const DEFAULT_COMPANY: CompanyInfo = {
-  name: "ProEstimate",
+  name: "MHP Estimate",
   address: "",
   city_state_zip: "",
   email: "info@proestimate.cloud",

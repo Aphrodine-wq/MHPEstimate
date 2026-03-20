@@ -105,10 +105,9 @@ export function App() {
     openEstimateEditor(estimate);
   }, [openEstimateEditor]);
 
-  // After splash completes, check auth
+  // After splash completes, go straight to app (auth disabled for now)
   const handleSplashReady = useCallback(async () => {
-    const session = await getSession();
-    setPhase(session ? "ready" : "auth");
+    setPhase("ready");
   }, []);
 
   const handleDevBypass = useCallback(() => {
@@ -138,18 +137,7 @@ export function App() {
     setShowOnboarding(false);
   }, []);
 
-  // Listen for auth state changes (e.g., token expiry, password recovery)
-  useEffect(() => {
-    if (!supabase) return;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        setPhase("auth");
-      } else if (event === "PASSWORD_RECOVERY") {
-        setPhase("reset-password");
-      }
-    });
-    return () => { subscription.unsubscribe(); };
-  }, []);
+  // Auth disabled for now — no auth state listener needed
 
   // Sync authenticated user identity to Sentry so errors include who was affected
   useEffect(() => {
@@ -174,8 +162,6 @@ export function App() {
     <ErrorBoundary>
       <AppProvider value={appCtx}>
       {phase === "splash" && <SplashScreen onReady={handleSplashReady} />}
-      {phase === "auth" && <AuthScreen onAuthenticated={handleAuthenticated} onDevBypass={handleDevBypass} />}
-      {phase === "reset-password" && <AuthScreen onAuthenticated={handleAuthenticated} initialView="reset-password" />}
       {showOnboarding && phase === "ready" && (
         <OnboardingWizard
           userName={user?.full_name?.split(" ")[0] ?? null}

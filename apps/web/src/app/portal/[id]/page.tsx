@@ -1915,7 +1915,7 @@ export default function PortalPage(): JSX.Element {
             </p>
             <p style={{ margin: 0, fontSize: 11, color: "#d1d5db" }}>
               Powered by{" "}
-              <span style={{ color: NAVY, fontWeight: 600 }}>ProEstimate AI</span>
+              <span style={{ color: NAVY, fontWeight: 600 }}>MHP Estimate</span>
               {" · "}
               {companyName}
               {companyEmail ? ` · ${companyEmail}` : ""}

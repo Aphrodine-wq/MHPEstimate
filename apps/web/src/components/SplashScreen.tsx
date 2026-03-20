@@ -54,7 +54,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
         style={{
           width: 320,
           height: 320,
-          background: "#29abe2",
+          background: "#C41E3A",
         }}
       />
 
@@ -70,7 +70,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
       {/* App name */}
       <div className="mt-6 animate-splash-text">
         <h1 className="text-center text-[22px] font-bold tracking-tight text-[#1a1a1a]">
-          ProEstimate AI
+          MHP Estimate
         </h1>
         <p className="mt-1 text-center text-[12px] font-medium tracking-wide text-[#8e8e93]">
           Intelligent Construction Estimating
@@ -84,7 +84,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
             className="h-full rounded-full transition-[width] duration-100 ease-out"
             style={{
               width: `${progress}%`,
-              background: "#29abe2",
+              background: "#C41E3A",
             }}
           />
         </div>

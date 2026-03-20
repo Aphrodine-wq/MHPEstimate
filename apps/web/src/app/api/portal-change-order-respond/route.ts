@@ -312,7 +312,7 @@ async function sendChangeOrderNotification(
               ` : ""}
             </table>
             <p style="margin: 20px 0 0; font-size: 12px; color: #9ca3af;">
-              This notification was sent automatically by ProEstimate AI.
+              This notification was sent automatically by MHP Estimate.
             </p>
           </div>
         </div>

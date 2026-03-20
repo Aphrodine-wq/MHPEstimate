@@ -110,7 +110,7 @@ export function IntegrationSettings() {
         <div>
           <p className="text-[14px] font-semibold text-[var(--label)]">Integrations</p>
           <p className="text-[11px] text-[var(--secondary)]">
-            Connect third-party services to extend ProEstimate
+            Connect third-party services to extend MHP Estimate
           </p>
         </div>
       </div>

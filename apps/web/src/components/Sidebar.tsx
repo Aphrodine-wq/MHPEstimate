@@ -119,7 +119,7 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
         <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-[15px] font-bold tracking-tight leading-tight">ProEstimate AI</p>
+            <p className="text-[15px] font-bold tracking-tight leading-tight">MHP Estimate</p>
             <p className="text-[11px] text-[var(--secondary)] leading-tight">MHP Construction</p>
           </div>
         )}
@@ -228,8 +228,8 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0 text-left">
-              <p className="text-[14px] font-medium leading-tight truncate">{user?.full_name ?? "Not signed in"}</p>
-              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Connect Supabase"}</p>
+              <p className="text-[14px] font-medium leading-tight truncate">{user?.full_name ?? "MHP Construction"}</p>
+              <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Estimator"}</p>
             </div>
           )}
         </Link>

@@ -91,7 +91,7 @@ export async function GET(
 
   // --- Generate .ics ---
   const icsContent = generateICalendar(icalPhases, {
-    calendarName: `ProEstimate - ${estimate.estimate_number}`,
+    calendarName: `MHP Estimate - ${estimate.estimate_number}`,
     companyName: "North MS Home Pros",
   });
 

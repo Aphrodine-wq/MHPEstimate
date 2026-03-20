@@ -59,21 +59,7 @@ export function middleware(request: NextRequest) {
     return addSecurityHeaders(response, pathname);
   }
 
-  // Check for Supabase auth token in cookies.
-  // Supabase v2 stores auth as `sb-<project-ref>-auth-token`.
-  // We match any cookie starting with "sb-" and ending with "-auth-token".
-  const allCookies = request.cookies.getAll();
-  const supabaseAuthCookie = allCookies.find(
-    (c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token")
-  );
-
-  if (!supabaseAuthCookie?.value) {
-    // No auth token — redirect to auth page
-    const authUrl = new URL("/", request.url);
-    const response = NextResponse.redirect(authUrl);
-    return addSecurityHeaders(response, pathname);
-  }
-
+  // Auth disabled for now — allow all routes through
   const response = NextResponse.next();
   return addSecurityHeaders(response, pathname);
 }

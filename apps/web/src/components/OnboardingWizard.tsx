@@ -219,7 +219,7 @@ function StepWelcome({ name }: { name: string }) {
       </div>
 
       <h2 className="text-2xl font-bold" style={{ color: "var(--label)" }}>
-        Welcome to ProEstimate AI
+        Welcome to MHP Estimate
       </h2>
       <p className="mt-2 text-lg font-medium" style={{ color: "var(--accent)" }}>
         Hi, {name}!

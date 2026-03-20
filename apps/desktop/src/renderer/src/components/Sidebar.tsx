@@ -24,7 +24,7 @@ import {
 } from "@heroicons/react/24/solid";
 import type { ComponentType, SVGProps } from "react";
 
-const mhpLogo = "/mhp-logo.png";
+import mhpLogo from "../assets/mhp-logo.png";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
