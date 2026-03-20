@@ -10,7 +10,7 @@ import { captureError } from "@/lib/sentry";
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
 }
-const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@northmshomepros.com";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@mhpestimate.cloud";
 
 export async function POST(
   req: NextRequest,
@@ -24,10 +24,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // --- Domain validation ---
-  if (!user.email?.endsWith("@northmshomepros.com")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  // --- Domain validation (disabled — allow any authenticated user) ---
 
   // --- Rate limiting: 5 sends/minute per user (email is expensive) ---
   try {

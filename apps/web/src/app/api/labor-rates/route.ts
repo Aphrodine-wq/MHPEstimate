@@ -23,7 +23,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
-import { getAuthUser } from "@/lib/auth-helpers";
+import { getAuthUser, getUserOrgId } from "@/lib/auth-helpers";
 import { captureError } from "@/lib/sentry";
 
 interface LaborRateBody {
@@ -42,13 +42,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const orgId = await getUserOrgId(req, user.id);
   const supabase = createServiceClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("labor_rate_presets")
     .select("*")
     .order("trade", { ascending: true })
     .order("role", { ascending: true });
+
+  if (orgId) {
+    query = query.eq("organization_id", orgId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     captureError(new Error(error.message), { route: "labor-rates-get" });
@@ -64,6 +71,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const orgId = await getUserOrgId(req, user.id);
 
   let body: LaborRateBody;
   try {
@@ -86,6 +95,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const { data, error } = await supabase
     .from("labor_rate_presets")
     .insert({
+      organization_id: orgId ?? null,
       trade: trade.trim(),
       role: (role ?? "journeyman").trim(),
       hourly_rate,
@@ -152,6 +162,8 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const orgId = await getUserOrgId(req, user.id);
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
@@ -161,10 +173,16 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
   const supabase = createServiceClient();
 
-  const { error } = await supabase
+  let query = supabase
     .from("labor_rate_presets")
     .delete()
     .eq("id", id);
+
+  if (orgId) {
+    query = query.eq("organization_id", orgId);
+  }
+
+  const { error } = await query;
 
   if (error) {
     captureError(new Error(error.message), { route: "labor-rates-delete" });

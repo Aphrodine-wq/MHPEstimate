@@ -201,7 +201,6 @@ export async function POST(req: NextRequest) {
           estimate_id,
           phase_id: phase_id ?? null,
           worker_name,
-          worker_id: user.id,
           clock_in: new Date().toISOString(),
           trade: trade ?? null,
           hourly_rate: hourly_rate ?? null,
@@ -275,8 +274,7 @@ export async function POST(req: NextRequest) {
           estimate_id: existing.estimate_id,
           worker_name: existing.worker_name,
           break_minutes,
-          hours_worked: updated.hours_worked,
-          labor_cost: updated.labor_cost,
+          total_hours: updated.total_hours,
         },
         ip,
       );

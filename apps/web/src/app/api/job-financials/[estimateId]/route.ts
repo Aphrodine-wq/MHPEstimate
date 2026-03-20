@@ -59,7 +59,7 @@ export async function GET(
     // --- Fetch time entries aggregation ---
     const { data: timeEntries, error: teError } = await supabase
       .from("time_entries")
-      .select("hours_worked, labor_cost, trade")
+      .select("total_hours, hourly_rate, trade")
       .eq("estimate_id", estimateId)
       .eq("organization_id", orgId)
       .not("clock_out", "is", null);
@@ -69,8 +69,8 @@ export async function GET(
     }
 
     const entries = timeEntries ?? [];
-    const totalHours = entries.reduce((sum, e) => sum + (Number(e.hours_worked) || 0), 0);
-    const totalLaborCost = entries.reduce((sum, e) => sum + (Number(e.labor_cost) || 0), 0);
+    const totalHours = entries.reduce((sum, e) => sum + (Number(e.total_hours) || 0), 0);
+    const totalLaborCost = entries.reduce((sum, e) => sum + ((Number(e.total_hours) || 0) * (Number(e.hourly_rate) || 0)), 0);
     const entriesCount = entries.length;
 
     // Group hours by trade
@@ -80,8 +80,8 @@ export async function GET(
       if (!tradeMap[trade]) {
         tradeMap[trade] = { hours: 0, cost: 0, count: 0 };
       }
-      tradeMap[trade].hours += Number(e.hours_worked) || 0;
-      tradeMap[trade].cost += Number(e.labor_cost) || 0;
+      tradeMap[trade].hours += Number(e.total_hours) || 0;
+      tradeMap[trade].cost += (Number(e.total_hours) || 0) * (Number(e.hourly_rate) || 0);
       tradeMap[trade].count += 1;
     }
 

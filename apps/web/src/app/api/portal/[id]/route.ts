@@ -157,10 +157,10 @@ export async function GET(
     email: string;
     phone: string | null;
   } = {
-    name: "North MS Home Pros",
+    name: "MHP Construction",
     address: null,
     city_state_zip: null,
-    email: "info@northmshomepros.com",
+    email: "info@mhpestimate.cloud",
     phone: null,
   };
 

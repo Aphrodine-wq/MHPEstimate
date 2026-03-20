@@ -228,11 +228,10 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     updates.status = validated.data.status;
 
     if (validated.data.status === "claimed" && existing.status === "active") {
-      updates.claimed_at = new Date().toISOString();
+      updates.claim_description = validated.data.claim_description ?? updates.claim_description;
     }
     if (validated.data.status === "resolved") {
-      updates.resolved_at = new Date().toISOString();
-      updates.resolved_by = user.id;
+      updates.resolution = validated.data.resolution ?? updates.resolution;
     }
   }
 

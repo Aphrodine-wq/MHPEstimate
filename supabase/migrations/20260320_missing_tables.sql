@@ -466,3 +466,9 @@ INSERT INTO billing_plans (id, name, price_monthly_cents, max_team_members, max_
     ('master',      'Master',      14900, 25, null, '{"basic_estimates": true, "voice_ai": true, "portal": true, "scheduling": true, "integrations": true}'),
     ('gc',          'General Contractor', 24900, null, null, '{"basic_estimates": true, "voice_ai": true, "portal": true, "scheduling": true, "integrations": true, "multi_project": true}')
 ON CONFLICT (id) DO NOTHING;
+
+-- ═══════════════════════════════════════
+-- FIX: audit_log user_id must be nullable for auth failure logging
+-- ═══════════════════════════════════════
+
+ALTER TABLE audit_log ALTER COLUMN user_id DROP NOT NULL;

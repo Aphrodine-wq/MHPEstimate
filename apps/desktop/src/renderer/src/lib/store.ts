@@ -303,7 +303,7 @@ export function useActivityFeed() {
 
 // ── Notifications (generated from real data) ──
 
-const NOTIF_READ_KEY = "proestimate_read_notifications";
+const NOTIF_READ_KEY = "mhpestimate_read_notifications";
 
 function getReadIds(): Set<string> {
   try {
@@ -546,7 +546,7 @@ export interface TimeEntry {
   created_at: string;
 }
 
-const TIME_ENTRIES_KEY = "proestimate_time_entries";
+const TIME_ENTRIES_KEY = "mhpestimate_time_entries";
 
 function loadTimeEntries(): TimeEntry[] {
   try {

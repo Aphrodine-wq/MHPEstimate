@@ -1,5 +1,5 @@
-appId: com.mshomepros.proestimate
-productName: ProEstimate AI
+appId: com.mshomepros.mhpestimate
+productName: MHP Estimate
 directories:
   buildResources: build
   output: release
@@ -41,9 +41,10 @@ mac:
   # Code signing — uses identity from keychain automatically
   # Set CSC_LINK + CSC_KEY_PASSWORD for CI builds
   protocols:
-    - name: ProEstimate AI
+    - name: MHP Estimate
       schemes:
         - proestimate
+        - mhpestimate
 dmg:
   sign: false
 
