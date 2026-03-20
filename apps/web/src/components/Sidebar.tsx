@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useCurrentUser } from "../lib/store";
 const mhpLogo = "/mhp-logo.png";
 import {
@@ -36,23 +35,6 @@ import type { ComponentType, SVGProps } from "react";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
-const PAGE_ROUTES: Record<string, string> = {
-  dashboard: "/dashboard",
-  estimates: "/estimates",
-  materials: "/materials",
-  invoices: "/invoices",
-  clients: "/clients",
-  schedule: "/schedule",
-  "time-tracking": "/time-tracking",
-  subcontractors: "/subcontractors",
-  calls: "/calls",
-  analytics: "/analytics",
-  settings: "/settings",
-  profile: "/profile",
-  team: "/team",
-  upgrade: "/upgrade",
-};
-
 interface SidebarProps {
   active: string;
   onNavigate: (page: string) => void;
@@ -83,7 +65,7 @@ const upgradeNav = [
   { id: "upgrade", label: "Upgrade", icon: SparklesIcon, iconActive: SparklesIconSolid },
 ];
 
-export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall }: SidebarProps) {
+export function Sidebar({ active, onNavigate, mobileOpen, onMobileClose, callActive, onCall }: SidebarProps) {
   const { user } = useCurrentUser();
   const [collapsed, setCollapsed] = useState(false);
   const [ttsReady, setTtsReady] = useState(false);
@@ -100,7 +82,8 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
     ? user.full_name.split(" ").filter(Boolean).map((n: string) => n[0]).join("").slice(0, 2) || "--"
     : "--";
 
-  const handleMobileClose = () => {
+  const handleNav = (page: string) => {
+    onNavigate(page);
     onMobileClose?.();
   };
 
@@ -190,13 +173,13 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
         <p className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--tertiary)]">
           {collapsed ? "" : "Main"}
         </p>
-        <NavGroup items={mainNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
+        <NavGroup items={mainNav} active={active} onNavigate={handleNav} collapsed={collapsed} />
         <p className="mt-4 mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--tertiary)]">
           {collapsed ? "" : "Tools"}
         </p>
-        <NavGroup items={toolsNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
+        <NavGroup items={toolsNav} active={active} onNavigate={handleNav} collapsed={collapsed} />
         <div className="mt-3" />
-        <NavGroup items={upgradeNav} active={active} onMobileClose={handleMobileClose} collapsed={collapsed} />
+        <NavGroup items={upgradeNav} active={active} onNavigate={handleNav} collapsed={collapsed} />
       </nav>
 
       {/* Collapse toggle */}
@@ -216,9 +199,8 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
 
       {/* User */}
       <div className="p-3">
-        <Link
-          href="/profile"
-          onClick={handleMobileClose}
+        <button
+          onClick={() => handleNav("profile")}
           className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors ${
             active === "profile" ? "bg-[var(--accent-light)]" : "hover:bg-[var(--fill)]"
           }`}
@@ -232,7 +214,7 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
               <p className="text-[11px] text-[var(--secondary)] truncate">{user?.role ?? "Estimator"}</p>
             </div>
           )}
-        </Link>
+        </button>
       </div>
     </div>
     </>
@@ -242,12 +224,12 @@ export function Sidebar({ active, mobileOpen, onMobileClose, callActive, onCall 
 function NavGroup({
   items,
   active,
-  onMobileClose,
+  onNavigate,
   collapsed,
 }: {
   items: { id: string; label: string; icon: HeroIcon; iconActive: HeroIcon }[];
   active: string;
-  onMobileClose: () => void;
+  onNavigate: (page: string) => void;
   collapsed: boolean;
 }) {
   return (
@@ -255,12 +237,10 @@ function NavGroup({
       {items.map((item) => {
         const isActive = active === item.id;
         const Icon = isActive ? item.iconActive : item.icon;
-        const href = PAGE_ROUTES[item.id] || `/${item.id}`;
         return (
-          <Link
+          <button
             key={item.id}
-            href={href}
-            onClick={onMobileClose}
+            onClick={() => onNavigate(item.id)}
             title={collapsed ? item.label : undefined}
             aria-current={isActive ? "page" : undefined}
             className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] transition-all duration-[var(--duration-fast)] ${
@@ -271,7 +251,7 @@ function NavGroup({
           >
             <Icon className={`h-5 w-5 flex-shrink-0 ${isActive ? "text-[var(--accent)]" : "text-[var(--gray1)]"}`} />
             {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
-          </Link>
+          </button>
         );
       })}
     </div>

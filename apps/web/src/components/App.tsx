@@ -28,6 +28,7 @@ const TeamMembersPage = dynamic(() => import("./TeamMembersPage").then(m => ({ d
 const ScheduleView = dynamic(() => import("./ScheduleView").then(m => ({ default: m.ScheduleView })), { ssr: false, loading: () => <PageSkeleton /> });
 const CallAlexFAB = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexFAB })), { ssr: false });
 const CallAlexPanel = dynamic(() => import("./CallAlex").then(m => ({ default: m.CallAlexPanel })), { ssr: false });
+import { ComingSoon } from "./ComingSoon";
 import { SplashScreen } from "./SplashScreen";
 import { AuthScreen } from "./AuthScreen";
 import { OnboardingWizard } from "./OnboardingWizard";
@@ -51,7 +52,11 @@ import { Toaster } from "react-hot-toast";
 type ModalType = null | "new-estimate" | "add-client" | "log-expense" | "upload-invoice" | "edit-profile" | "edit-estimate" | "auto-estimate" | "clone-estimate" | "quick-estimate";
 type AppPhase = "splash" | "auth" | "reset-password" | "ready";
 
-// Pages no longer receive props — they use useAppContext() instead
+// Coming soon page wrappers
+function TimeTrackingPage() { return <ComingSoon title="Time Tracking" description="Track crew hours, clock in/out, and monitor labor costs per job." />; }
+function SubcontractorsPage() { return <ComingSoon title="Subcontractors" description="Manage your sub network, request bids, and track sub performance." />; }
+function UpgradePage() { return <ComingSoon title="Upgrade" description="Unlock advanced features with a Pro plan." />; }
+
 const PAGE_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   estimates: "Estimates",
@@ -64,6 +69,9 @@ const PAGE_TITLES: Record<string, string> = {
   profile: "Profile",
   team: "Team Members",
   schedule: "Schedule",
+  "time-tracking": "Time Tracking",
+  subcontractors: "Subcontractors",
+  upgrade: "Upgrade",
 };
 
 const pages: Record<string, React.ComponentType> = {
@@ -78,11 +86,38 @@ const pages: Record<string, React.ComponentType> = {
   profile: Profile,
   team: TeamMembersPage,
   schedule: ScheduleView,
+  "time-tracking": TimeTrackingPage,
+  subcontractors: SubcontractorsPage,
+  upgrade: UpgradePage,
 };
+
+// Map URL paths to page IDs
+const PATH_TO_PAGE: Record<string, string> = {
+  "/": "dashboard",
+  "/dashboard": "dashboard",
+  "/estimates": "estimates",
+  "/materials": "materials",
+  "/invoices": "invoices",
+  "/clients": "clients",
+  "/calls": "calls",
+  "/analytics": "analytics",
+  "/settings": "settings",
+  "/profile": "profile",
+  "/team": "team",
+  "/schedule": "schedule",
+  "/time-tracking": "time-tracking",
+  "/subcontractors": "subcontractors",
+  "/upgrade": "upgrade",
+};
+
+function getPageFromPath(): string {
+  if (typeof window === "undefined") return "dashboard";
+  return PATH_TO_PAGE[window.location.pathname] ?? "dashboard";
+}
 
 export function App() {
   const [phase, setPhase] = useState<AppPhase>("splash");
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(getPageFromPath);
   const [callOpen, setCallOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modal, setModal] = useState<ModalType>(null);
@@ -92,6 +127,25 @@ export function App() {
   const { user } = useCurrentUser();
   const { data: estimates, loading: estimatesLoading } = useEstimates();
   useDarkMode();
+
+  // Sync URL with active page
+  const navigate = useCallback((page: string) => {
+    setActive(page);
+    const path = page === "dashboard" ? "/" : `/${page}`;
+    if (window.location.pathname !== path) {
+      window.history.pushState({ page }, "", path);
+    }
+  }, []);
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const page = e.state?.page ?? getPageFromPath();
+      setActive(page);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const openCall = useCallback(() => setCallOpen(true), []);
   const handleModal = useCallback((m: string) => setModal(m as ModalType), []);
@@ -121,8 +175,8 @@ export function App() {
   const handleSignOut = useCallback(async () => {
     await signOut();
     setPhase("auth");
-    setActive("dashboard");
-  }, []);
+    navigate("dashboard");
+  }, [navigate]);
 
   // Check if onboarding should show (new user with no estimates)
   useEffect(() => {
@@ -151,12 +205,12 @@ export function App() {
   const Page = pages[active] ?? Dashboard;
 
   const appCtx = useMemo<AppContextValue>(() => ({
-    onNavigate: setActive,
+    onNavigate: navigate,
     onCallAlex: openCall,
     onModal: handleModal,
     onEditEstimate: openEstimateEditor,
     onSignOut: handleSignOut,
-  }), [openCall, handleModal, openEstimateEditor, handleSignOut]);
+  }), [navigate, openCall, handleModal, openEstimateEditor, handleSignOut]);
 
   return (
     <ErrorBoundary>
@@ -166,19 +220,19 @@ export function App() {
         <OnboardingWizard
           userName={user?.full_name?.split(" ")[0] ?? null}
           onComplete={handleOnboardingComplete}
-          onNavigate={setActive}
+          onNavigate={navigate}
           onNewEstimate={() => handleModal("new-estimate")}
           onCallAlex={openCall}
         />
       )}
       <div className={`flex h-screen overflow-hidden bg-[var(--bg)] ${phase !== "ready" ? "invisible" : ""}`}
           aria-hidden={phase !== "ready"}>
-        <Sidebar active={active} onNavigate={(page) => { setActive(page); setMobileMenuOpen(false); }} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} callActive={callOpen} onCall={openCall} />
+        <Sidebar active={active} onNavigate={(page) => { navigate(page); setMobileMenuOpen(false); }} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} callActive={callOpen} onCall={openCall} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <TopBar
             title={PAGE_TITLES[active] ?? "Dashboard"}
             onModal={handleModal}
-            onNavigate={setActive}
+            onNavigate={navigate}
             user={user}
             onSignOut={handleSignOut}
             onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)}
