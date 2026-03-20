@@ -144,7 +144,7 @@ export function buildMenu(getWindow: () => BrowserWindow | undefined): Menu {
         },
         {
           label: "MHP Construction Website",
-          click: () => shell.openExternal("https://northmshomepros.com"),
+          click: () => shell.openExternal("https://mhpestimate.cloud"),
         },
         { type: "separator" },
         {

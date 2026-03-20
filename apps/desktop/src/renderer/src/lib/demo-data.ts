@@ -789,8 +789,8 @@ export const demoActivityEntries = [
 
 // ── Team Members (for Settings > Team) ──
 export const demoTeamMembers = [
-  { name: "James Walton", role: "owner", email: "james@northmshomepros.com", status: "active" },
-  { name: "Marcus Thompson", role: "estimator", email: "marcus.t@northmshomepros.com", status: "active" },
-  { name: "Devon Lewis", role: "field_tech", email: "devon.l@northmshomepros.com", status: "active" },
-  { name: "Sarah Mitchell", role: "pm", email: "sarah.m@northmshomepros.com", status: "active" },
+  { name: "James Walton", role: "owner", email: "james@mhpestimate.cloud", status: "active" },
+  { name: "Marcus Thompson", role: "estimator", email: "marcus.t@mhpestimate.cloud", status: "active" },
+  { name: "Devon Lewis", role: "field_tech", email: "devon.l@mhpestimate.cloud", status: "active" },
+  { name: "Sarah Mitchell", role: "pm", email: "sarah.m@mhpestimate.cloud", status: "active" },
 ];

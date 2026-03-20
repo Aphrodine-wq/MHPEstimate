@@ -38,10 +38,10 @@ export interface CompanyInfo {
 }
 
 const DEFAULT_COMPANY: CompanyInfo = {
-  name: "North MS Home Pros",
+  name: "MHP Construction",
   address: "",
   city_state_zip: "",
-  email: "info@northmshomepros.com",
+  email: "info@mhpestimate.cloud",
 };
 
 /* ── Logo path ── */

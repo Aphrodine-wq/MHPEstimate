@@ -258,8 +258,8 @@ async function sendChangeOrderNotification(
     return;
   }
 
-  const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@northmshomepros.com";
-  const NOTIFICATION_EMAIL = process.env.TEAM_NOTIFICATION_EMAIL ?? "info@northmshomepros.com";
+  const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@mhpestimate.cloud";
+  const NOTIFICATION_EMAIL = process.env.TEAM_NOTIFICATION_EMAIL ?? "info@mhpestimate.cloud";
 
   const costFormatted = `${opts.costImpact >= 0 ? "+" : ""}$${Math.abs(opts.costImpact).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const statusColor = opts.action === "approved" ? "#16a34a" : "#dc2626";

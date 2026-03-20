@@ -36,7 +36,7 @@ const DEFAULT_COMPANY: CompanyInfo = {
   name: "MHP Estimate",
   address: "",
   city_state_zip: "",
-  email: "info@proestimate.cloud",
+  email: "info@mhpestimate.cloud",
 };
 
 /* -- Border helper -- */

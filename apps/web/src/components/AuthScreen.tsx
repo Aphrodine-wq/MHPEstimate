@@ -255,7 +255,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   autoFocus
                   autoComplete="email"
                   className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
-                  placeholder="you@northmshomepros.com"
+                  placeholder="you@mhpestimate.cloud"
                 />
               </div>
               <div>
@@ -320,9 +320,9 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   required
                   autoComplete="email"
                   className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
-                  placeholder="you@northmshomepros.com"
+                  placeholder="you@mhpestimate.cloud"
                 />
-                <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a @northmshomepros.com email</p>
+                <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a company email</p>
               </div>
               <div>
                 <label className="mb-1 block text-[12px] font-medium text-[#8e8e93]">Password</label>
@@ -368,9 +368,9 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
                   autoFocus
                   autoComplete="email"
                   className="w-full rounded-lg border border-[var(--gray5)] bg-[var(--bg)] px-3 py-2.5 text-[14px] text-[var(--label)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
-                  placeholder="you@northmshomepros.com"
+                  placeholder="you@mhpestimate.cloud"
                 />
-                <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a @northmshomepros.com email</p>
+                <p className="mt-1 text-[10px] text-[var(--secondary)]">Must be a company email</p>
               </div>
               <button
                 type="submit"

@@ -321,7 +321,7 @@ export function useActivityFeed() {
 
 // ── Notifications (generated from real data) ──
 
-const NOTIF_READ_KEY = "proestimate_read_notifications";
+const NOTIF_READ_KEY = "mhpestimate_read_notifications";
 
 function getReadIds(): Set<string> {
   try {

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 type Theme = "light" | "dark" | "system";
 
-const STORAGE_KEY = "proestimate_theme";
+const STORAGE_KEY = "mhpestimate_theme";
 
 function getSystemPreference(): "light" | "dark" {
   if (typeof window === "undefined") return "light";

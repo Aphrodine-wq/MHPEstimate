@@ -127,6 +127,20 @@
 .animate-modal-overlay { animation: modal-overlay 0.15s ease-out both; }
 .animate-modal-content { animation: modal-content 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* ── Page & interaction animations ── */
+
+@keyframes page-enter {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-page-enter { animation: page-enter 0.25s ease-out both; }
+
+@keyframes call-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+.animate-call-pulse { animation: call-pulse 1.5s ease-in-out infinite; }
+
 /* ── Reduced motion ── */
 
 @media (prefers-reduced-motion: reduce) {

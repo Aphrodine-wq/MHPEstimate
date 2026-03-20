@@ -110,7 +110,7 @@ export function UpgradePage() {
   const handleUpgrade = useCallback(async (planId: string) => {
     if (planId === "apprentice") return;
     if (planId === "gc") {
-      window.location.href = "mailto:sales@proestimate.cloud?subject=General%20Contractor%20Plan";
+      window.location.href = "mailto:sales@mhpestimate.cloud?subject=General%20Contractor%20Plan";
       return;
     }
     setActionLoading(planId);

@@ -42,7 +42,7 @@ export function MHPCoverPage({
       </View>
 
       {/* Company name */}
-      <Text style={s.coverCompanyName}>NORTH MS HOME PROS</Text>
+      <Text style={s.coverCompanyName}>MHP CONSTRUCTION</Text>
 
       {/* Subtitle */}
       <Text style={s.coverSubtitle}>Construction Estimate Package</Text>

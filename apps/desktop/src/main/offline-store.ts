@@ -3,7 +3,7 @@ import { app } from "electron";
 import path from "path";
 import { randomUUID } from "crypto";
 
-const DB_NAME = "proestimate-offline.db";
+const DB_NAME = "mhpestimate-offline.db";
 
 let db: Database.Database | null = null;
 

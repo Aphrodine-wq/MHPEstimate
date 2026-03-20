@@ -429,7 +429,7 @@ async function sendChangeOrderClientNotification(
 
     if (!client?.email) return;
 
-    const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@northmshomepros.com";
+    const FROM = process.env.RESEND_FROM_EMAIL ?? "estimates@mhpestimate.cloud";
     const portalUrl = getPortalUrl(opts.estimateId);
 
     const costFormatted = `${opts.costImpact >= 0 ? "+" : ""}$${Math.abs(opts.costImpact).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

@@ -251,8 +251,8 @@ function ErrorState({ message }: { message: string }): JSX.Element {
         </p>
         <p style={{ margin: 0, fontSize: 12, color: "#9ca3af" }}>
           If you believe this is an error, please contact{" "}
-          <a href="mailto:info@northmshomepros.com" style={{ color: NAVY }}>
-            info@northmshomepros.com
+          <a href="mailto:info@mhpestimate.cloud" style={{ color: NAVY }}>
+            info@mhpestimate.cloud
           </a>
         </p>
       </div>
@@ -599,8 +599,8 @@ export default function PortalPage(): JSX.Element {
   const isAccepted = estimate.status === "accepted" || signSuccess;
   const isDeclined = estimate.status === "declined" || declineSuccess;
 
-  const companyName = company.name || "North MS Home Pros";
-  const companyEmail = company.email || "info@northmshomepros.com";
+  const companyName = company.name || "MHP Construction";
+  const companyEmail = company.email || "info@mhpestimate.cloud";
 
   /* ── Full render ── */
 

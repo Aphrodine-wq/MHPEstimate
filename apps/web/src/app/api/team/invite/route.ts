@@ -24,12 +24,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // --- Server-side domain restriction ---
-  // The @northmshomepros.com check exists client-side too, but we enforce it
-  // here so that API calls bypassing the UI are rejected.
-  if (!user.email?.endsWith("@northmshomepros.com")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  // --- Server-side domain restriction (disabled — allow any authenticated user) ---
 
   // --- Rate limiting: 10 invites per hour per user ---
   try {

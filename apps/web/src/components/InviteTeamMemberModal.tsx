@@ -92,7 +92,7 @@ export function InviteTeamMemberModal({ open, onClose, onInviteSent }: InviteTea
             value={email}
             onChange={(e) => { setEmail(e.target.value); validateEmail(e.target.value); }}
             onBlur={(e) => validateEmail(e.target.value)}
-            placeholder="jane@northmshomepros.com"
+            placeholder="jane@mhpestimate.cloud"
             className={`${inputClass} ${emailErr ? "border-red-400 focus:border-red-400 focus:ring-red-400/20" : ""}`}
             onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           />

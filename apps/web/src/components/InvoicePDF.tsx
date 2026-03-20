@@ -265,10 +265,10 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<void> {
         {/* Header */}
         <View style={s.header}>
           <View>
-            <Text style={s.companyName}>North MS Home Pros</Text>
-            <Text style={s.companyDetail}>123 Business Ave, Suite 100</Text>
-            <Text style={s.companyDetail}>Tupelo, MS 38801</Text>
-            <Text style={s.companyDetail}>info@northmshomepros.com</Text>
+            <Text style={s.companyName}>MHP Construction</Text>
+            <Text style={s.companyDetail}>404 Galleria Drive, Suite #6</Text>
+            <Text style={s.companyDetail}>Oxford, MS 38655</Text>
+            <Text style={s.companyDetail}>info@mhpestimate.cloud</Text>
           </View>
           <View>
             <Text style={s.invoiceTitle}>INVOICE</Text>

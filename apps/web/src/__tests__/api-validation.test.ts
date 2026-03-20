@@ -190,7 +190,7 @@ describe("api-validation schemas", () => {
   describe("teamInviteSchema", () => {
     it("accepts valid invite", () => {
       const result = teamInviteSchema.safeParse({
-        email: "newguy@northmshomepros.com",
+        email: "newguy@mhpestimate.cloud",
         full_name: "New Guy",
         role: "estimator",
       });

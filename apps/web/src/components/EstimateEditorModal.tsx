@@ -619,10 +619,10 @@ export function EstimateEditorModal({ open, onClose, estimate }: { open: boolean
 function buildCompanyInfo(settings: Record<string, unknown>) {
   const info = (settings["company_info"] ?? {}) as Record<string, string>;
   return {
-    name: info.name || "North MS Home Pros",
+    name: info.name || "MHP Construction",
     address: info.address || "",
     city_state_zip: info.city_state_zip || "",
-    email: info.email || "info@northmshomepros.com",
+    email: info.email || "info@mhpestimate.cloud",
     phone: info.phone || "",
   };
 }

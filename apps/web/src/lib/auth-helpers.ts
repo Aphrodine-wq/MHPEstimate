@@ -67,7 +67,7 @@ export async function getAuthUser(request: NextRequest) {
   return { user: null, error: new Error("No valid auth token found") };
 }
 
-const ALLOWED_DOMAIN = "@northmshomepros.com";
+const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_ALLOWED_DOMAIN ?? "@northmshomepros.com";
 
 /**
  * Server-side domain restriction check.

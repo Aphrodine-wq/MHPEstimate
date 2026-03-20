@@ -23,7 +23,7 @@ export const COMPANY_CITY_STATE = "Oxford, MS 38655";
 export const CONTRACTOR_NAME = "Josh Harris";
 export const CONTRACTOR_LICENSE = "R21909";
 export const CONTRACTOR_ADDRESS = "1501 W. Jackson Ave., Suite 113 #144, Oxford, MS 38655";
-export const CONTRACTOR_EMAIL = "josh@northmshomepros.com";
+export const CONTRACTOR_EMAIL = "info@mhpestimate.cloud";
 export const CONTRACTOR_PHONE = "662-871-8071";
 
 /* ── Helpers ── */
