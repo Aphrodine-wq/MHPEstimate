@@ -125,6 +125,7 @@ export type FoundationType = "raised_slab" | "monolithic_slab" | "crawlspace" | 
 export interface Estimate {
   id: string;
   estimate_number: string;
+  organization_id?: string | null;
   client_id: string | null;
   estimator_id: string | null;
   reviewer_id: string | null;
@@ -439,7 +440,7 @@ export interface EstimateReminder {
 
 // ── Job Scheduling ──
 
-export type JobPhaseStatus = "not_started" | "in_progress" | "completed" | "blocked" | "skipped";
+export type JobPhaseStatus = "not_started" | "in_progress" | "completed" | "blocked" | "skipped" | "pending";
 
 export interface JobPhase {
   id: string;
@@ -449,6 +450,7 @@ export interface JobPhase {
   sort_order: number;
   start_date: string | null;
   end_date: string | null;
+  duration_days: number | null;
   status: JobPhaseStatus;
   crew_assigned: string[];
   notes: string | null;
@@ -457,6 +459,297 @@ export interface JobPhase {
   dependencies: string[];
   actual_start: string | null;
   actual_end: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Schedule Templates ──
+
+export interface ScheduleTemplate {
+  id: string;
+  organization_id: string;
+  project_type: string;
+  phases: { name: string; duration_days: number; offset_days: number; dependencies: string[] }[];
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Estimate Templates ──
+
+export interface EstimateTemplate {
+  id: string;
+  organization_id: string;
+  name: string;
+  project_type: string;
+  description: string | null;
+  line_items: Record<string, unknown>[];
+  template_data: Record<string, unknown> | null;
+  is_default: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Labor Rates ──
+
+export interface LaborRatePreset {
+  id: string;
+  organization_id: string;
+  trade: string;
+  role: string;
+  hourly_rate: number;
+  overtime_rate: number | null;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Subcontractors & Bids ──
+
+export type SubBidStatus = "draft" | "requested" | "received" | "accepted" | "rejected" | "expired";
+
+export interface Subcontractor {
+  id: string;
+  organization_id: string;
+  company_name: string;
+  contact_name: string | null;
+  email: string | null;
+  phone: string | null;
+  trades: string[];
+  license_number: string | null;
+  insurance_expiry: string | null;
+  rating: number | null;
+  notes: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubBid {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  subcontractor_id: string | null;
+  trade: string;
+  scope_description: string | null;
+  due_date: string | null;
+  bid_amount: number | null;
+  status: SubBidStatus;
+  requested_at: string | null;
+  received_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Purchase Orders ──
+
+export type PurchaseOrderStatus = "draft" | "sent" | "confirmed" | "partial" | "fulfilled" | "cancelled";
+
+export interface PurchaseOrder {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  po_number: string;
+  vendor_name: string;
+  vendor_contact: string | null;
+  vendor_phone: string | null;
+  vendor_email: string | null;
+  status: PurchaseOrderStatus;
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  order_date: string | null;
+  expected_delivery: string | null;
+  delivery_address: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface POLineItem {
+  id: string;
+  purchase_order_id: string;
+  estimate_line_item_id: string | null;
+  description: string;
+  quantity: number;
+  unit: string;
+  unit_price: number;
+  received_qty: number;
+  status: "pending" | "received";
+  notes: string | null;
+  created_at: string;
+}
+
+// ── Time Tracking ──
+
+export interface TimeEntry {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  phase_id: string | null;
+  worker_name: string;
+  trade: string | null;
+  hourly_rate: number | null;
+  clock_in: string;
+  clock_out: string | null;
+  break_minutes: number;
+  total_hours: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Field Operations ──
+
+export type PhotoCategory = "before" | "during" | "after" | "issue" | "progress" | "material" | "inspection" | "safety" | "other";
+
+export interface JobPhoto {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  phase_id: string | null;
+  storage_path: string;
+  thumbnail_path: string | null;
+  file_name: string;
+  file_size_bytes: number | null;
+  mime_type: string;
+  category: PhotoCategory;
+  caption: string | null;
+  tags: string[];
+  room: string | null;
+  gps_lat: number | null;
+  gps_lng: number | null;
+  taken_by: string | null;
+  taken_by_name: string | null;
+  taken_at: string;
+  created_at: string;
+}
+
+export type WeatherCondition = "clear" | "cloudy" | "rain" | "snow" | "wind" | "extreme_heat" | "extreme_cold";
+
+export interface DailyLog {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  log_date: string;
+  weather: WeatherCondition | null;
+  temperature_f: number | null;
+  crew_count: number;
+  hours_on_site: number | null;
+  work_performed: string | null;
+  materials_used: string | null;
+  deliveries: string | null;
+  visitors: string | null;
+  issues: string | null;
+  safety_notes: string | null;
+  delay_reason: string | null;
+  delay_hours: number | null;
+  created_by: string | null;
+  created_by_name: string | null;
+  updated_at: string;
+}
+
+// ── Takeoff & Selections ──
+
+export type MeasurementType = "linear" | "area" | "count" | "volume";
+
+export interface TakeoffMeasurement {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  page_number: number;
+  plan_image_path: string | null;
+  measurement_type: MeasurementType | null;
+  label: string;
+  value: number;
+  unit: string;
+  color: string;
+  points: unknown[];
+  linked_line_item_id: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export type SelectionSheetStatus = "draft" | "sent" | "in_progress" | "completed" | "approved";
+
+export interface SelectionSheet {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  name: string;
+  status: SelectionSheetStatus;
+  due_date: string | null;
+  notes: string | null;
+  sent_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SelectionItem {
+  id: string;
+  sheet_id: string;
+  category: string;
+  item_name: string;
+  room: string | null;
+  budget_amount: number | null;
+  options: { name: string; price: number; thumbnail?: string }[];
+  selected_option: number | null;
+  actual_amount: number | null;
+  status: "pending" | "selected" | "ordered" | "installed";
+  sort_order: number | null;
+  client_notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Warranty ──
+
+export type WarrantyStatus = "active" | "claimed" | "in_progress" | "resolved" | "expired" | "voided";
+export type WarrantyCategory = "labor" | "material" | "structural" | "plumbing" | "electrical" | "hvac" | "roofing" | "flooring" | "painting" | "appliance" | "other";
+
+export interface WarrantyItem {
+  id: string;
+  organization_id: string;
+  estimate_id: string;
+  client_id: string | null;
+  item_description: string;
+  category: WarrantyCategory | null;
+  warranty_start: string;
+  warranty_end: string;
+  status: WarrantyStatus;
+  claim_description: string | null;
+  resolution: string | null;
+  cost_to_repair: number | null;
+  callback_date: string | null;
+  callback_notes: string | null;
+  photos: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Integrations ──
+
+export type IntegrationProvider = "quickbooks" | "stripe" | "twilio";
+
+export interface IntegrationConnection {
+  id: string;
+  user_id: string;
+  provider: IntegrationProvider;
+  realm_id: string | null;
+  access_token_encrypted: string;
+  refresh_token_encrypted: string | null;
+  token_expires_at: string | null;
+  refresh_token_expires_at: string | null;
+  is_active: boolean;
+  connected_at: string;
+  disconnected_at: string | null;
   created_at: string;
   updated_at: string;
 }

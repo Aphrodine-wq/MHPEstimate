@@ -1,6 +1,6 @@
 [auth]
 site_url = "https://mhpestimate.cloud"
-additional_redirect_urls = ["https://mhpestimate.cloud/auth/callback", "http://localhost:3000/auth/callback", "proestimate://auth/callback"]
+additional_redirect_urls = ["https://mhpestimate.cloud/auth/callback", "http://localhost:3000/auth/callback", "proestimate://auth/callback", "mhpestimate://auth/callback"]
 
 [auth.email]
 enable_signup = true

@@ -198,7 +198,7 @@ export function AuthScreen({ onAuthenticated, initialView = "login", onDevBypass
         <div className="mb-8 flex flex-col items-center">
           <img src={mhpLogo} alt="MHP Construction" className="h-20 w-auto drop-shadow-sm" />
           <h1 className="mt-4 text-[20px] font-bold text-[var(--label)]" style={{ letterSpacing: "-0.03em", WebkitFontSmoothing: "antialiased" }}>
-            ProEstimate AI
+            MHP Estimate
           </h1>
           <p className="mt-1 text-[12px] font-medium text-[var(--tertiary)]">
             {view === "login" && "Sign in to continue"}

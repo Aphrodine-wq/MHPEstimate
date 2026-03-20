@@ -380,7 +380,7 @@ export function ProjectsPage({ onNavigate, onEditEstimate, onCallAlex, onModal }
               style={{ background: "var(--green)" }}
             >
               <PhoneIcon size={12} />
-              Call Hunter
+              Call Alex
             </button>
           </div>
         </div>

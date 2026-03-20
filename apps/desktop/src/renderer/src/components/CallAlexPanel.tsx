@@ -31,7 +31,7 @@ export default function CallAlexPanel({ onClose, onEstimateCreated: _onEstimateC
       });
     } catch (err) {
       console.error("Failed to start session:", err);
-      setError("Could not connect to Hunter. Please check your connection and try again.");
+      setError("Could not connect to Alex. Please check your connection and try again.");
     }
   }, [conversation]);
 
@@ -65,7 +65,7 @@ export default function CallAlexPanel({ onClose, onEstimateCreated: _onEstimateC
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 items-center justify-center rounded-full text-[14px] font-semibold text-white ${error ? "bg-[var(--red)]" : status === "connected" ? "bg-[var(--green)]" : "bg-[var(--green)] text-white"}`}>H</div>
             <div>
-              <p className="text-[15px] font-semibold">Hunter</p>
+              <p className="text-[15px] font-semibold">Alex</p>
               <p className="text-[11px] text-[var(--secondary)]">
                 {error ? "Connection Error" : status === "disconnected" ? "Estimation Assistant" : status === "connecting" ? "Connecting…" : isSpeaking ? "Speaking…" : "Listening…"}
               </p>
@@ -107,7 +107,7 @@ export default function CallAlexPanel({ onClose, onEstimateCreated: _onEstimateC
                   </svg>
                 </div>
                 <p className="text-[13px] text-[var(--secondary)]">
-                  {isSpeaking ? "Hunter is speaking…" : "Listening — speak to Hunter"}
+                  {isSpeaking ? "Alex is speaking…" : "Listening — speak to Alex"}
                 </p>
               </>
             ) : null}

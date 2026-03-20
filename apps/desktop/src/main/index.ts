@@ -238,7 +238,7 @@ function createWindow() {
     },
     frame: false,
     titleBarStyle: "hidden",
-    title: "ProEstimate AI",
+    title: "MHP Estimate",
     icon: path.join(__dirname, "../../build/icon.png"),
     show: false, // Show when ready to prevent flash
   });

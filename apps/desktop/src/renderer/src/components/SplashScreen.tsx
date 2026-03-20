@@ -65,7 +65,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
       {/* App name */}
       <div className="mt-6 animate-splash-text">
         <h1 className="text-center text-[22px] font-bold text-[#111318]" style={{ letterSpacing: "-0.03em" }}>
-          ProEstimate AI
+          MHP Estimate
         </h1>
         <p className="mt-1 text-center text-[12px] font-medium tracking-wide text-[#9CA3AF]">
           Intelligent Construction Estimating

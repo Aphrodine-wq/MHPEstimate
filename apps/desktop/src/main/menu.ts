@@ -139,7 +139,7 @@ export function buildMenu(getWindow: () => BrowserWindow | undefined): Menu {
       label: "Help",
       submenu: [
         {
-          label: "ProEstimate Documentation",
+          label: "MHP Estimate Documentation",
           click: () => shell.openExternal("https://mhpestimate.cloud/docs"),
         },
         {

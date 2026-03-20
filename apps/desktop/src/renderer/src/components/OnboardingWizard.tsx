@@ -206,7 +206,7 @@ function StepWelcome({ name }: { name: string }) {
       </div>
 
       <h2 className="text-2xl font-bold" style={{ color: "var(--label)" }}>
-        Welcome to ProEstimate AI
+        Welcome to MHP Estimate
       </h2>
       <p className="mt-2 text-lg font-medium" style={{ color: "var(--accent)" }}>
         Hi, {name}!
@@ -312,10 +312,10 @@ function StepMeetAlex() {
       </div>
 
       <h2 className="text-xl font-bold" style={{ color: "var(--label)" }}>
-        Meet Hunter, Your AI Assistant
+        Meet Alex, Your AI Assistant
       </h2>
       <p className="mt-4 text-sm leading-relaxed max-w-sm" style={{ color: "var(--secondary)" }}>
-        You can call Hunter anytime to create estimates by voice. Just tap the phone
+        You can call Alex anytime to create estimates by voice. Just tap the phone
         button in the bottom-right corner to start a conversation.
       </p>
 
@@ -338,7 +338,7 @@ function StepMeetAlex() {
           className="w-2 h-2 rounded-full"
           style={{ background: "var(--green)", animation: "onboarding-pulse 2s ease-in-out infinite" }}
         />
-        <span className="text-xs" style={{ color: "var(--gray1)" }}>Hunter is always ready</span>
+        <span className="text-xs" style={{ color: "var(--gray1)" }}>Alex is always ready</span>
       </div>
     </div>
   );

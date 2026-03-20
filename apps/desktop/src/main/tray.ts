@@ -15,11 +15,11 @@ export function setupTray(getWindow: () => BrowserWindow | undefined): Tray {
   }
 
   tray = new Tray(icon);
-  tray.setToolTip("ProEstimate AI");
+  tray.setToolTip("MHP Estimate");
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: "Open ProEstimate",
+      label: "Open MHP Estimate",
       click: () => {
         const win = getWindow();
         if (win) {
@@ -53,7 +53,7 @@ export function setupTray(getWindow: () => BrowserWindow | undefined): Tray {
     },
     { type: "separator" },
     {
-      label: "Quit ProEstimate",
+      label: "Quit MHP Estimate",
       click: () => {
         app.quit();
       },

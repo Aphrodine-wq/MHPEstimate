@@ -62,7 +62,7 @@ export function Sidebar({ active, onNavigate, callActive, onCall }: SidebarProps
         <img src={mhpLogo} alt="MHP Construction" className="h-9 w-9 flex-shrink-0 rounded-lg object-contain" />
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-[15px] font-bold tracking-tight leading-tight">ProEstimate AI</p>
+            <p className="text-[15px] font-bold tracking-tight leading-tight">MHP Estimate</p>
             <p className="text-[11px] text-[var(--secondary)] leading-tight">MHP Construction</p>
           </div>
         )}

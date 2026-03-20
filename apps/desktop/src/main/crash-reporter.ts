@@ -21,7 +21,7 @@ export function setupCrashReporter() {
   process.on("uncaughtException", (error) => {
     writeCrashLog("uncaught-exception", error);
     dialog.showErrorBox(
-      "ProEstimate - Unexpected Error",
+      "MHP Estimate - Unexpected Error",
       `An unexpected error occurred:\n\n${error.message}\n\nThe app will try to continue, but you may want to restart.`,
     );
   });
@@ -37,7 +37,7 @@ export function setupCrashReporter() {
     writeCrashLog("render-process-gone", new Error(`Renderer crashed: ${details.reason}`));
     if (details.reason !== "clean-exit") {
       dialog.showErrorBox(
-        "ProEstimate - Display Error",
+        "MHP Estimate - Display Error",
         `The display process encountered an issue (${details.reason}).\n\nPlease restart the application.`,
       );
     }
