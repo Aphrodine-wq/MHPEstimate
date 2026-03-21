@@ -66,3 +66,5 @@ yarn-error.log*
 # Misc
 .cache/
 *.tsbuildinfo
+.~lock.*
+.next-dev/
