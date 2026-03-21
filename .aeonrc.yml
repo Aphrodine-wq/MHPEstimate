@@ -1,0 +1,69 @@
+# AEON Verification Config — MHP Estimate
+# Construction estimation platform: Stripe payments, Supabase, Twilio voice,
+# Anthropic AI, Resend email, 32 API routes, multi-tenant orgs
+profile: construction
+
+engines:
+  symbolic_exec: true
+  taint_analysis: true
+  information_flow: true
+  numeric_safety: true
+  money_math: true
+  concurrency_check: true
+  framework_rules: true
+  construction_domain: true
+
+severity: warning
+
+include:
+  - "apps/web/src/**/*.ts"
+  - "apps/web/src/**/*.tsx"
+  - "apps/desktop/src/**/*.ts"
+  - "apps/desktop/src/**/*.tsx"
+  - "packages/estimation-engine/src/**/*.ts"
+  - "packages/shared/src/**/*.ts"
+  - "packages/ui/src/**/*.ts"
+  - "packages/ui/src/**/*.tsx"
+
+exclude:
+  - "node_modules/**"
+  - ".next/**"
+  - ".turbo/**"
+  - "dist/**"
+  - "out/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "packages/ui/src/components/ui/**"
+
+custom_taint_sources:
+  - "searchParams"
+  - "params"
+  - "cookies"
+  - "formData"
+  - "request.json"
+  - "request.body"
+  - "supabase.auth.getUser"
+  - "req.nextUrl.searchParams"
+  - "req.headers"
+
+custom_taint_sinks:
+  # Database
+  - "supabase.from"
+  - "supabase.rpc"
+  # Payments
+  - "stripe.customers.create"
+  - "stripe.checkout.sessions.create"
+  - "stripe.subscriptions.retrieve"
+  - "stripe.webhooks.constructEvent"
+  # AI
+  - "anthropic.messages.create"
+  # Email
+  - "Resend.emails.send"
+  # Navigation
+  - "redirect"
+  - "dangerouslySetInnerHTML"
+  # External APIs
+  - "fetch"
+
+parallel: true

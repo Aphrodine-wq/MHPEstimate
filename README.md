@@ -1,241 +1,241 @@
-# ProEstimate AI — AI-Powered Estimation Platform for MHP Construction
+# MHP Estimate — AI-Powered Estimation Platform
 
-An intelligent estimation platform designed for residential home improvement and remodeling. Built as a monorepo with shared logic across web, desktop, and mobile platforms.
+Construction estimation platform built for MHP Construction. Voice AI assistant, smart pricing engine, multi-platform (web, desktop, mobile). Deployed at [mhpestimate.cloud](https://mhpestimate.cloud).
 
 ## Features
 
-- **Voice AI Assistant** — Call Alex for instant estimation help via phone
-- **Smart Estimation** — Calculation engine powered by historical MHP pricing data and ML suggestions
-- **Multi-Platform** — Web app (Vercel), desktop app (Electron), and mobile (Expo)
-- **Real-time Collaboration** — Multiple users estimating together
-- **Document Export** — PDF and DOCX exports of estimates
+- **Voice AI Assistant (Call Alex)** — ElevenLabs-powered voice estimation via phone and in-app
+- **Smart Estimation Engine** — Calculation engine with historical MHP pricing data, template generation, and margin guardrails
+- **Multi-Platform** — Web (Vercel), Desktop (Electron), Mobile (Expo)
+- **Live Pricing** — Price Scraper MCP for Home Depot/Lowe's pricing with freshness tracking
+- **Real-time Collaboration** — Supabase Realtime for multi-user estimating
+- **PDF Export** — Estimate document packages with line items, payment schedules, terms
 - **Change Order Workflow** — Track estimate modifications and approvals
-- **Analytics Dashboard** — Insights into estimation patterns and accuracy
+- **Stripe Billing** — Subscription management and payment processing
+- **Invoice OCR** — Parse supplier invoices with Anthropic AI
+- **Analytics Dashboard** — Estimation patterns, accuracy insights, job actuals tracking
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Web | Next.js 15, React 19, Tailwind CSS 3.4 |
+| Desktop | Electron 33, Vite, React 19 |
+| Mobile | Expo 52, React Native 0.76 |
+| Database | Supabase (PostgreSQL + pgvector + Realtime + Auth) |
+| AI | Anthropic SDK, ElevenLabs |
+| Payments | Stripe |
+| Email | Resend |
+| Voice | Twilio + ElevenLabs |
+| PDF | @react-pdf/renderer |
+| Testing | Vitest, Playwright |
+| Monitoring | Sentry |
+| Build | Turbo 2, pnpm 10.28 |
 
 ## Project Structure
-
-This is a **monorepo** managed with **pnpm 10.28.2** and **Turbo 2**.
 
 ```
 MHPEstimate/
 ├── apps/
-│   ├── web/                  # Next.js 15 web application
-│   ├── desktop/              # Electron 33 desktop application
-│   └── mobile/               # Expo 52 React Native mobile app
+│   ├── web/                  # Next.js 15 SPA (32 API route dirs, 77 components)
+│   ├── desktop/              # Electron 33 + Vite (frameless window, IPC, deep links)
+│   └── mobile/               # Expo 52 React Native (file-based routing)
 ├── packages/
-│   ├── shared/               # Shared types, constants, utils
-│   ├── estimation-engine/    # Core estimation logic (client + server)
-│   ├── ui/                   # Shared UI components
-│   └── tsconfig/             # TypeScript configuration presets
+│   ├── shared/               # Types, constants, Zod validation schemas
+│   ├── estimation-engine/    # Calculations, pricing, importers, validation
+│   ├── ui/                   # Shared React components + Realtime hooks
+│   └── tsconfig/             # TypeScript config presets
+├── supabase/
+│   ├── migrations/           # 15 SQL migration files
+│   ├── functions/            # Edge functions
+│   └── seed.sql              # Seed data (8 templates, 23 labor rates, 5 schedule templates)
+├── tests/
+│   └── e2e/                  # Playwright tests (web + desktop)
 ├── docs/
-│   └── adr/                  # Architecture Decision Records
-├── supabase/                 # Database migrations and functions
-├── data/                     # Seed data, pricing databases
-├── tests/                    # Integration and E2E tests
-└── turbo.json                # Turbo build configuration
+│   ├── adr/                  # Architecture Decision Records (4)
+│   ├── plans/                # Design plans
+│   └── LAUNCH_CHECKLIST.md   # Pre-launch verification
+├── data/                     # Pricing databases
+├── Price Scraper MCP/        # Live pricing microservice (Docker)
+├── production-hardening/     # Security hardening scripts + docs
+├── CLAUDE.md                 # Developer guide for Claude Code
+├── CONTRIBUTING.md           # Contributing guidelines
+├── FEATURES.md               # Feature inventory with completion %
+├── turbo.json                # Turbo build configuration
+└── pnpm-workspace.yaml       # Workspace config
 ```
 
 ## Prerequisites
 
-- **Node.js** — v20.0.0 or later (see `.nvmrc` for pinned version)
-- **pnpm** — v10.28.2 (install via `npm install -g pnpm@10.28.2`)
-- **Git** — For version control
-- **Supabase CLI** — For local database development (optional)
+- **Node.js** v20.0.0+ (see `.nvmrc`)
+- **pnpm** v10.28.2 (`npm install -g pnpm@10.28.2`)
+- **Supabase CLI** (for local database development)
 
-## Environment Variables
-
-Create a `.env.local` file in the root and each app directory with the following:
-
-### Root `.env.local`
-
-```env
-# Supabase (shared across all apps)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-# Feature Flags (optional - stored in Supabase)
-# Leave empty to use defaults
-
-# Voice AI (ElevenLabs + Twilio)
-ELEVENLABS_API_KEY=your-api-key
-TWILIO_ACCOUNT_SID=your-sid
-TWILIO_AUTH_TOKEN=your-token
-TWILIO_PHONE_NUMBER=+1234567890
-```
-
-### Web App (`apps/web/.env.local`)
-
-```env
-# Public keys (visible in browser)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-
-# Secret keys (server-side only)
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-NEXTAUTH_SECRET=your-secret-key-here
-NEXTAUTH_URL=http://localhost:3000
-```
-
-### Desktop App (`apps/desktop/.env.local`)
-
-```env
-# Electron main process
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### Mobile App (`apps/mobile/.env.local`)
-
-```env
-# Expo configuration
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-## Setup Instructions
-
-### 1. Clone the Repository
+## Setup
 
 ```bash
-git clone https://github.com/yourusername/MHPEstimate.git
+git clone https://github.com/Aphrodine-wq/MHPEstimate.git
 cd MHPEstimate
-```
-
-### 2. Install Dependencies
-
-```bash
 pnpm install
 ```
 
-This installs all workspace dependencies and links packages locally.
+### Environment Variables
 
-### 3. Set Up Environment Variables
+Create `.env.local` in root and each app directory.
 
-Copy template files and fill in your Supabase credentials:
+#### Required
+
+| Variable | Where | Purpose |
+|----------|-------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Root + Web | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Root + Web | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Root + Web | Supabase admin key (server-side) |
+| `VITE_SUPABASE_URL` | Desktop | Supabase URL for Electron |
+| `VITE_SUPABASE_ANON_KEY` | Desktop | Supabase anon key for Electron |
+
+#### Voice AI & Telephony
+
+| Variable | Purpose |
+|----------|---------|
+| `ELEVENLABS_API_KEY` | ElevenLabs API |
+| `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` | Agent ID for Call Alex |
+| `NEXT_PUBLIC_ELEVENLABS_API_KEY` | Client-side ElevenLabs |
+| `TWILIO_ACCOUNT_SID` | Twilio voice |
+| `TWILIO_AUTH_TOKEN` | Twilio auth |
+
+#### Payments & Billing
+
+| Variable | Purpose |
+|----------|---------|
+| `STRIPE_SECRET_KEY` | Stripe server key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook verification |
+
+#### AI & Email
+
+| Variable | Purpose |
+|----------|---------|
+| `ANTHROPIC_API_KEY` | Claude API for invoice OCR |
+| `RESEND_API_KEY` | Email delivery |
+| `RESEND_FROM_EMAIL` | Sender address |
+
+#### Integrations
+
+| Variable | Purpose |
+|----------|---------|
+| `QB_CLIENT_ID` | QuickBooks OAuth |
+| `QB_CLIENT_SECRET` | QuickBooks OAuth |
+| `QB_REDIRECT_URI` | QuickBooks callback URL |
+| `BLS_API_KEY` | Bureau of Labor Statistics (commodity pricing) |
+| `EIA_API_KEY` | Energy Information Admin (commodity pricing) |
+| `FRED_API_KEY` | Federal Reserve data (commodity pricing) |
+| `MCP_SCRAPER_URL` | Price Scraper MCP endpoint |
+| `PRICE_SCRAPER_API_KEY` | Price Scraper auth |
+| `INTEGRATION_ENCRYPTION_KEY` | Integration credential encryption |
+| `PORTAL_TOKEN_SECRET` | Client portal token signing |
+
+#### Monitoring
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry client DSN |
+| `SENTRY_DSN` | Sentry server DSN |
+
+### Database Setup
 
 ```bash
-cp .env.example .env.local
-# Edit .env.local with your actual values
-
-cp apps/web/.env.example apps/web/.env.local
-cp apps/desktop/.env.example apps/desktop/.env.local
-cp apps/mobile/.env.example apps/mobile/.env.local
-```
-
-### 4. Initialize Supabase (Local Development)
-
-```bash
-# Start Supabase local environment
 supabase start
-
-# Apply migrations
-supabase db push
-
-# Seed initial data (optional)
-pnpm run seed
+supabase db push        # Apply migrations
+pnpm db:seed            # Seed MHP data
 ```
 
-### 5. Run Development Servers
-
-**Web App**
-```bash
-pnpm dev:web
-# Opens on http://localhost:3000
-```
-
-**Desktop App**
-```bash
-pnpm dev:desktop
-# Opens Electron window in development mode
-```
-
-**Mobile App**
-```bash
-pnpm dev:mobile
-# Opens Expo dev menu
-# Use Expo Go app on mobile device to scan QR code
-```
-
-**All Apps (parallel)**
-```bash
-pnpm dev
-```
-
-## Build & Deployment
-
-### Web (Vercel)
+## Development
 
 ```bash
-# Build
-pnpm build:web
-
-# Deploy to Vercel (connected to GitHub)
-# Automatically triggers on push to main
+pnpm dev                # All apps
+pnpm dev:web            # Web only (localhost:3000)
+pnpm dev:desktop        # Desktop only (Electron)
+pnpm dev:mobile         # Mobile (Expo)
 ```
 
-### Desktop (Electron Builder)
+## Scripts
 
-```bash
-# Build for distribution
-pnpm build:desktop
-
-# Creates .dmg (macOS), .exe (Windows), .AppImage (Linux)
-# Installers in apps/desktop/dist/
-```
-
-### Mobile (Expo)
-
-```bash
-# Build for production
-eas build --platform all
-
-# Submit to app stores
-eas submit
-```
-
-## Testing
-
-```bash
-# Run all tests (unit + integration)
-pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run E2E tests (Playwright)
-pnpm test:e2e
-
-# Check code coverage
-pnpm test:coverage
-```
-
-## Linting & Formatting
-
-```bash
-# Lint all packages
-pnpm lint
-
-# Format with Prettier
-pnpm format
-
-# Type check
-pnpm type-check
-```
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all dev servers |
+| `pnpm dev:web` | Web dev server |
+| `pnpm dev:desktop` | Desktop dev (Electron) |
+| `pnpm dev:mobile` | Mobile dev (Expo) |
+| `pnpm build` | Build all apps (except mobile) |
+| `pnpm build:all` | Build all apps including mobile |
+| `pnpm typecheck` | TypeScript type checking |
+| `pnpm lint` | ESLint |
+| `pnpm test` | All unit tests (Vitest) |
+| `pnpm test:e2e` | All E2E tests (Playwright) |
+| `pnpm test:e2e:web` | Web E2E only |
+| `pnpm test:e2e:desktop` | Desktop E2E only |
+| `pnpm test:e2e:ui` | Playwright interactive UI |
+| `pnpm db:migrate` | Apply Supabase migrations |
+| `pnpm db:reset` | Reset database |
+| `pnpm db:seed` | Seed database |
+| `pnpm clean` | Clean all build artifacts + node_modules |
+| `pnpm changeset` | Create changeset for versioning |
+| `pnpm version` | Bump versions from changesets |
+| `pnpm release` | Build + publish packages |
 
 ## Database Schema
 
-The Supabase database includes:
+Supabase PostgreSQL with pgvector. 30+ tables across 15 migration files.
 
-- **users** — User accounts (managed by Supabase Auth)
-- **companies** — Organization accounts
-- **company_members** — User-company membership with roles
-- **company_settings** — Feature flags, configurations per company
-- **estimates** — Estimation records
-- **estimate_items** — Line items within estimates
-- **pricing_history** — Historical pricing for ML training
-- **change_orders** — Change order records
-- **audit_log** — Compliance and audit trail
+### Core Tables
+
+| Table | Purpose |
+|-------|---------|
+| `estimates` | Estimation records (number, client, status, totals, tier) |
+| `estimate_line_items` | Line items per estimate (qty, unit price, extended price) |
+| `estimate_change_orders` | Change order tracking (cost impact, status) |
+| `estimate_versions` | Estimate revision history |
+| `estimate_reminders` | Follow-up notification scheduling |
+| `estimate_templates` | Reusable estimate templates |
+| `estimate_embeddings` | pgvector embeddings for similarity search |
+| `clients` | Client contact records |
+| `team_members` | Internal staff with roles |
+| `products` | Material catalog (SKUs for HD/Lowe's, tiered pricing) |
+| `pricing_history` | Historical pricing by source (hd/lowes/invoice) |
+| `unified_pricing` | Latest price rollup with freshness |
+| `invoices` | Supplier invoices (OCR, parsed data) |
+| `voice_calls` | Call records (Twilio SID, transcript, extracted data) |
+| `job_actuals` | Actual cost/duration vs estimate |
+| `job_phases` | Project phase tracking |
+
+### Organization & Billing
+
+| Table | Purpose |
+|-------|---------|
+| `organizations` | Multi-tenant orgs |
+| `org_members` | Org membership with roles |
+| `subscriptions` | Stripe subscription state |
+| `billing_plans` | Plan definitions |
+| `company_settings` | Org config + feature flags (JSONB) |
+
+### Operations
+
+| Table | Purpose |
+|-------|---------|
+| `audit_log` | Activity tracking (entity, action, user, changes) |
+| `subcontractors` | Sub contact records |
+| `sub_bids` | Subcontractor bid tracking |
+| `purchase_orders` | PO management |
+| `po_line_items` | PO line items |
+| `daily_logs` | Daily job logs |
+| `time_entries` | Labor time tracking |
+| `job_photos` | Job site photos |
+| `labor_rate_presets` | Labor rate templates |
+| `schedule_templates` | Schedule templates |
+| `selection_sheets` | Material selection sheets |
+| `selection_items` | Selection sheet items |
+| `takeoff_measurements` | Moasure measurement imports |
+| `warranty_items` | Warranty tracking |
+| `integration_connections` | Third-party integration credentials |
 
 See `supabase/migrations/` for complete schema.
 
@@ -243,161 +243,62 @@ See `supabase/migrations/` for complete schema.
 
 ### `@proestimate/shared`
 
-Core types, constants, and utilities shared across all apps.
+Types, constants, and Zod validation schemas shared across all apps.
 
-```bash
-pnpm add @proestimate/shared
-```
-
-Key exports:
-- Types: `Estimate`, `EstimateItem`, `User`, `Company`
-- Constants: `PROJECT_TYPES`, `PRICE_FRESHNESS_THRESHOLDS`
-- Utils: `calculateEstimate()`, `validateEstimate()`
-- Feature flags: `resolveFlags()`, `isFeatureEnabled()`
+- Types: `Estimate`, `EstimateLineItem`, `Client`, `Product`, `TeamMember`, `Organization`
+- Constants: `PROJECT_TYPES`, `PRICE_FRESHNESS_THRESHOLDS`, margin configs, validation checks
+- Validation: Zod schemas for all entities
 
 ### `@proestimate/estimation-engine`
 
-The core estimation calculation engine. Can run on client (read-only) or server (with permission checks).
+Pure calculation functions for estimation.
 
-```bash
-pnpm add @proestimate/estimation-engine
-```
-
-Key exports:
-- `EstimationEngine` — Main class
-- `calculateLineItem()` — Single line calculation
-- `calculateEstimate()` — Full estimate calculation
-- `applyMarginGuardrails()` — Safety constraints
+- `calculateMaterials()`, `calculateLabor()`, `calculateMargins()` — core math
+- `suggestPrice(name)` — fuzzy-match line item name to historical pricing
+- `generateEstimateFromTemplate()`, `generatePackageEstimate()` — template-based generation
+- `applyMarginGuardrails()` — safety constraints on margins
+- Moasure/plans/takeoff importers
+- Validation runner (15-point checklist)
 
 ### `@proestimate/ui`
 
-Shared React UI components built with Shadcn/UI.
+Shared React components and Realtime hooks.
 
-```bash
-pnpm add @proestimate/ui
-```
-
-Key components:
-- `EstimateForm`, `EstimateViewer` — Estimate UI
-- `ProjectSelector`, `LineItemInput` — Input components
-- `EstimateTable`, `SummaryCard` — Display components
-- `LoadingSpinner`, `ErrorBoundary` — Utilities
+- Components: `Button`, `Badge`, `Card`, `Modal`, `EmptyState`, `StatusBadge`
+- Realtime: `useTableSync`, `useRealtimeRow`, `useRealtimePresence` hooks
 
 ### `@proestimate/tsconfig`
 
-Shared TypeScript configuration.
+Shared TypeScript configs for nextjs, electron, react-library, and base targets.
 
-```bash
-pnpm add -D @proestimate/tsconfig
-```
+## Architecture Decisions
 
-## Feature Flags
+See `docs/adr/` for detailed records:
 
-Feature flags are stored in `company_settings.feature_flags` (JSON) in Supabase. They enable gradual rollouts and A/B testing.
+1. **Monorepo with Turbo + pnpm** — shared code across 3 platforms
+2. **Supabase as Backend** — Postgres + RLS + pgvector + Realtime
+3. **Shared Estimation Engine** — extracted calculation logic into a package
+4. **Cross-Platform Strategy** — web + desktop + mobile approach
 
-```typescript
-import { resolveFlags, isFeatureEnabled } from '@proestimate/shared';
+## Auth
 
-const flags = resolveFlags(remoteFlags);
+Email/password via Supabase Auth. Domain restriction to `@northmshomepros.com` enforced client-side. Web middleware checks `sb-*-auth-token` cookie. Desktop handles auth callbacks via `proestimate://auth/callback` deep link.
 
-if (isFeatureEnabled(flags, 'voice_ai')) {
-  // Show "Call Alex" button
-}
-```
+## Testing
 
-Available flags:
-- `voice_ai` — Voice AI enabled
-- `dark_mode` — Dark mode UI
-- `ml_pricing` — ML pricing suggestions
-- `ocr_invoices` — Invoice OCR processing
-- `mobile_app` — Mobile app access
-- `multi_tier` — Multi-tier estimates
-- `realtime_collab` — Real-time collaboration
-- `document_export` — PDF/DOCX export
-- `analytics` — Analytics dashboard
-- `change_orders` — Change order workflow
+- **Unit tests**: 594+ tests (Vitest) across web app and packages
+- **E2E tests**: Playwright for web + desktop
+- All tests passing as of latest build
 
-## Architecture Decision Records
+## Deployment
 
-See `docs/adr/` for detailed decisions on:
-
-1. **Monorepo Strategy** — Why Turbo + pnpm
-2. **Supabase Backend** — Why Postgres + RLS + pgvector
-3. **Shared Estimation Engine** — Why extracting logic into a package
-4. **Cross-Platform Approach** — Why web + desktop + mobile
-
-## Contributing
-
-1. **Branch naming** — `feature/`, `fix/`, `docs/`
-2. **Commits** — Use conventional commits (`feat:`, `fix:`, `docs:`)
-3. **Pull Requests** — Target `develop` branch, request review
-4. **Code Style** — Prettier + ESLint (run `pnpm format && pnpm lint`)
-
-## Deployment Checklist
-
-Before deploying to production:
-
-- [ ] All tests pass (`pnpm test`)
-- [ ] No TypeScript errors (`pnpm type-check`)
-- [ ] Environment variables set (check Vercel/GitHub Secrets)
-- [ ] Database migrations applied
-- [ ] Feature flags configured in Supabase
-- [ ] Changelog updated
-- [ ] Version bumped in `package.json`
-
-## Troubleshooting
-
-### `pnpm install` fails
-
-```bash
-# Clear cache and reinstall
-pnpm store prune
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
-```
-
-### Supabase connection error
-
-```bash
-# Verify credentials in .env.local
-# Check Supabase project status: https://app.supabase.com
-
-# For local development
-supabase status
-supabase start
-```
-
-### Turbo cache issues
-
-```bash
-# Clear Turbo cache
-pnpm turbo prune --scope='*'
-
-# Rebuild
-pnpm build
-```
-
-### Port already in use
-
-```bash
-# Find process using port 3000
-lsof -i :3000
-kill -9 <PID>
-
-# Or use different port
-PORT=3001 pnpm dev:web
-```
-
-## Support
-
-- **Documentation** — See `docs/` directory
-- **Issues** — GitHub Issues for bugs and features
-- **Discussion** — GitHub Discussions for questions
-- **Team** — Slack channel #proestimate-dev
+- **Web**: Vercel (auto-deploy on push to main) at mhpestimate.cloud
+- **Desktop**: Electron Builder → macOS dmg
+- **Mobile**: Expo EAS Build + Submit
 
 ## License
 
-Proprietary — MS Home Pros
+Proprietary — MHP Construction
 
 ---
 

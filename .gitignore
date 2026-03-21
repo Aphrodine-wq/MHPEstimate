@@ -68,3 +68,4 @@ yarn-error.log*
 *.tsbuildinfo
 .~lock.*
 .next-dev/
+.aeon-baseline.json
