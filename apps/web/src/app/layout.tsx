@@ -1,4 +1,3 @@
-import type { JSX, ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -28,7 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }): JSX.Element {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
