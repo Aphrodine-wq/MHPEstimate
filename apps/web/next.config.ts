@@ -3,7 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  distDir: ".next",
   outputFileTracingRoot: path.join(__dirname, "../../"),
   transpilePackages: ["@proestimate/ui", "@proestimate/shared"],
   experimental: {
